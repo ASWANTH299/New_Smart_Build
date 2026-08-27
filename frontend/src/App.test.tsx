@@ -11,7 +11,7 @@ describe("Application Shell & Navigation (Phase 3)", () => {
     render(<App />);
     expect(screen.getByText(/Sign In to Your Workspace/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Email Address/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Password/i)).toBeInTheDocument();
   });
 
   it("renders workspace branding and title", () => {

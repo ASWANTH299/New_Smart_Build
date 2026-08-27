@@ -1,19 +1,21 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Lock, UserCheck } from "lucide-react";
 import { Input } from "../../components/ui/Input.js";
 import { Button } from "../../components/ui/Button.js";
 import { useToast } from "../../hooks/useToast.js";
+import authService from "../../services/authService.js";
 
 export const ActivateAccountPage: React.FC = () => {
-  const [activationCode, setActivationCode] = useState("");
+  const [searchParams] = useSearchParams();
+  const [activationCode, setActivationCode] = useState(() => searchParams.get("token") || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { showError, showSuccess } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activationCode) {
       showError("Validation Error", "Please provide your activation code from your invite email.");
@@ -29,11 +31,18 @@ export const ActivateAccountPage: React.FC = () => {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await authService.activateAccount(activationCode, password);
       showSuccess("Account Activated", "Your account is active. You may now log in.");
       navigate("/login");
-    }, 400);
+    } catch (error) {
+      showError(
+        "Activation Failed",
+        error instanceof Error ? error.message : "Unable to activate account. Code may be invalid or expired."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -46,15 +55,17 @@ export const ActivateAccountPage: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Input
-          label="Activation Code"
-          type="text"
-          required
-          placeholder="e.g. ACT-98421"
-          value={activationCode}
-          onChange={(e) => setActivationCode(e.target.value)}
-          leftIcon={<UserCheck className="w-4 h-4" />}
-        />
+        {!searchParams.get("token") && (
+          <Input
+            label="Activation Code"
+            type="text"
+            required
+            placeholder="e.g. ACT-98421 or invitation token"
+            value={activationCode}
+            onChange={(e) => setActivationCode(e.target.value)}
+            leftIcon={<UserCheck className="w-4 h-4" />}
+          />
+        )}
 
         <Input
           label="Set Password"
@@ -64,6 +75,7 @@ export const ActivateAccountPage: React.FC = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           leftIcon={<Lock className="w-4 h-4" />}
+          helperText="Minimum 8 characters with letters and numbers"
         />
 
         <Input

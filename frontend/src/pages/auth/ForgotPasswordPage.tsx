@@ -3,20 +3,32 @@ import { Link } from "react-router-dom";
 import { Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { Input } from "../../components/ui/Input.js";
 import { Button } from "../../components/ui/Button.js";
+import { useToast } from "../../hooks/useToast.js";
+import authService from "../../services/authService.js";
 
 export const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { showError, showSuccess } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
+
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await authService.forgotPassword(email);
       setIsSubmitted(true);
-    }, 400);
+      showSuccess("Instructions Dispatched", "Password reset instructions have been generated.");
+    } catch (error) {
+      showError(
+        "Request Failed",
+        error instanceof Error ? error.message : "Unable to request password reset."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -54,6 +66,7 @@ export const ForgotPasswordPage: React.FC = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             leftIcon={<Mail className="w-4 h-4" />}
+            autoComplete="email"
           />
 
           <Button type="submit" variant="primary" className="w-full" isLoading={isLoading}>

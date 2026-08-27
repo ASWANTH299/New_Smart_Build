@@ -1,20 +1,21 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Lock, Mail } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 import { Input } from "../../components/ui/Input.js";
 import { Button } from "../../components/ui/Button.js";
 import { useAuth } from "../../hooks/useAuth.js";
 import { useToast } from "../../hooks/useToast.js";
-import { UserRole } from "../../types/index.js";
+import authService from "../../services/authService.js";
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [selectedRole, setSelectedRole] = useState<UserRole>("PROJECT_MANAGER");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,20 +25,24 @@ export const LoginPage: React.FC = () => {
     }
 
     setIsLoading(true);
-    // Phase 3 placeholder auth flow (Phase 4 connects to real backend JWT endpoint)
-    setTimeout(() => {
+    try {
+      const response = await authService.login(email, password);
+      if (response.success && response.data) {
+        login(response.data.token, response.data.user);
+        showSuccess("Welcome Back", `Signed in as ${response.data.user.name}`);
+        const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/dashboard";
+        navigate(from, { replace: true });
+      } else {
+        showError("Authentication Failed", response.message || "Invalid credentials.");
+      }
+    } catch (error) {
+      showError(
+        "Sign In Failed",
+        error instanceof Error ? error.message : "Unable to authenticate at this time."
+      );
+    } finally {
       setIsLoading(false);
-      login("dummy_jwt_token_for_phase_3_shell", {
-        id: "usr-001",
-        name: email.split("@")[0].toUpperCase() || "Operations User",
-        email,
-        primaryRole: selectedRole,
-        additionalPermissions: [],
-        status: "ACTIVE",
-      });
-      showSuccess("Welcome Back", "Logged into Smart Build Workspace");
-      navigate("/dashboard");
-    }, 400);
+    }
   };
 
   return (
@@ -56,36 +61,29 @@ export const LoginPage: React.FC = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           leftIcon={<Mail className="w-4 h-4" />}
+          autoComplete="email"
         />
 
         <Input
           label="Password"
-          type="password"
+          type={showPassword ? "text" : "password"}
           required
           placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           leftIcon={<Lock className="w-4 h-4" />}
+          rightIcon={
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="text-slate-400 hover:text-slate-600 focus:outline-none"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          }
+          autoComplete="current-password"
         />
-
-        {/* Phase 3 Role Preview Selector */}
-        <div className="space-y-1.5 pt-1">
-          <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-            Workspace Role (Phase 3 Shell Preview)
-          </label>
-          <select
-            value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value as UserRole)}
-            className="block w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs text-slate-800 focus:bg-white focus:border-brand-500 focus:outline-none"
-          >
-            <option value="ADMIN">ADMIN (Full Access)</option>
-            <option value="PROJECT_MANAGER">PROJECT_MANAGER (PM Suite)</option>
-            <option value="SITE_ENGINEER">SITE_ENGINEER (Field Operations)</option>
-            <option value="STORE_MANAGER">STORE_MANAGER (Inventory)</option>
-            <option value="CONTRACTOR">CONTRACTOR (Work Orders)</option>
-            <option value="CLIENT">CLIENT (Portal View)</option>
-          </select>
-        </div>
 
         <div className="flex items-center justify-between text-xs pt-1">
           <Link

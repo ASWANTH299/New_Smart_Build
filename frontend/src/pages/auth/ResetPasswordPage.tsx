@@ -1,20 +1,27 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Lock, CheckCircle2 } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Lock, CheckCircle2, KeyRound } from "lucide-react";
 import { Input } from "../../components/ui/Input.js";
 import { Button } from "../../components/ui/Button.js";
 import { useToast } from "../../hooks/useToast.js";
+import authService from "../../services/authService.js";
 
 export const ResetPasswordPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const [token, setToken] = useState(() => searchParams.get("token") || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const { showError } = useToast();
+  const { showError, showSuccess } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!token) {
+      showError("Validation Error", "Reset token is required.");
+      return;
+    }
     if (password.length < 8) {
       showError("Validation Error", "Password must be at least 8 characters long.");
       return;
@@ -25,10 +32,18 @@ export const ResetPasswordPage: React.FC = () => {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await authService.resetPassword(token, password);
       setIsSuccess(true);
-    }, 400);
+      showSuccess("Password Reset", "Your password has been updated successfully.");
+    } catch (error) {
+      showError(
+        "Reset Failed",
+        error instanceof Error ? error.message : "Unable to reset password. Token may be expired."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -54,6 +69,18 @@ export const ResetPasswordPage: React.FC = () => {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+          {!searchParams.get("token") && (
+            <Input
+              label="Reset Token"
+              type="text"
+              required
+              placeholder="Paste the reset token from your email"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              leftIcon={<KeyRound className="w-4 h-4" />}
+            />
+          )}
+
           <Input
             label="New Password"
             type="password"
