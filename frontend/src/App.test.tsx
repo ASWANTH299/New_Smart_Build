@@ -1,21 +1,40 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import App from "./App.js";
 
-describe("Frontend Foundation (Phase 1)", () => {
-  it("renders the Smart Build title and baseline badge", () => {
-    render(<App />);
-    expect(screen.getByText("Smart Build")).toBeInTheDocument();
-    expect(screen.getByText("V1 Baseline")).toBeInTheDocument();
+describe("Application Shell & Navigation (Phase 3)", () => {
+  beforeEach(() => {
+    localStorage.clear();
   });
 
-  it("renders the overview heading and architecture cards", () => {
+  it("redirects unauthenticated user to /login by default", async () => {
     render(<App />);
-    expect(
-      screen.getByText("Construction Project & Resource Management")
-    ).toBeInTheDocument();
-    expect(screen.getByText("Frontend Foundation")).toBeInTheDocument();
-    expect(screen.getByText("Backend Foundation")).toBeInTheDocument();
-    expect(screen.getByText("Security & Isolation")).toBeInTheDocument();
+    expect(screen.getByText(/Sign In to Your Workspace/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Email Address/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
+  });
+
+  it("renders workspace branding and title", () => {
+    render(<App />);
+    expect(screen.getAllByText(/Smart Build/i).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("renders authenticated application shell when user is logged in", () => {
+    localStorage.setItem("smart_build_token", "test-token");
+    localStorage.setItem(
+      "smart_build_user",
+      JSON.stringify({
+        id: "usr-1",
+        name: "Vikram Engineer",
+        email: "vikram@smartbuild.com",
+        primaryRole: "PROJECT_MANAGER",
+        additionalPermissions: [],
+        status: "ACTIVE",
+      })
+    );
+
+    render(<App />);
+    expect(screen.getByText(/Operations Dashboard/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Vikram Engineer/i).length).toBeGreaterThanOrEqual(1);
   });
 });

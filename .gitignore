@@ -41,3 +41,8 @@ test-results/
 *.sw?
 .DS_Store
 Thumbs.db
+
+
+
+# Ignore local agent rules
+.agents/

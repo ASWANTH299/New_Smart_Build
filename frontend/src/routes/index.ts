@@ -1,2 +1,3 @@
-// Route registry and navigation definitions - Initialized in Phase 3
-export {};
+export * from "./AppRoutes.js";
+export * from "./ProtectedRoute.js";
+export * from "./PublicRoute.js";
