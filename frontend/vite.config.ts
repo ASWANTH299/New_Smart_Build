@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react";
 import path from "node:path";
 import fs from "node:fs";
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   // Check current directory first, then root directory for monorepo .env
   const rootDir = fs.existsSync(path.resolve(process.cwd(), ".env"))
     ? process.cwd()
@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
   };
 
   const vitePort = env.VITE_PORT;
-  if (!vitePort && mode !== "test") {
+  if (!vitePort && command === "serve" && mode !== "test") {
     throw new Error("Missing required environment variable: VITE_PORT");
   }
 

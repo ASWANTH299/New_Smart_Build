@@ -1,42 +1,54 @@
 import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
+import config from "./config/index.js";
+import { correlationIdMiddleware } from "./middleware/correlationId.js";
+import { requestLoggerMiddleware } from "./middleware/requestLogger.js";
+import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
+import apiV1Router from "./routes/index.js";
+import { sendSuccess } from "./utils/apiResponse.js";
 
 export const createApp = (): Express => {
-  const clientUrl = process.env.CLIENT_URL;
-  if (!clientUrl) {
-    throw new Error("Missing required environment variable: CLIENT_URL");
-  }
-
   const app = express();
 
-  // Security & Cross-Cutting Middleware
+  // 1. Request Tracking & Correlation ID
+  app.use(correlationIdMiddleware);
+
+  // 2. Security Headers & CORS
   app.use(helmet());
   app.use(
     cors({
-      origin: clientUrl,
+      origin: config.CLIENT_URL,
       credentials: true,
     })
   );
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
 
-  // Baseline Root Route
+  // 3. Body Parsing
+  app.use(express.json({ limit: "10mb" }));
+  app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+  // 4. Structured Request Logging
+  app.use(requestLoggerMiddleware);
+
+  // 5. Root Baseline Route
   app.get("/", (_req: Request, res: Response) => {
-    res.status(200).json({
+    return sendSuccess(res, {
       name: "Smart Build API",
       version: "1.0.0",
       status: "online",
+      environment: config.NODE_ENV,
+      apiPrefix: "/api/v1",
     });
   });
 
-  // Base API v1 status
-  app.get("/api/v1", (_req: Request, res: Response) => {
-    res.status(200).json({
-      success: true,
-      message: "Smart Build API v1 baseline operational",
-    });
-  });
+  // 6. Mount API v1 Routers
+  app.use("/api/v1", apiV1Router);
+
+  // 7. 404 Not Found Handler
+  app.use(notFoundHandler);
+
+  // 8. Centralized Error Handler (must be last)
+  app.use(errorHandler);
 
   return app;
 };
