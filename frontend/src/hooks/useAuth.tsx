@@ -86,13 +86,22 @@ export const usePermissions = () => {
   const hasPermission = (permission: string): boolean => {
     if (!user) return false;
     if (user.primaryRole === "ADMIN") return true;
+    if (user.effectivePermissions?.includes(permission)) return true;
     return user.additionalPermissions?.includes(permission) || false;
+  };
+
+  const hasAnyPermission = (permissions: string[]): boolean => {
+    if (!user) return false;
+    if (user.primaryRole === "ADMIN") return true;
+    return permissions.some((p) => hasPermission(p));
   };
 
   return {
     userRole: user?.primaryRole,
     hasRole,
     hasPermission,
+    hasAnyPermission,
+    effectivePermissions: user?.effectivePermissions || [],
     isAdmin: user?.primaryRole === "ADMIN",
     isProjectManager: user?.primaryRole === "PROJECT_MANAGER",
     isSiteEngineer: user?.primaryRole === "SITE_ENGINEER",

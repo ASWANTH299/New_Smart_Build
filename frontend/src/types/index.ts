@@ -12,7 +12,8 @@ export interface User {
   email: string;
   primaryRole: UserRole;
   additionalPermissions: string[];
-  status: "ACTIVE" | "DEACTIVATED" | "LOCKED";
+  effectivePermissions?: string[];
+  status: "ACTIVE" | "DEACTIVATED" | "LOCKED" | "PENDING_ACTIVATION";
 }
 
 export interface ProjectContextType {

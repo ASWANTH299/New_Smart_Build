@@ -13,6 +13,8 @@ import {
   NotFoundError,
 } from "../../utils/AppError.js";
 
+import { getEffectivePermissions } from "./permissions.js";
+
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 
@@ -22,6 +24,7 @@ export interface UserResponse {
   email: string;
   primaryRole: string;
   additionalPermissions: string[];
+  effectivePermissions: string[];
   status: string;
   lastLoginAt?: Date | null;
 }
@@ -32,6 +35,7 @@ export const sanitizeUser = (user: IUser): UserResponse => ({
   email: user.email,
   primaryRole: user.primaryRole,
   additionalPermissions: user.additionalPermissions || [],
+  effectivePermissions: Array.from(getEffectivePermissions(user)),
   status: user.status,
   lastLoginAt: user.lastLoginAt,
 });

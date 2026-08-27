@@ -27,9 +27,9 @@ interface NavItemConfig {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
-  const { isAdmin, isClient } = usePermissions();
+  const { userRole, isAdmin, isClient } = usePermissions();
 
-  const navigation: NavItemConfig[] = [
+  const allNavigation: NavItemConfig[] = [
     {
       name: "Dashboard",
       href: "/dashboard",
@@ -77,6 +77,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         ]
       : []),
   ];
+
+  const navigation = allNavigation.filter((item) => {
+    if (!item.roles || item.roles.length === 0) return true;
+    if (isAdmin) return true;
+    return userRole && item.roles.includes(userRole);
+  });
 
   return (
     <>
