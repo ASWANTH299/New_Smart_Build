@@ -7,6 +7,7 @@ export interface Column<T> {
   key: string;
   header: string;
   render?: (row: T) => React.ReactNode;
+  accessor?: (row: T) => React.ReactNode;
   className?: string;
   align?: "left" | "center" | "right";
 }
@@ -14,7 +15,7 @@ export interface Column<T> {
 export interface DataTableProps<T> {
   columns: Column<T>[];
   data: T[];
-  keyExtractor: (row: T) => string | number;
+  keyExtractor?: (row: T) => string | number;
   isLoading?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
@@ -26,7 +27,10 @@ export interface DataTableProps<T> {
 export function DataTable<T>({
   columns,
   data,
-  keyExtractor,
+  keyExtractor = (item: T) => {
+    const row = item as Record<string, unknown>;
+    return String(row._id || row.id || Math.random());
+  },
   isLoading = false,
   emptyTitle = "No records found",
   emptyDescription = "No data matches your current criteria.",
@@ -48,23 +52,22 @@ export function DataTable<T>({
         title={emptyTitle}
         description={emptyDescription}
         action={emptyAction}
-        className={className}
       />
     );
   }
 
   return (
-    <div className={cn("overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card", className)}>
+    <div className={cn("w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card", className)}>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200 text-left text-xs sm:text-sm">
-          <thead className="bg-slate-50">
+        <table className="w-full text-left text-xs sm:text-sm">
+          <thead className="border-b border-slate-200 bg-slate-50 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
                   scope="col"
                   className={cn(
-                    "px-4 py-3 font-semibold uppercase tracking-wider text-slate-600 text-[11px]",
+                    "px-4 py-3",
                     col.align === "center" && "text-center",
                     col.align === "right" && "text-right",
                     col.className
@@ -99,7 +102,11 @@ export function DataTable<T>({
                           col.className
                         )}
                       >
-                        {col.render ? col.render(row) : (cellValue as React.ReactNode)}
+                        {col.render
+                          ? col.render(row)
+                          : col.accessor
+                          ? col.accessor(row)
+                          : (cellValue as React.ReactNode)}
                       </td>
                     );
                   })}

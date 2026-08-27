@@ -13,6 +13,12 @@ import {
   ActivateAccountPage,
   DashboardPage,
   ProjectsPage,
+  CreateProjectPage,
+  ProjectOverviewPage,
+  EditProjectPage,
+  UsersPage,
+  UserDetailPage,
+  EditUserPage,
   NotFoundPage,
   PermissionDeniedPage,
 } from "../pages/index.js";
@@ -56,13 +62,70 @@ export const AppRoutes: React.FC = () => {
       >
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+
+        {/* Project Routes */}
         <Route path="/projects" element={<ProjectsPage />} />
+        <Route
+          path="/projects/new"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN", "PROJECT_MANAGER"]}>
+              <CreateProjectPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/projects/:projectId" element={<ProjectOverviewPage />} />
+        <Route
+          path="/projects/:projectId/edit"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN", "PROJECT_MANAGER"]}>
+              <EditProjectPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin Organization & User Directory */}
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <UsersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/users/:userId"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <UserDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/users/:userId/edit"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <EditUserPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Settings Route */}
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <UsersPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Module Placeholders */}
         <Route
           path="/operations"
           element={
             <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-card">
               <h2 className="text-lg font-bold text-slate-900">Site Operations Module</h2>
-              <p className="text-xs text-slate-500 mt-1">Foundation shell ready for Phase 6.</p>
+              <p className="text-xs text-slate-500 mt-1">Foundation shell ready for subsequent phases.</p>
             </div>
           }
         />
@@ -71,7 +134,7 @@ export const AppRoutes: React.FC = () => {
           element={
             <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-card">
               <h2 className="text-lg font-bold text-slate-900">Materials & Inventory Module</h2>
-              <p className="text-xs text-slate-500 mt-1">Foundation shell ready for Phase 7.</p>
+              <p className="text-xs text-slate-500 mt-1">Foundation shell ready for subsequent phases.</p>
             </div>
           }
         />
@@ -80,21 +143,11 @@ export const AppRoutes: React.FC = () => {
           element={
             <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-card">
               <h2 className="text-lg font-bold text-slate-900">Quality & Safety Module</h2>
-              <p className="text-xs text-slate-500 mt-1">Foundation shell ready for Phase 8.</p>
+              <p className="text-xs text-slate-500 mt-1">Foundation shell ready for subsequent phases.</p>
             </div>
           }
         />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
-              <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-card">
-                <h2 className="text-lg font-bold text-slate-900">System Admin Settings</h2>
-                <p className="text-xs text-slate-500 mt-1">Administrator controls ready for Phase 11.</p>
-              </div>
-            </ProtectedRoute>
-          }
-        />
+
         <Route path="/permission-denied" element={<PermissionDeniedPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

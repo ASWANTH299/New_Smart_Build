@@ -14,6 +14,7 @@ export interface User {
   additionalPermissions: string[];
   effectivePermissions?: string[];
   status: "ACTIVE" | "DEACTIVATED" | "LOCKED" | "PENDING_ACTIVATION";
+  lastLoginAt?: string | Date | null;
 }
 
 export interface ProjectContextType {

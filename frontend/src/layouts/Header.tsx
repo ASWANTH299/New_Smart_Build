@@ -1,9 +1,8 @@
 import React from "react";
-import { Menu, LogOut, User, FolderKanban } from "lucide-react";
+import { Menu, LogOut, User } from "lucide-react";
 import { useAuth } from "../hooks/useAuth.js";
-import { useProjectContext } from "../hooks/useProjectContext.js";
-import { StatusBadge } from "../components/ui/StatusBadge.js";
 import { Button } from "../components/ui/Button.js";
+import { ProjectSwitcher } from "../components/ProjectSwitcher.js";
 
 export interface HeaderProps {
   onToggleSidebar: () => void;
@@ -11,7 +10,6 @@ export interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const { user, logout } = useAuth();
-  const { activeProject } = useProjectContext();
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6">
@@ -25,18 +23,9 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           <Menu className="w-5 h-5" />
         </button>
 
-        {/* Project Context Display */}
-        <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-slate-200">
-          <FolderKanban className="w-4 h-4 text-brand-600" />
-          <span className="text-xs text-slate-500 font-medium">Active Project:</span>
-          {activeProject ? (
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-900">{activeProject.name}</span>
-              <StatusBadge status={activeProject.health.toLowerCase()} size="sm" />
-            </div>
-          ) : (
-            <span className="text-xs font-medium text-slate-400 italic">All Projects Overview</span>
-          )}
+        {/* Project Context Switcher */}
+        <div className="hidden sm:flex items-center pl-2 border-l border-slate-200">
+          <ProjectSwitcher />
         </div>
       </div>
 
