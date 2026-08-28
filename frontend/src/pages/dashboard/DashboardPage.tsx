@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   FolderKanban,
-  CheckSquare,
-  Package,
-  ShieldCheck,
+  CheckCircle2,
+  AlertTriangle,
+  Activity,
   Plus,
   ArrowRight,
-  TrendingUp,
+  MapPin,
+  Calendar,
 } from "lucide-react";
 import { PageHeader } from "../../components/ui/PageHeader.js";
 import { Metric } from "../../components/ui/Metric.js";
@@ -15,83 +16,63 @@ import { Card } from "../../components/ui/Card.js";
 import { Button } from "../../components/ui/Button.js";
 import { StatusBadge } from "../../components/ui/StatusBadge.js";
 import { ProgressIndicator } from "../../components/ui/ProgressIndicator.js";
-import { useAuth } from "../../hooks/useAuth.js";
+import { LoadingState } from "../../components/ui/LoadingState.js";
+import { EmptyState } from "../../components/ui/EmptyState.js";
+import { useAuth, usePermissions } from "../../hooks/useAuth.js";
+import { projectService, ProjectDetail } from "../../services/projectService.js";
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
+  const { isAdmin, isProjectManager } = usePermissions();
+  const [projects, setProjects] = useState<ProjectDetail[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const mockProjects = [
-    {
-      id: "PRJ-001",
-      name: "Metro Tower Phase 2",
-      client: "Urban Skyline Developers",
-      status: "active",
-      progress: 68,
-      plannedQty: 1200,
-      completedQty: 816,
-      unit: "m³ Concrete",
-      endDate: "Dec 2026",
-    },
-    {
-      id: "PRJ-002",
-      name: "Highway Overpass Sector 4",
-      client: "National Infrastructure Corp",
-      status: "active",
-      progress: 42,
-      plannedQty: 4500,
-      completedQty: 1890,
-      unit: "m Asphalting",
-      endDate: "Mar 2027",
-    },
-    {
-      id: "PRJ-003",
-      name: "Greenfield Commercial Park",
-      client: "Apex Real Estate Holdings",
-      status: "risk",
-      progress: 25,
-      plannedQty: 800,
-      completedQty: 200,
-      unit: "Tons Steel",
-      endDate: "Aug 2027",
-    },
-  ];
+  useEffect(() => {
+    let isMounted = true;
+    const fetchDashboardData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await projectService.getProjects({ limit: 10 });
+        if (isMounted && res.success && res.data) {
+          setProjects(res.data);
+        }
+      } catch {
+        // Fallback gracefully on network/unauthenticated
+        if (isMounted) {
+          setProjects([]);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
 
-  const mockActivities = [
-    {
-      id: 1,
-      title: "Daily Log submitted for Metro Tower Phase 2",
-      time: "25 minutes ago",
-      author: "Site Eng. Sharma",
-      tag: "Log",
-    },
-    {
-      id: 2,
-      title: "Material Dispatch: 400 Bags Grade 53 Cement",
-      time: "1 hour ago",
-      author: "Store Mgr. Verma",
-      tag: "Inventory",
-    },
-    {
-      id: 3,
-      title: "Safety Audit cleared: Zero Critical NCRs",
-      time: "3 hours ago",
-      author: "Safety Officer Patil",
-      tag: "Quality",
-    },
-    {
-      id: 4,
-      title: "Milestone B-2 Foundation Pour Completed",
-      time: "Yesterday at 17:30",
-      author: "PM Mukherjee",
-      tag: "Milestone",
-    },
-  ];
+    fetchDashboardData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const totalProjects = projects.length;
+  const activeProjects = projects.filter((p) => p.status === "ACTIVE");
+  const healthyProjects = projects.filter((p) => p.health === "HEALTHY");
+  const atRiskProjects = projects.filter((p) => p.health === "AT_RISK" || p.health === "CRITICAL");
+  const avgProgress =
+    activeProjects.length > 0
+      ? Math.round(
+          activeProjects.reduce((acc, curr) => acc + (curr.progress || 0), 0) /
+            activeProjects.length
+        )
+      : 0;
+
+  const canCreateProject = isAdmin || isProjectManager;
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`Operations Dashboard`}
-        description={`Welcome, ${user?.name || "Team Member"}. Construction operations overview and operational status.`}
+        title="Operations Dashboard"
+        description={`Welcome, ${user?.name || "Team Member"}. Construction operations overview and active workspace status.`}
         actions={
           <div className="flex items-center gap-2.5">
             <Link to="/projects">
@@ -99,8 +80,8 @@ export const DashboardPage: React.FC = () => {
                 View All Projects
               </Button>
             </Link>
-            {user?.primaryRole !== "CLIENT" && (
-              <Link to="/projects">
+            {canCreateProject && (
+              <Link to="/projects/new">
                 <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />}>
                   New Project
                 </Button>
@@ -110,40 +91,37 @@ export const DashboardPage: React.FC = () => {
         }
       />
 
-      {/* Metric Cards Row */}
+      {/* Real Metric Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Metric
-          label="Active Projects"
-          value="12"
-          subtext="Across 4 operational sectors"
-          trend={{ value: "+2 this quarter", isPositive: true }}
+          label="Total Projects"
+          value={isLoading ? "..." : totalProjects}
+          subtext="Assigned construction workspaces"
           icon={<FolderKanban className="w-5 h-5" />}
         />
         <Metric
-          label="Open Tasks Today"
-          value="38"
-          subtext="8 high priority work orders"
-          trend={{ value: "92% completion rate", isPositive: true }}
-          icon={<CheckSquare className="w-5 h-5" />}
+          label="Active Projects"
+          value={isLoading ? "..." : activeProjects.length}
+          subtext="Currently in active execution"
+          icon={<Activity className="w-5 h-5" />}
         />
         <Metric
-          label="Material Requests"
-          value="6"
-          subtext="Pending store verification"
-          icon={<Package className="w-5 h-5" />}
+          label="Average Progress"
+          value={isLoading ? "..." : `${avgProgress}%`}
+          subtext="Active projects weighted average"
+          icon={<CheckCircle2 className="w-5 h-5" />}
         />
         <Metric
-          label="Safety Compliance"
-          value="100%"
-          subtext="0 lost-time incidents (30d)"
-          trend={{ value: "All Clear", isPositive: true }}
-          icon={<ShieldCheck className="w-5 h-5" />}
+          label="Project Health"
+          value={isLoading ? "..." : `${healthyProjects.length} Healthy`}
+          subtext={atRiskProjects.length > 0 ? `${atRiskProjects.length} At Risk / Critical` : "All schedules on track"}
+          icon={<AlertTriangle className="w-5 h-5" />}
         />
       </div>
 
       {/* Main Two-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Active Projects Status Overview */}
+        {/* Real Active Projects Section */}
         <div className="lg:col-span-2 space-y-4">
           <Card
             title="Active Construction Projects"
@@ -158,73 +136,109 @@ export const DashboardPage: React.FC = () => {
               </Link>
             }
           >
-            <div className="divide-y divide-slate-100">
-              {mockProjects.map((project) => (
-                <div key={project.id} className="py-4 first:pt-0 last:pb-0 space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-500 font-mono">{project.id}</span>
-                        <h4 className="text-sm font-semibold text-slate-900">{project.name}</h4>
+            {isLoading ? (
+              <LoadingState message="Loading projects..." />
+            ) : projects.length === 0 ? (
+              <EmptyState
+                title="No Construction Projects Found"
+                description={
+                  canCreateProject
+                    ? "Get started by creating your first construction project to begin tracking progress and milestones."
+                    : "You do not have any active project assignments yet."
+                }
+                action={
+                  canCreateProject ? (
+                    <Link to="/projects/new">
+                      <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />}>
+                        Create Project
+                      </Button>
+                    </Link>
+                  ) : undefined
+                }
+              />
+            ) : (
+              <div className="divide-y divide-slate-100">
+                {projects.map((project) => (
+                  <div key={project._id} className="py-4 first:pt-0 last:pb-0 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-500 font-mono">
+                            {project.code}
+                          </span>
+                          <Link
+                            to={`/projects/${project._id}`}
+                            className="text-sm font-semibold text-slate-900 hover:text-brand-600 transition-colors"
+                          >
+                            {project.name}
+                          </Link>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-slate-500 mt-0.5">
+                          <span className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            {project.location}
+                          </span>
+                          {project.plannedEndDate && (
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              Target: {new Date(project.plannedEndDate).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <p className="text-xs text-slate-500">{project.client}</p>
+                      <div className="flex items-center gap-2 mt-2 sm:mt-0">
+                        <StatusBadge status={project.health} size="sm" />
+                        <StatusBadge status={project.status} size="sm" />
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <StatusBadge status={project.status} size="sm" />
-                      <span className="text-xs text-slate-500 font-medium">Target: {project.endDate}</span>
-                    </div>
-                  </div>
 
-                  <ProgressIndicator
-                    progress={project.progress}
-                    plannedQuantity={project.plannedQty}
-                    completedQuantity={project.completedQty}
-                    unit={project.unit}
-                    size="sm"
-                  />
-                </div>
-              ))}
-            </div>
+                    <ProgressIndicator
+                      progress={project.progress || 0}
+                      size="sm"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </Card>
         </div>
 
-        {/* Recent Operational Feed */}
+        {/* Phase 6/7 Operational Intelligence Card */}
         <div className="space-y-4">
           <Card
-            title="Site Operations Feed"
-            subtitle="Recent logs, inspections & material updates"
+            title="Operational Overview"
+            subtitle="Platform readiness & phase status"
           >
-            <div className="flow-root">
-              <ul className="-mb-8">
-                {mockActivities.map((activity, idx) => (
-                  <li key={activity.id}>
-                    <div className="relative pb-8">
-                      {idx !== mockActivities.length - 1 && (
-                        <span
-                          className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-slate-200"
-                          aria-hidden="true"
-                        />
-                      )}
-                      <div className="relative flex space-x-3">
-                        <div>
-                          <span className="h-8 w-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600">
-                            <TrendingUp className="w-4 h-4 text-brand-600" />
-                          </span>
-                        </div>
-                        <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1">
-                          <div>
-                            <p className="text-xs font-semibold text-slate-800">{activity.title}</p>
-                            <p className="text-[11px] text-slate-500 mt-0.5">By {activity.author}</p>
-                          </div>
-                          <div className="whitespace-nowrap text-right text-[10px] text-slate-400">
-                            {activity.time}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+            <div className="space-y-3 text-xs text-slate-600">
+              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-1.5">
+                <div className="flex items-center justify-between font-semibold text-slate-800">
+                  <span>Project & Team Foundation</span>
+                  <span className="text-emerald-700 font-bold">Phase 6</span>
+                </div>
+                <p className="text-slate-500 text-[11px]">
+                  User management, RBAC authorization, and project memberships are active.
+                </p>
+              </div>
+
+              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-1.5">
+                <div className="flex items-center justify-between font-semibold text-slate-800">
+                  <span>Progress & Milestone Tracking</span>
+                  <span className="text-emerald-700 font-bold">Phase 7</span>
+                </div>
+                <p className="text-slate-500 text-[11px]">
+                  Quantity progress logging, hierarchical rollups, and rule-based health are active.
+                </p>
+              </div>
+
+              <div className="p-3 bg-amber-50/60 rounded-lg border border-amber-200/60 space-y-1.5">
+                <div className="flex items-center justify-between font-semibold text-amber-900">
+                  <span>Materials & Supply Chain</span>
+                  <span className="text-amber-700 font-bold text-[10px] uppercase">Phase 8</span>
+                </div>
+                <p className="text-amber-800/80 text-[11px]">
+                  Material catalog, inventory registers, and GRN workflows unlock in Phase 8.
+                </p>
+              </div>
             </div>
           </Card>
         </div>

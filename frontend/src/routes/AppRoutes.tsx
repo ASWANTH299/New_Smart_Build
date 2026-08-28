@@ -16,9 +16,15 @@ import {
   CreateProjectPage,
   ProjectOverviewPage,
   EditProjectPage,
+  PhasesPage,
+  PhaseDetailPage,
+  TasksPage,
+  TaskDetailPage,
+  MilestonesPage,
   UsersPage,
   UserDetailPage,
   EditUserPage,
+  ProfilePage,
   NotFoundPage,
   PermissionDeniedPage,
 } from "../pages/index.js";
@@ -63,6 +69,9 @@ export const AppRoutes: React.FC = () => {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<DashboardPage />} />
 
+        {/* Global Tasks Direct Route */}
+        <Route path="/tasks" element={<TasksPage />} />
+
         {/* Project Routes */}
         <Route path="/projects" element={<ProjectsPage />} />
         <Route
@@ -82,6 +91,13 @@ export const AppRoutes: React.FC = () => {
             </ProtectedRoute>
           }
         />
+
+        {/* Project Planning Routes */}
+        <Route path="/projects/:projectId/phases" element={<PhasesPage />} />
+        <Route path="/projects/:projectId/phases/:phaseId" element={<PhaseDetailPage />} />
+        <Route path="/projects/:projectId/tasks" element={<TasksPage />} />
+        <Route path="/projects/:projectId/tasks/:taskId" element={<TaskDetailPage />} />
+        <Route path="/projects/:projectId/milestones" element={<MilestonesPage />} />
 
         {/* Admin Organization & User Directory */}
         <Route
@@ -108,6 +124,9 @@ export const AppRoutes: React.FC = () => {
             </ProtectedRoute>
           }
         />
+
+        {/* Account Profile Route */}
+        <Route path="/profile" element={<ProfilePage />} />
 
         {/* Settings Route */}
         <Route

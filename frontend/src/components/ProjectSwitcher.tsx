@@ -37,7 +37,7 @@ export const ProjectSwitcher: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [activeProject, setActiveProject]);
+  }, [setActiveProject]);
 
   const handleSelect = (p: ProjectDetail) => {
     setActiveProject({

@@ -25,7 +25,11 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const addToast = (toast: Omit<ToastItem, "id">) => {
+  const removeToast = React.useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
+  const addToast = React.useCallback((toast: Omit<ToastItem, "id">) => {
     const id = Math.random().toString(36).substring(2, 9);
     const newToast: ToastItem = { ...toast, id };
     setToasts((prev) => [...prev, newToast]);
@@ -34,29 +38,40 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setTimeout(() => {
       removeToast(id);
     }, duration);
-  };
+  }, [removeToast]);
 
-  const removeToast = (id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  };
+  const showSuccess = React.useCallback(
+    (title: string, message?: string) => addToast({ type: "success", title, message }),
+    [addToast]
+  );
+  const showError = React.useCallback(
+    (title: string, message?: string) => addToast({ type: "error", title, message }),
+    [addToast]
+  );
+  const showInfo = React.useCallback(
+    (title: string, message?: string) => addToast({ type: "info", title, message }),
+    [addToast]
+  );
+  const showWarning = React.useCallback(
+    (title: string, message?: string) => addToast({ type: "warning", title, message }),
+    [addToast]
+  );
 
-  const showSuccess = (title: string, message?: string) => addToast({ type: "success", title, message });
-  const showError = (title: string, message?: string) => addToast({ type: "error", title, message });
-  const showInfo = (title: string, message?: string) => addToast({ type: "info", title, message });
-  const showWarning = (title: string, message?: string) => addToast({ type: "warning", title, message });
+  const contextValue = React.useMemo(
+    () => ({
+      toasts,
+      addToast,
+      removeToast,
+      showSuccess,
+      showError,
+      showInfo,
+      showWarning,
+    }),
+    [toasts, addToast, removeToast, showSuccess, showError, showInfo, showWarning]
+  );
 
   return (
-    <ToastContext.Provider
-      value={{
-        toasts,
-        addToast,
-        removeToast,
-        showSuccess,
-        showError,
-        showInfo,
-        showWarning,
-      }}
-    >
+    <ToastContext.Provider value={contextValue}>
       {children}
     </ToastContext.Provider>
   );

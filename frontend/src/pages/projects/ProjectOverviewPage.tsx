@@ -1,14 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   ArrowLeft,
   MapPin,
   RotateCcw,
   CheckCircle2,
+  Layers,
+  CheckSquare,
+  Flag,
+  AlertTriangle,
+  HeartPulse,
 } from "lucide-react";
 import { PageHeader } from "../../components/ui/PageHeader.js";
 import { Card } from "../../components/ui/Card.js";
 import { Metric } from "../../components/ui/Metric.js";
+import { StatusBadge } from "../../components/ui/StatusBadge.js";
 import { ProgressIndicator } from "../../components/ui/ProgressIndicator.js";
 import { Button } from "../../components/ui/Button.js";
 import { Modal } from "../../components/ui/Modal.js";
@@ -22,11 +28,15 @@ import {
   projectService,
   ProjectOverviewData,
 } from "../../services/projectService.js";
+import { phaseService, Phase } from "../../services/phaseService.js";
+import { milestoneService, Milestone } from "../../services/milestoneService.js";
 import { ProjectContextType } from "../../types/index.js";
 
 export const ProjectOverviewPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const [data, setData] = useState<ProjectOverviewData | null>(null);
+  const [phases, setPhases] = useState<Phase[]>([]);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [team, setTeam] = useState<
     Array<{
       membershipId: string;
@@ -43,13 +53,15 @@ export const ProjectOverviewPage: React.FC = () => {
   const { showSuccess, showError } = useToast();
   const { isAdmin, isProjectManager } = usePermissions();
 
-  const loadData = React.useCallback(async () => {
+  const loadData = useCallback(async () => {
     if (!projectId) return;
     setIsLoading(true);
     try {
-      const [overviewRes, teamRes] = await Promise.all([
+      const [overviewRes, teamRes, phasesRes, milestonesRes] = await Promise.all([
         projectService.getProjectOverview(projectId),
         projectService.getProjectTeam(projectId),
+        phaseService.getPhases(projectId),
+        milestoneService.getMilestones(projectId),
       ]);
 
       if (overviewRes.success && overviewRes.data) {
@@ -57,6 +69,12 @@ export const ProjectOverviewPage: React.FC = () => {
       }
       if (teamRes.success && teamRes.data) {
         setTeam(teamRes.data);
+      }
+      if (phasesRes.success && phasesRes.data) {
+        setPhases(phasesRes.data);
+      }
+      if (milestonesRes.success && milestonesRes.data) {
+        setMilestones(milestonesRes.data);
       }
     } catch {
       showError("Error", "Unable to load project workspace details.");
@@ -122,7 +140,7 @@ export const ProjectOverviewPage: React.FC = () => {
         title={`${project.name} (${project.code})`}
         description={project.location}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Button
               variant={isCurrentActive ? "secondary" : "outline"}
               onClick={handleSetCurrentContext}
@@ -148,6 +166,25 @@ export const ProjectOverviewPage: React.FC = () => {
         }
       />
 
+      {/* Quick Access Navigation Bar for Project Modules */}
+      <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200 overflow-x-auto">
+        <Link to={`/projects/${projectId}/phases`} className="shrink-0">
+          <Button variant="outline" size="sm" leftIcon={<Layers className="w-3.5 h-3.5 text-brand-600" />}>
+            Phases ({phases.length})
+          </Button>
+        </Link>
+        <Link to={`/projects/${projectId}/tasks`} className="shrink-0">
+          <Button variant="outline" size="sm" leftIcon={<CheckSquare className="w-3.5 h-3.5 text-brand-600" />}>
+            Tasks & Progress
+          </Button>
+        </Link>
+        <Link to={`/projects/${projectId}/milestones`} className="shrink-0">
+          <Button variant="outline" size="sm" leftIcon={<Flag className="w-3.5 h-3.5 text-brand-600" />}>
+            Milestones ({milestones.length})
+          </Button>
+        </Link>
+      </div>
+
       {/* Overview Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Metric label="Lifecycle Status" value={project.status} />
@@ -159,36 +196,85 @@ export const ProjectOverviewPage: React.FC = () => {
       {/* Progress & Specifications */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card title="Construction Progress & Milestone Status">
+          <Card title="Construction Progress Rollup">
             <div className="space-y-4">
-              <ProgressIndicator progress={project.progress || 0} size="lg" />
-              <div className="text-xs text-slate-600 space-y-2 pt-2">
-                <p>{project.description || "No scope description specified."}</p>
+              <div className="flex items-center justify-between text-xs text-slate-700">
+                <span className="font-semibold">Overall Project Completion</span>
+                <span className="font-bold text-brand-600">{project.progress || 0}%</span>
               </div>
+              <ProgressIndicator progress={project.progress || 0} size="lg" />
+
+              {project.description && (
+                <div className="text-xs text-slate-600 pt-2 border-t border-slate-100">
+                  <p>{project.description}</p>
+                </div>
+              )}
             </div>
           </Card>
 
-          <Card title={`Project Team Roster (${team.length})`}>
-            {team.length === 0 ? (
-              <p className="text-xs text-slate-500 italic">No team members assigned.</p>
+          {/* Construction Phases Progress Breakdown */}
+          <Card
+            title={`Construction Phases Roadmap (${phases.length})`}
+            action={
+              <Link to={`/projects/${projectId}/phases`} className="text-xs font-semibold text-brand-600 hover:underline">
+                View All
+              </Link>
+            }
+          >
+            {phases.length === 0 ? (
+              <p className="text-xs text-slate-500 italic">No phases defined.</p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {team.map((member) => (
-                  <div
-                    key={member.membershipId}
-                    className="p-3 rounded-lg border border-slate-100 bg-slate-50 flex items-center justify-between"
+              <div className="space-y-3">
+                {phases.slice(0, 4).map((p) => (
+                  <Link
+                    key={p._id}
+                    to={`/projects/${projectId}/phases/${p._id}`}
+                    className="block p-2.5 rounded-lg border border-slate-100 bg-slate-50 hover:bg-slate-100 transition-colors"
                   >
-                    <div>
-                      <span className="font-semibold text-xs text-slate-900 block">
-                        {member.user.name}
-                      </span>
-                      <span className="text-[11px] text-slate-500 font-mono">
-                        {member.user.email}
-                      </span>
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-brand-100 text-brand-800 font-mono text-[10px] font-bold flex items-center justify-center">
+                          {p.sequence}
+                        </span>
+                        <span className="font-bold text-slate-900">{p.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-slate-700">{p.progress}%</span>
+                        <StatusBadge status={p.status} size="sm" />
+                      </div>
                     </div>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-brand-50 text-brand-700 uppercase">
-                      {member.user.primaryRole.replace(/_/g, " ")}
-                    </span>
+                    <ProgressIndicator progress={p.progress} size="sm" />
+                  </Link>
+                ))}
+              </div>
+            )}
+          </Card>
+
+          {/* Upcoming Key Milestones */}
+          <Card
+            title={`Upcoming Milestone Gates (${milestones.length})`}
+            action={
+              <Link to={`/projects/${projectId}/milestones`} className="text-xs font-semibold text-brand-600 hover:underline">
+                View All
+              </Link>
+            }
+          >
+            {milestones.length === 0 ? (
+              <p className="text-xs text-slate-500 italic">No milestones defined.</p>
+            ) : (
+              <div className="divide-y divide-slate-100">
+                {milestones.slice(0, 4).map((m) => (
+                  <div key={m._id} className="py-2.5 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <Flag className="w-3.5 h-3.5 text-brand-600" />
+                      <div>
+                        <span className="font-semibold text-slate-900 block">{m.name}</span>
+                        <span className="text-[11px] text-slate-400">
+                          Due {new Date(m.plannedDate).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                    <StatusBadge status={m.status} size="sm" />
                   </div>
                 ))}
               </div>
@@ -196,8 +282,45 @@ export const ProjectOverviewPage: React.FC = () => {
           </Card>
         </div>
 
-        {/* Project Meta Details */}
+        {/* Project Meta Details & Health Engine Output */}
         <div className="space-y-6">
+          {/* Health Assessment Details */}
+          <Card title="Project Health Intelligence">
+            <div className="space-y-3 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500 font-medium">Health Rating:</span>
+                <span
+                  className={`font-bold px-2 py-0.5 rounded flex items-center gap-1 text-[11px] ${
+                    project.health === "HEALTHY"
+                      ? "bg-emerald-50 text-emerald-700"
+                      : project.health === "AT_RISK"
+                      ? "bg-amber-50 text-amber-700"
+                      : "bg-red-50 text-red-700"
+                  }`}
+                >
+                  <HeartPulse className="w-3.5 h-3.5" />
+                  {project.health}
+                </span>
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                <span className="text-slate-500 font-semibold block">Contributing Factors:</span>
+                {!project.healthFactors || project.healthFactors.length === 0 ? (
+                  <p className="text-slate-500 italic">No active risk factors detected.</p>
+                ) : (
+                  <ul className="space-y-1 text-slate-700">
+                    {project.healthFactors.map((factor, idx) => (
+                      <li key={idx} className="flex items-start gap-1.5">
+                        <AlertTriangle className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
+                        <span className="text-[11px] leading-tight">{factor}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          </Card>
+
           <Card title="Project Details">
             <div className="space-y-3.5 text-xs">
               <div>
@@ -234,6 +357,29 @@ export const ProjectOverviewPage: React.FC = () => {
                 </div>
               </div>
             </div>
+          </Card>
+
+          <Card title={`Project Team Roster (${team.length})`}>
+            {team.length === 0 ? (
+              <p className="text-xs text-slate-500 italic">No team members assigned.</p>
+            ) : (
+              <div className="space-y-2">
+                {team.map((member) => (
+                  <div
+                    key={member.membershipId}
+                    className="p-2 rounded-lg border border-slate-100 bg-slate-50 flex items-center justify-between text-xs"
+                  >
+                    <div>
+                      <span className="font-semibold text-slate-900 block">{member.user.name}</span>
+                      <span className="text-[10px] text-slate-500 font-mono">{member.user.email}</span>
+                    </div>
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-brand-50 text-brand-700 uppercase">
+                      {member.user.primaryRole.replace(/_/g, " ")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </Card>
         </div>
       </div>

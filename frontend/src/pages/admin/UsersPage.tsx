@@ -50,7 +50,6 @@ export const UsersPage: React.FC = () => {
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
-    fetchUsers();
   };
 
   const handleCreateUser = async (e: React.FormEvent) => {

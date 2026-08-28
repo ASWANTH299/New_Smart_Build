@@ -45,7 +45,6 @@ export const ProjectsPage: React.FC = () => {
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
-    fetchProjects();
   };
 
   const canCreateProject = isAdmin || isProjectManager;

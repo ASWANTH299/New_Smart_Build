@@ -39,28 +39,41 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, [user, token]);
 
-  const login = (newToken: string, newUser: User) => {
+  const login = React.useCallback((newToken: string, newUser: User) => {
+    try {
+      localStorage.setItem("smart_build_token", newToken);
+      localStorage.setItem("smart_build_user", JSON.stringify(newUser));
+    } catch {
+      // Ignore storage errors in restricted environments
+    }
     setToken(newToken);
     setUser(newUser);
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = React.useCallback(() => {
+    try {
+      localStorage.removeItem("smart_build_token");
+      localStorage.removeItem("smart_build_user");
+    } catch {
+      // Ignore storage errors
+    }
     setToken(null);
     setUser(null);
-    localStorage.removeItem("smart_build_token");
-    localStorage.removeItem("smart_build_user");
-  };
+  }, []);
+
+  const contextValue = React.useMemo(
+    () => ({
+      user,
+      token,
+      isAuthenticated: !!token && !!user,
+      login,
+      logout,
+    }),
+    [user, token, login, logout]
+  );
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        isAuthenticated: !!token && !!user,
-        login,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

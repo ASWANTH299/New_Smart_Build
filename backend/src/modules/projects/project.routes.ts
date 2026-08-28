@@ -1,5 +1,9 @@
 import { Router } from "express";
 import projectController from "./project.controller.js";
+import phaseRoutes from "../phases/phase.routes.js";
+import taskRoutes from "../tasks/task.routes.js";
+import milestoneRoutes from "../milestones/milestone.routes.js";
+import progressRoutes from "../progress/progress.routes.js";
 import { authenticate } from "../../middleware/authenticate.js";
 import { requireRoles } from "../../middleware/authorize.js";
 import { requireProjectAccess } from "../../middleware/projectAccess.js";
@@ -25,7 +29,13 @@ router.post(
   (req, res, next) => projectController.createProject(req, res, next)
 );
 
-// Project-scoped routes (with membership check)
+// Nested resource routes with project isolation
+router.use("/:projectId/phases", phaseRoutes);
+router.use("/:projectId/tasks", taskRoutes);
+router.use("/:projectId/milestones", milestoneRoutes);
+router.use("/:projectId/progress", progressRoutes);
+
+// Project-scoped direct routes (with membership check)
 router.get("/:projectId", requireProjectAccess("projectId"), (req, res, next) =>
   projectController.getProjectById(req, res, next)
 );
@@ -56,6 +66,12 @@ router.get(
   "/:projectId/team",
   requireProjectAccess("projectId"),
   (req, res, next) => projectController.getProjectTeam(req, res, next)
+);
+
+router.get(
+  "/:projectId/health",
+  requireProjectAccess("projectId"),
+  (req, res, next) => projectController.getProjectHealth(req, res, next)
 );
 
 export default router;

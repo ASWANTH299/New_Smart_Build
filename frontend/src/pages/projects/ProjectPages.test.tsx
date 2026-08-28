@@ -8,6 +8,8 @@ import { AuthProvider } from "../../hooks/useAuth.js";
 import { ToastProvider } from "../../hooks/useToast.js";
 import { ProjectProvider } from "../../hooks/useProjectContext.js";
 import { projectService } from "../../services/projectService.js";
+import { phaseService } from "../../services/phaseService.js";
+import { milestoneService } from "../../services/milestoneService.js";
 import { userService } from "../../services/userService.js";
 
 describe("Project Pages Integration Tests (Phase 6)", () => {
@@ -201,6 +203,16 @@ describe("Project Pages Integration Tests (Phase 6)", () => {
             assignedAt: "2026-08-01",
           },
         ],
+      });
+
+      vi.spyOn(phaseService, "getPhases").mockResolvedValue({
+        success: true,
+        data: [],
+      });
+
+      vi.spyOn(milestoneService, "getMilestones").mockResolvedValue({
+        success: true,
+        data: [],
       });
 
       render(

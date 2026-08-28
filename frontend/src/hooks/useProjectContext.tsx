@@ -14,15 +14,18 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [activeProject, setActiveProject] = useState<ProjectContextType | null>(null);
   const [availableProjects, setAvailableProjects] = useState<ProjectContextType[]>([]);
 
+  const contextValue = React.useMemo(
+    () => ({
+      activeProject,
+      setActiveProject,
+      availableProjects,
+      setAvailableProjects,
+    }),
+    [activeProject, availableProjects]
+  );
+
   return (
-    <ProjectContext.Provider
-      value={{
-        activeProject,
-        setActiveProject,
-        availableProjects,
-        setAvailableProjects,
-      }}
-    >
+    <ProjectContext.Provider value={contextValue}>
       {children}
     </ProjectContext.Provider>
   );

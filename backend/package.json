@@ -8,6 +8,8 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
+    "seed": "tsx src/scripts/seed.ts",
+    "seed:reset": "tsx src/scripts/seed.ts --reset-admin",
     "lint": "eslint src --max-warnings 0",
     "test": "vitest run"
   },

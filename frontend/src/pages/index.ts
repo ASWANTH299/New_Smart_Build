@@ -7,8 +7,15 @@ export * from "./projects/ProjectsPage.js";
 export * from "./projects/CreateProjectPage.js";
 export * from "./projects/ProjectOverviewPage.js";
 export * from "./projects/EditProjectPage.js";
+export * from "./projects/PhasesPage.js";
+export * from "./projects/PhaseDetailPage.js";
+export * from "./projects/TasksPage.js";
+export * from "./projects/TaskDetailPage.js";
+export * from "./projects/MilestonesPage.js";
 export * from "./admin/UsersPage.js";
 export * from "./admin/UserDetailPage.js";
 export * from "./admin/EditUserPage.js";
 export * from "./shared/NotFoundPage.js";
 export * from "./shared/PermissionDeniedPage.js";
+export * from "./profile/ProfilePage.js";
+

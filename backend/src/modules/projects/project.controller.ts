@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import projectService from "./project.service.js";
+import healthService from "./health.service.js";
 import { sendSuccess } from "../../utils/apiResponse.js";
 import { ProjectStatus, ProjectHealth } from "./project.model.js";
 
@@ -98,6 +99,16 @@ export class ProjectController {
       const projectId = String(req.params.projectId);
       const team = await projectService.getProjectTeam(projectId);
       sendSuccess(res, team);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getProjectHealth(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const projectId = String(req.params.projectId);
+      const healthData = await healthService.evaluateProjectHealth(projectId);
+      sendSuccess(res, healthData);
     } catch (error) {
       next(error);
     }

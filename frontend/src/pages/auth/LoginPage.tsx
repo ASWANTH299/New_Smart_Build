@@ -13,7 +13,7 @@ export const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
-  const { showSuccess, showError } = useToast();
+  const { showError } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -29,8 +29,10 @@ export const LoginPage: React.FC = () => {
       const response = await authService.login(email, password);
       if (response.success && response.data) {
         login(response.data.token, response.data.user);
-        showSuccess("Welcome Back", `Signed in as ${response.data.user.name}`);
-        const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/dashboard";
+        const defaultTarget =
+          response.data.user.primaryRole === "CLIENT" ? "/client-portal" : "/dashboard";
+        const from =
+          (location.state as { from?: { pathname: string } })?.from?.pathname || defaultTarget;
         navigate(from, { replace: true });
       } else {
         showError("Authentication Failed", response.message || "Invalid credentials.");
