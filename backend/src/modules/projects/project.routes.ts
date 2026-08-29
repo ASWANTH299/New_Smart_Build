@@ -4,6 +4,8 @@ import phaseRoutes from "../phases/phase.routes.js";
 import taskRoutes from "../tasks/task.routes.js";
 import milestoneRoutes from "../milestones/milestone.routes.js";
 import progressRoutes from "../progress/progress.routes.js";
+import bomRoutes from "../bom/bom.routes.js";
+import materialRequestRoutes from "../material-requests/materialRequest.routes.js";
 import { authenticate } from "../../middleware/authenticate.js";
 import { requireRoles } from "../../middleware/authorize.js";
 import { requireProjectAccess } from "../../middleware/projectAccess.js";
@@ -34,6 +36,8 @@ router.use("/:projectId/phases", phaseRoutes);
 router.use("/:projectId/tasks", taskRoutes);
 router.use("/:projectId/milestones", milestoneRoutes);
 router.use("/:projectId/progress", progressRoutes);
+router.use("/:projectId/bom", bomRoutes);
+router.use("/:projectId/material-requests", materialRequestRoutes);
 
 // Project-scoped direct routes (with membership check)
 router.get("/:projectId", requireProjectAccess("projectId"), (req, res, next) =>

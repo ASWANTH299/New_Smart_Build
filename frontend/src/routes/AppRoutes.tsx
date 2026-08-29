@@ -22,6 +22,13 @@ import {
   TasksPage,
   TaskDetailPage,
   MilestonesPage,
+  BOMPage,
+  MaterialRequestsPage,
+  MaterialRequestDetailPage,
+  MaterialCatalogPage,
+  MaterialDetailPage,
+  InventoryPage,
+  InventoryDetailPage,
   UsersPage,
   UserDetailPage,
   EditUserPage,
@@ -95,12 +102,23 @@ export const AppRoutes: React.FC = () => {
           }
         />
 
-        {/* Project Planning Routes */}
+        {/* Project Planning & Material Management Routes */}
         <Route path="/projects/:projectId/phases" element={<PhasesPage />} />
         <Route path="/projects/:projectId/phases/:phaseId" element={<PhaseDetailPage />} />
         <Route path="/projects/:projectId/tasks" element={<TasksPage />} />
         <Route path="/projects/:projectId/tasks/:taskId" element={<TaskDetailPage />} />
         <Route path="/projects/:projectId/milestones" element={<MilestonesPage />} />
+        <Route path="/projects/:projectId/bom" element={<BOMPage />} />
+        <Route path="/projects/:projectId/material-requests" element={<MaterialRequestsPage />} />
+        <Route path="/projects/:projectId/material-requests/:requestId" element={<MaterialRequestDetailPage />} />
+
+        {/* Master Materials Catalog */}
+        <Route path="/materials" element={<MaterialCatalogPage />} />
+        <Route path="/materials/:materialId" element={<MaterialDetailPage />} />
+
+        {/* Multi-Location Inventory & Warehouse Operations */}
+        <Route path="/inventory" element={<InventoryPage />} />
+        <Route path="/inventory/:locationId" element={<InventoryDetailPage />} />
 
         {/* Admin Organization & User Directory */}
         <Route
@@ -151,15 +169,7 @@ export const AppRoutes: React.FC = () => {
             </div>
           }
         />
-        <Route
-          path="/inventory"
-          element={
-            <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-card">
-              <h2 className="text-lg font-bold text-slate-900">Materials & Inventory Module</h2>
-              <p className="text-xs text-slate-500 mt-1">Foundation shell ready for subsequent phases.</p>
-            </div>
-          }
-        />
+
         <Route
           path="/quality-safety"
           element={

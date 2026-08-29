@@ -5,6 +5,8 @@ import userRoutes from "../modules/users/user.routes.js";
 import projectRoutes from "../modules/projects/project.routes.js";
 import projectTypeRoutes from "../modules/project-types/projectType.routes.js";
 import projectTemplateRoutes from "../modules/project-templates/projectTemplate.routes.js";
+import materialRoutes from "../modules/materials/material.routes.js";
+import inventoryRoutes from "../modules/inventory/inventory.routes.js";
 
 const router = Router();
 
@@ -20,6 +22,12 @@ router.use("/users", userRoutes);
 // Mount project types & templates routes
 router.use("/project-types", projectTypeRoutes);
 router.use("/project-templates", projectTemplateRoutes);
+
+// Mount materials catalog routes at /api/v1/materials
+router.use("/materials", materialRoutes);
+
+// Mount inventory management routes at /api/v1/inventory
+router.use("/inventory", inventoryRoutes);
 
 // Mount project operations routes at /api/v1/projects
 router.use("/projects", projectRoutes);

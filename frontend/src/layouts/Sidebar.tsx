@@ -48,9 +48,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       roles: ["ADMIN", "PROJECT_MANAGER", "SITE_ENGINEER", "CONTRACTOR"],
     },
     {
+      name: "Materials Catalog",
+      href: "/materials",
+      icon: <Package className="w-4 h-4 shrink-0" />,
+      roles: ["ADMIN", "PROJECT_MANAGER", "STORE_MANAGER", "SITE_ENGINEER"],
+    },
+    {
       name: "Inventory & Materials",
       href: "/inventory",
-      icon: <Package className="w-4 h-4 shrink-0" />,
+      icon: <Building2 className="w-4 h-4 shrink-0" />,
       roles: ["ADMIN", "PROJECT_MANAGER", "STORE_MANAGER"],
     },
     {

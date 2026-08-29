@@ -10,6 +10,7 @@ import {
   Flag,
   AlertTriangle,
   HeartPulse,
+  Package,
 } from "lucide-react";
 import { PageHeader } from "../../components/ui/PageHeader.js";
 import { Card } from "../../components/ui/Card.js";
@@ -190,6 +191,16 @@ export const ProjectOverviewPage: React.FC = () => {
         <Link to={`/projects/${projectId}/milestones`} className="shrink-0">
           <Button variant="outline" size="sm" leftIcon={<Flag className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
             Milestones ({milestones.length})
+          </Button>
+        </Link>
+        <Link to={`/projects/${projectId}/bom`} className="shrink-0">
+          <Button variant="outline" size="sm" leftIcon={<Package className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
+            Bill of Materials (BOM)
+          </Button>
+        </Link>
+        <Link to={`/projects/${projectId}/material-requests`} className="shrink-0">
+          <Button variant="outline" size="sm" leftIcon={<RotateCcw className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
+            Material Requests
           </Button>
         </Link>
       </div>
