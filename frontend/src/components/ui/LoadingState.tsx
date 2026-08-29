@@ -22,8 +22,8 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
       )}
       role="status"
     >
-      <Loader2 className="w-8 h-8 animate-spin text-brand-600" />
-      <p className="text-sm font-medium text-slate-600">{message}</p>
+      <Loader2 className="w-8 h-8 animate-spin text-brand-600 dark:text-brand-400" />
+      <p className="text-sm font-medium text-slate-600 dark:text-slate-400">{message}</p>
     </div>
   );
 };

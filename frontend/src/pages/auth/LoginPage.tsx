@@ -50,8 +50,8 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="text-center space-y-1">
-        <h3 className="text-xl font-bold text-slate-900">Sign In to Your Workspace</h3>
-        <p className="text-xs text-slate-500">Enter your credentials to access project operations</p>
+        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Sign In to Your Workspace</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Enter your credentials to access project operations</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -78,7 +78,7 @@ export const LoginPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="text-slate-400 hover:text-slate-600 focus:outline-none"
+              className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 focus:outline-none"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -90,13 +90,13 @@ export const LoginPage: React.FC = () => {
         <div className="flex items-center justify-between text-xs pt-1">
           <Link
             to="/forgot-password"
-            className="font-medium text-brand-600 hover:text-brand-700 hover:underline"
+            className="font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 hover:underline"
           >
             Forgot Password?
           </Link>
           <Link
             to="/activate-account"
-            className="font-medium text-slate-500 hover:text-slate-700 hover:underline"
+            className="font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:underline"
           >
             Activate Account
           </Link>
@@ -111,11 +111,11 @@ export const LoginPage: React.FC = () => {
           Sign In
         </Button>
 
-        <div className="text-center text-xs text-slate-500 pt-3 border-t border-slate-100 mt-4">
+        <div className="text-center text-xs text-slate-500 dark:text-slate-400 pt-3 border-t border-slate-100 dark:border-slate-800 mt-4">
           <span>Don't have an account? </span>
           <Link
             to="/request-access"
-            className="font-semibold text-brand-600 hover:text-brand-700 hover:underline"
+            className="font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 hover:underline"
           >
             Request Access
           </Link>

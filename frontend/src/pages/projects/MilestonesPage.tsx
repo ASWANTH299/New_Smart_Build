@@ -145,10 +145,10 @@ export const MilestonesPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-xs text-slate-500">
+      <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
         <Link
           to={`/projects/${projectId}`}
-          className="hover:text-slate-900 inline-flex items-center gap-1"
+          className="hover:text-slate-900 dark:hover:text-slate-100 inline-flex items-center gap-1 transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Back to Project Workspace
         </Link>
@@ -190,17 +190,17 @@ export const MilestonesPage: React.FC = () => {
               new Date(milestone.plannedDate) < new Date();
 
             return (
-              <Card key={milestone._id} className="h-full border-slate-200 hover:shadow-card">
+              <Card key={milestone._id} className="h-full border-slate-200 dark:border-slate-800 hover:shadow-card transition-all">
                 <div className="space-y-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <div className="p-2 rounded-lg bg-brand-50 text-brand-700">
+                      <div className="p-2 rounded-lg bg-brand-50 dark:bg-brand-950/80 text-brand-700 dark:text-brand-300 border border-brand-100 dark:border-brand-900">
                         <Flag className="w-4 h-4" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-slate-900 text-base">{milestone.name}</h3>
+                        <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">{milestone.name}</h3>
                         {milestone.phaseId && (
-                          <span className="text-[11px] font-medium text-slate-500">
+                          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                             {milestone.phaseId.name}
                           </span>
                         )}
@@ -209,11 +209,11 @@ export const MilestonesPage: React.FC = () => {
                     <div className="flex items-center gap-1.5">
                       <StatusBadge status={milestone.status} size="sm" />
                       {milestone.clientVisible ? (
-                        <span title="Client Visible" className="p-1 text-slate-400">
+                        <span title="Client Visible" className="p-1 text-slate-400 dark:text-slate-500">
                           <Eye className="w-3.5 h-3.5" />
                         </span>
                       ) : (
-                        <span title="Internal Only" className="p-1 text-slate-400">
+                        <span title="Internal Only" className="p-1 text-slate-400 dark:text-slate-500">
                           <EyeOff className="w-3.5 h-3.5" />
                         </span>
                       )}
@@ -221,17 +221,17 @@ export const MilestonesPage: React.FC = () => {
                   </div>
 
                   {milestone.description && (
-                    <p className="text-xs text-slate-600">{milestone.description}</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">{milestone.description}</p>
                   )}
 
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5" />
                       <span>
                         Target: {new Date(milestone.plannedDate).toLocaleDateString()}
                       </span>
                       {isOverdue && (
-                        <span className="text-red-600 font-bold ml-1 flex items-center gap-0.5">
+                        <span className="text-red-600 dark:text-red-400 font-bold ml-1 flex items-center gap-0.5">
                           <AlertTriangle className="w-3 h-3" /> Overdue
                         </span>
                       )}

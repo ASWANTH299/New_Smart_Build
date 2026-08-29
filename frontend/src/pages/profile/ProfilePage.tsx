@@ -75,11 +75,11 @@ export const ProfilePage: React.FC = () => {
         <div className="md:col-span-1 space-y-6">
           <Card>
             <div className="flex flex-col items-center text-center p-2">
-              <div className="w-16 h-16 rounded-full bg-brand-100 border border-brand-200 text-brand-700 flex items-center justify-center font-bold text-xl mb-3">
+              <div className="w-16 h-16 rounded-full bg-brand-100 dark:bg-brand-950/80 border border-brand-200 dark:border-brand-800 text-brand-700 dark:text-brand-300 flex items-center justify-center font-bold text-xl mb-3">
                 {user.name.charAt(0).toUpperCase()}
               </div>
-              <h2 className="text-base font-bold text-slate-900">{user.name}</h2>
-              <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+              <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">{user.name}</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5">
                 <Mail className="w-3 h-3" />
                 {user.email}
               </p>
@@ -88,23 +88,23 @@ export const ProfilePage: React.FC = () => {
               </div>
             </div>
 
-            <div className="border-t border-slate-100 mt-4 pt-4 space-y-2.5 text-xs text-slate-600">
+            <div className="border-t border-slate-100 dark:border-slate-800 mt-4 pt-4 space-y-2.5 text-xs text-slate-600 dark:text-slate-400">
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Account Status</span>
-                <span className="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                <span className="text-slate-400 dark:text-slate-500">Account Status</span>
+                <span className="font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded">
                   {user.status}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Account ID</span>
-                <span className="font-mono text-[11px] text-slate-700 truncate max-w-[120px]" title={user.id}>
+                <span className="text-slate-400 dark:text-slate-500">Account ID</span>
+                <span className="font-mono text-[11px] text-slate-700 dark:text-slate-300 truncate max-w-[120px]" title={user.id}>
                   {user.id}
                 </span>
               </div>
               {user.lastLoginAt && (
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Last Login</span>
-                  <span className="text-slate-700">
+                  <span className="text-slate-400 dark:text-slate-500">Last Login</span>
+                  <span className="text-slate-700 dark:text-slate-300">
                     {new Date(user.lastLoginAt).toLocaleDateString()}
                   </span>
                 </div>
@@ -119,13 +119,13 @@ export const ProfilePage: React.FC = () => {
                 effectivePermissions.map((perm) => (
                   <span
                     key={perm}
-                    className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-slate-100 text-slate-700 border border-slate-200"
+                    className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
                   >
                     {perm}
                   </span>
                 ))
               ) : (
-                <span className="text-xs text-slate-400">Standard role access</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500">Standard role access</span>
               )}
             </div>
           </Card>
@@ -163,12 +163,12 @@ export const ProfilePage: React.FC = () => {
                 />
               </div>
 
-              <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs text-slate-600 space-y-1">
-                <p className="font-semibold text-slate-700 flex items-center gap-1">
-                  <Key className="w-3.5 h-3.5 text-brand-600" />
+              <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 space-y-1">
+                <p className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                  <Key className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
                   Password Requirements:
                 </p>
-                <ul className="list-disc list-inside text-slate-500 space-y-0.5 pl-1">
+                <ul className="list-disc list-inside text-slate-500 dark:text-slate-400 space-y-0.5 pl-1">
                   <li>Minimum 8 characters in length</li>
                   <li>Must not match your previous password</li>
                 </ul>

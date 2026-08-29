@@ -53,48 +53,48 @@ export const RequestAccessPage: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-1">
-        <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 border border-brand-100 mb-1">
+        <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 border border-brand-100 dark:border-brand-900 mb-1">
           <UserCheck className="w-5 h-5" />
         </div>
-        <h3 className="text-xl font-bold text-slate-900">Request Platform Access</h3>
-        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Request Platform Access</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
           Submit your details to request access to project operations and site records
         </p>
       </div>
 
       {/* 5-Step Workflow Visualizer */}
-      <div className="bg-slate-50 rounded-xl p-3 border border-slate-200/80">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-2 text-center">
+      <div className="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-3 border border-slate-200/80 dark:border-slate-800">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 text-center">
           Onboarding Lifecycle
         </p>
-        <div className="flex items-center justify-between text-[11px] font-medium text-slate-600 px-1 overflow-x-auto">
-          <span className="text-brand-700 font-bold bg-brand-50 px-1.5 py-0.5 rounded border border-brand-200/60">
+        <div className="flex items-center justify-between text-[11px] font-medium text-slate-600 dark:text-slate-400 px-1 overflow-x-auto">
+          <span className="text-brand-700 dark:text-brand-300 font-bold bg-brand-50 dark:bg-brand-950/60 px-1.5 py-0.5 rounded border border-brand-200/60 dark:border-brand-800">
             1. Request
           </span>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-600 shrink-0" />
           <span>2. Review</span>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-600 shrink-0" />
           <span>3. Approval</span>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-600 shrink-0" />
           <span>4. Activation</span>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-600 shrink-0" />
           <span>5. Login</span>
         </div>
       </div>
 
       {isSubmitted ? (
         <div className="text-center space-y-4 py-4">
-          <div className="w-12 h-12 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto">
             <CheckCircle2 className="w-7 h-7" />
           </div>
           <div className="space-y-1">
-            <h4 className="text-base font-bold text-slate-900">Access Request Submitted</h4>
-            <p className="text-xs text-slate-600 leading-relaxed max-w-sm mx-auto">
-              Your request for <span className="font-semibold text-slate-900">{email}</span> has been dispatched to the System Administrator for role assignment and verification.
+            <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">Access Request Submitted</h4>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-sm mx-auto">
+              Your request for <span className="font-semibold text-slate-900 dark:text-slate-100">{email}</span> has been dispatched to the System Administrator for role assignment and verification.
             </p>
           </div>
-          <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-500 text-left space-y-1">
-            <p className="font-semibold text-slate-700">What happens next?</p>
+          <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 text-left space-y-1">
+            <p className="font-semibold text-slate-700 dark:text-slate-300">What happens next?</p>
             <p>Once an administrator reviews and approves your request, you will receive an activation code to set your secure password and access your workspace.</p>
           </div>
           <div className="pt-2">
@@ -108,8 +108,8 @@ export const RequestAccessPage: React.FC = () => {
       ) : (
         <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Informational notice */}
-          <div className="p-3 bg-brand-50/70 rounded-lg border border-brand-100 flex items-start gap-2.5 text-xs text-brand-900">
-            <ShieldAlert className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
+          <div className="p-3 bg-brand-50/70 dark:bg-brand-950/40 rounded-lg border border-brand-100 dark:border-brand-900/60 flex items-start gap-2.5 text-xs text-brand-900 dark:text-brand-300">
+            <ShieldAlert className="w-4 h-4 text-brand-600 dark:text-brand-400 shrink-0 mt-0.5" />
             <p className="leading-relaxed">
               Smart Build enforces verified access. Public registration is reviewed before role credentials and project permissions are granted.
             </p>
@@ -180,7 +180,7 @@ export const RequestAccessPage: React.FC = () => {
           <div className="text-center pt-2">
             <Link
               to="/login"
-              className="text-xs font-semibold text-slate-600 hover:text-brand-600 inline-flex items-center gap-1.5 transition-colors"
+              className="text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 inline-flex items-center gap-1.5 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Sign In
             </Link>

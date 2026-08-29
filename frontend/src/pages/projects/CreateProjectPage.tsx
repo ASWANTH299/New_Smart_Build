@@ -99,8 +99,8 @@ export const CreateProjectPage: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <div className="flex items-center gap-2 text-xs text-slate-500">
-        <Link to="/projects" className="hover:text-slate-900 inline-flex items-center gap-1">
+      <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+        <Link to="/projects" className="hover:text-slate-900 dark:hover:text-slate-100 inline-flex items-center gap-1 transition-colors">
           <ArrowLeft className="w-3.5 h-3.5" /> Back to Projects Directory
         </Link>
       </div>
@@ -199,7 +199,7 @@ export const CreateProjectPage: React.FC = () => {
           </div>
         </Card>
 
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
           <Link to="/projects">
             <Button variant="outline" type="button">
               Cancel

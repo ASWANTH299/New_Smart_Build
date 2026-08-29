@@ -109,37 +109,40 @@ export const ProjectsPage: React.FC = () => {
             <Link
               key={project._id}
               to={`/projects/${project._id}`}
-              className="block group transition-transform hover:-translate-y-0.5"
+              className="block group transition-all duration-200 hover:-translate-y-1"
             >
-              <Card className="h-full border-slate-200 hover:border-brand-500 hover:shadow-md transition-all">
+              <Card className="h-full border-slate-200/80 dark:border-slate-800 hover:border-brand-500/80 dark:hover:border-brand-500/80 hover:shadow-card-hover transition-all">
                 <div className="flex flex-col h-full justify-between space-y-4">
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded">
+                      <span className="font-mono text-xs font-bold text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-950/80 border border-brand-200/60 dark:border-brand-800 px-2 py-0.5 rounded-md">
                         {project.code}
                       </span>
-                      <StatusBadge status={project.status} size="sm" />
+                      <div className="flex items-center gap-1.5">
+                        <StatusBadge status={project.health} size="sm" />
+                        <StatusBadge status={project.status} size="sm" />
+                      </div>
                     </div>
-                    <h3 className="font-bold text-slate-900 group-hover:text-brand-600 text-sm sm:text-base line-clamp-1">
+                    <h3 className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-brand-600 dark:group-hover:text-brand-400 text-base line-clamp-1 transition-colors font-display">
                       {project.name}
                     </h3>
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                      <MapPin className="w-3.5 h-3.5 shrink-0" />
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                      <MapPin className="w-3.5 h-3.5 shrink-0 text-slate-400" />
                       <span className="truncate">{project.location}</span>
                     </div>
                   </div>
 
-                  <div className="space-y-3 pt-2 border-t border-slate-100">
+                  <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
                     <ProgressIndicator progress={project.progress || 0} size="sm" />
 
-                    <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5" />
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
                         <span>Due {new Date(project.plannedEndDate).toLocaleDateString()}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5" />
-                        <span>PM: {project.projectManagerId?.name || "Unassigned"}</span>
+                      <div className="flex items-center gap-1.5 truncate max-w-[140px]">
+                        <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="truncate">PM: <strong className="text-slate-700 dark:text-slate-300">{project.projectManagerId?.name || "Unassigned"}</strong></span>
                       </div>
                     </div>
                   </div>

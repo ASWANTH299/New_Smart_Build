@@ -139,12 +139,18 @@ export const ProjectOverviewPage: React.FC = () => {
       <PageHeader
         title={`${project.name} (${project.code})`}
         description={project.location}
+        badge={
+          <div className="flex items-center gap-1.5">
+            <StatusBadge status={project.health} size="md" />
+            <StatusBadge status={project.status} size="md" />
+          </div>
+        }
         actions={
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <Button
               variant={isCurrentActive ? "secondary" : "outline"}
               onClick={handleSetCurrentContext}
-              leftIcon={isCurrentActive ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : undefined}
+              leftIcon={isCurrentActive ? <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> : undefined}
             >
               {isCurrentActive ? "Active Workspace" : "Set as Active Project"}
             </Button>
@@ -158,7 +164,7 @@ export const ProjectOverviewPage: React.FC = () => {
                   leftIcon={<RotateCcw className="w-4 h-4" />}
                   onClick={() => setIsStatusModalOpen(true)}
                 >
-                  Change Lifecycle Status
+                  Change Lifecycle
                 </Button>
               </>
             )}
@@ -167,19 +173,22 @@ export const ProjectOverviewPage: React.FC = () => {
       />
 
       {/* Quick Access Navigation Bar for Project Modules */}
-      <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200 overflow-x-auto">
+      <div className="flex items-center gap-3 p-2.5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-card overflow-x-auto transition-colors duration-150">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 font-display px-2 shrink-0">
+          Project Modules:
+        </span>
         <Link to={`/projects/${projectId}/phases`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<Layers className="w-3.5 h-3.5 text-brand-600" />}>
+          <Button variant="outline" size="sm" leftIcon={<Layers className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
             Phases ({phases.length})
           </Button>
         </Link>
         <Link to={`/projects/${projectId}/tasks`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<CheckSquare className="w-3.5 h-3.5 text-brand-600" />}>
-            Tasks & Progress
+          <Button variant="outline" size="sm" leftIcon={<CheckSquare className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
+            Tasks & Work Tracking
           </Button>
         </Link>
         <Link to={`/projects/${projectId}/milestones`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<Flag className="w-3.5 h-3.5 text-brand-600" />}>
+          <Button variant="outline" size="sm" leftIcon={<Flag className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
             Milestones ({milestones.length})
           </Button>
         </Link>
@@ -187,10 +196,30 @@ export const ProjectOverviewPage: React.FC = () => {
 
       {/* Overview Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Metric label="Lifecycle Status" value={project.status} />
-        <Metric label="Schedule Health" value={project.health} />
-        <Metric label="Days Remaining" value={`${daysRemaining} Days`} />
-        <Metric label="Active Team" value={`${team.length} Members`} />
+        <Metric
+          label="Lifecycle Status"
+          value={project.status}
+          subtext="Current project stage"
+          icon={<RotateCcw className="w-5 h-5" />}
+        />
+        <Metric
+          label="Schedule Health"
+          value={project.health}
+          subtext={project.health === "HEALTHY" ? "Schedule on target" : "Requires attention"}
+          icon={<HeartPulse className="w-5 h-5" />}
+        />
+        <Metric
+          label="Days Remaining"
+          value={`${daysRemaining} Days`}
+          subtext={`Target: ${new Date(project.plannedEndDate).toLocaleDateString()}`}
+          icon={<Flag className="w-5 h-5" />}
+        />
+        <Metric
+          label="Assigned Team"
+          value={`${team.length}`}
+          subtext="Active members on site"
+          icon={<Layers className="w-5 h-5" />}
+        />
       </div>
 
       {/* Progress & Specifications */}
@@ -198,14 +227,14 @@ export const ProjectOverviewPage: React.FC = () => {
         <div className="lg:col-span-2 space-y-6">
           <Card title="Construction Progress Rollup">
             <div className="space-y-4">
-              <div className="flex items-center justify-between text-xs text-slate-700">
+              <div className="flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
                 <span className="font-semibold">Overall Project Completion</span>
-                <span className="font-bold text-brand-600">{project.progress || 0}%</span>
+                <span className="font-bold text-brand-600 dark:text-brand-400">{project.progress || 0}%</span>
               </div>
               <ProgressIndicator progress={project.progress || 0} size="lg" />
 
               {project.description && (
-                <div className="text-xs text-slate-600 pt-2 border-t border-slate-100">
+                <div className="text-xs text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
                   <p>{project.description}</p>
                 </div>
               )}
@@ -216,30 +245,30 @@ export const ProjectOverviewPage: React.FC = () => {
           <Card
             title={`Construction Phases Roadmap (${phases.length})`}
             action={
-              <Link to={`/projects/${projectId}/phases`} className="text-xs font-semibold text-brand-600 hover:underline">
+              <Link to={`/projects/${projectId}/phases`} className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline">
                 View All
               </Link>
             }
           >
             {phases.length === 0 ? (
-              <p className="text-xs text-slate-500 italic">No phases defined.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic">No phases defined.</p>
             ) : (
               <div className="space-y-3">
                 {phases.slice(0, 4).map((p) => (
                   <Link
                     key={p._id}
                     to={`/projects/${projectId}/phases/${p._id}`}
-                    className="block p-2.5 rounded-lg border border-slate-100 bg-slate-50 hover:bg-slate-100 transition-colors"
+                    className="block p-2.5 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                   >
                     <div className="flex items-center justify-between text-xs mb-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-brand-100 text-brand-800 font-mono text-[10px] font-bold flex items-center justify-center">
+                        <span className="w-5 h-5 rounded-full bg-brand-100 dark:bg-brand-950/80 text-brand-800 dark:text-brand-300 font-mono text-[10px] font-bold flex items-center justify-center">
                           {p.sequence}
                         </span>
-                        <span className="font-bold text-slate-900">{p.name}</span>
+                        <span className="font-bold text-slate-900 dark:text-slate-100">{p.name}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-slate-700">{p.progress}%</span>
+                        <span className="font-bold text-slate-700 dark:text-slate-300">{p.progress}%</span>
                         <StatusBadge status={p.status} size="sm" />
                       </div>
                     </div>
@@ -254,22 +283,22 @@ export const ProjectOverviewPage: React.FC = () => {
           <Card
             title={`Upcoming Milestone Gates (${milestones.length})`}
             action={
-              <Link to={`/projects/${projectId}/milestones`} className="text-xs font-semibold text-brand-600 hover:underline">
+              <Link to={`/projects/${projectId}/milestones`} className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline">
                 View All
               </Link>
             }
           >
             {milestones.length === 0 ? (
-              <p className="text-xs text-slate-500 italic">No milestones defined.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic">No milestones defined.</p>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {milestones.slice(0, 4).map((m) => (
                   <div key={m._id} className="py-2.5 flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
-                      <Flag className="w-3.5 h-3.5 text-brand-600" />
+                      <Flag className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
                       <div>
-                        <span className="font-semibold text-slate-900 block">{m.name}</span>
-                        <span className="text-[11px] text-slate-400">
+                        <span className="font-semibold text-slate-900 dark:text-slate-100 block">{m.name}</span>
+                        <span className="text-[11px] text-slate-400 dark:text-slate-500">
                           Due {new Date(m.plannedDate).toLocaleDateString()}
                         </span>
                       </div>
@@ -288,14 +317,14 @@ export const ProjectOverviewPage: React.FC = () => {
           <Card title="Project Health Intelligence">
             <div className="space-y-3 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-slate-500 font-medium">Health Rating:</span>
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Health Rating:</span>
                 <span
                   className={`font-bold px-2 py-0.5 rounded flex items-center gap-1 text-[11px] ${
                     project.health === "HEALTHY"
-                      ? "bg-emerald-50 text-emerald-700"
+                      ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300"
                       : project.health === "AT_RISK"
-                      ? "bg-amber-50 text-amber-700"
-                      : "bg-red-50 text-red-700"
+                      ? "bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300"
+                      : "bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300"
                   }`}
                 >
                   <HeartPulse className="w-3.5 h-3.5" />
@@ -303,12 +332,12 @@ export const ProjectOverviewPage: React.FC = () => {
                 </span>
               </div>
 
-              <div className="pt-2 border-t border-slate-100 space-y-1.5">
-                <span className="text-slate-500 font-semibold block">Contributing Factors:</span>
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1.5">
+                <span className="text-slate-500 dark:text-slate-400 font-semibold block">Contributing Factors:</span>
                 {!project.healthFactors || project.healthFactors.length === 0 ? (
-                  <p className="text-slate-500 italic">No active risk factors detected.</p>
+                  <p className="text-slate-500 dark:text-slate-400 italic">No active risk factors detected.</p>
                 ) : (
-                  <ul className="space-y-1 text-slate-700">
+                  <ul className="space-y-1 text-slate-700 dark:text-slate-300">
                     {project.healthFactors.map((factor, idx) => (
                       <li key={idx} className="flex items-start gap-1.5">
                         <AlertTriangle className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
@@ -324,34 +353,34 @@ export const ProjectOverviewPage: React.FC = () => {
           <Card title="Project Details">
             <div className="space-y-3.5 text-xs">
               <div>
-                <span className="text-slate-500 block">Project Manager</span>
-                <span className="font-semibold text-slate-900">
+                <span className="text-slate-500 dark:text-slate-400 block">Project Manager</span>
+                <span className="font-semibold text-slate-900 dark:text-slate-100">
                   {project.projectManagerId?.name || "Unassigned"}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block">Construction Type</span>
-                <span className="font-semibold text-slate-900">
+                <span className="text-slate-500 dark:text-slate-400 block">Construction Type</span>
+                <span className="font-semibold text-slate-900 dark:text-slate-100">
                   {project.typeId?.name || "Standard Project"}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block">Site Location</span>
-                <div className="flex items-center gap-1 font-semibold text-slate-900 mt-0.5">
+                <span className="text-slate-500 dark:text-slate-400 block">Site Location</span>
+                <div className="flex items-center gap-1 font-semibold text-slate-900 dark:text-slate-100 mt-0.5">
                   <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   <span>{project.location}</span>
                 </div>
               </div>
-              <div className="pt-2 border-t border-slate-100 grid grid-cols-2 gap-2">
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2">
                 <div>
-                  <span className="text-slate-500 block text-[11px]">Start Date</span>
-                  <span className="font-semibold text-slate-900 text-xs">
+                  <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Start Date</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-100 text-xs">
                     {new Date(project.plannedStartDate).toLocaleDateString()}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[11px]">Target Handover</span>
-                  <span className="font-semibold text-slate-900 text-xs">
+                  <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Target Handover</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-100 text-xs">
                     {new Date(project.plannedEndDate).toLocaleDateString()}
                   </span>
                 </div>
@@ -361,19 +390,19 @@ export const ProjectOverviewPage: React.FC = () => {
 
           <Card title={`Project Team Roster (${team.length})`}>
             {team.length === 0 ? (
-              <p className="text-xs text-slate-500 italic">No team members assigned.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic">No team members assigned.</p>
             ) : (
               <div className="space-y-2">
                 {team.map((member) => (
                   <div
                     key={member.membershipId}
-                    className="p-2 rounded-lg border border-slate-100 bg-slate-50 flex items-center justify-between text-xs"
+                    className="p-2 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between text-xs"
                   >
                     <div>
-                      <span className="font-semibold text-slate-900 block">{member.user.name}</span>
-                      <span className="text-[10px] text-slate-500 font-mono">{member.user.email}</span>
+                      <span className="font-semibold text-slate-900 dark:text-slate-100 block">{member.user.name}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">{member.user.email}</span>
                     </div>
-                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-brand-50 text-brand-700 uppercase">
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-brand-50 dark:bg-brand-950/80 text-brand-700 dark:text-brand-300 uppercase">
                       {member.user.primaryRole.replace(/_/g, " ")}
                     </span>
                   </div>

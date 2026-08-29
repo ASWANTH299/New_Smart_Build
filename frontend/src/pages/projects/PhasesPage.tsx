@@ -140,14 +140,14 @@ export const PhasesPage: React.FC = () => {
               to={`/projects/${projectId}/phases/${phase._id}`}
               className="block group"
             >
-              <Card className="h-full border-slate-200 group-hover:border-brand-500 group-hover:shadow-md transition-all">
+              <Card className="h-full border-slate-200 dark:border-slate-800 group-hover:border-brand-500 dark:group-hover:border-brand-500 group-hover:shadow-md transition-all">
                 <div className="space-y-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-brand-50 text-brand-700 font-mono text-xs font-bold flex items-center justify-center">
+                      <span className="w-6 h-6 rounded-full bg-brand-50 dark:bg-brand-950/80 text-brand-700 dark:text-brand-300 font-mono text-xs font-bold flex items-center justify-center border border-brand-200 dark:border-brand-900">
                         {phase.sequence}
                       </span>
-                      <h3 className="font-bold text-slate-900 group-hover:text-brand-600 text-base">
+                      <h3 className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-brand-600 dark:group-hover:text-brand-400 text-base transition-colors">
                         {phase.name}
                       </h3>
                     </div>
@@ -155,20 +155,20 @@ export const PhasesPage: React.FC = () => {
                   </div>
 
                   {phase.description && (
-                    <p className="text-xs text-slate-600 line-clamp-2">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2">
                       {phase.description}
                     </p>
                   )}
 
                   <div className="space-y-2 pt-2">
-                    <div className="flex items-center justify-between text-xs text-slate-600">
+                    <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
                       <span className="font-medium">Phase Progression:</span>
-                      <span className="font-bold text-slate-900">{phase.progress}%</span>
+                      <span className="font-bold text-slate-900 dark:text-slate-100">{phase.progress}%</span>
                     </div>
                     <ProgressIndicator progress={phase.progress} size="md" />
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 pt-3 border-t border-slate-100">
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-3 border-t border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5" />
                       <span>
@@ -177,7 +177,7 @@ export const PhasesPage: React.FC = () => {
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <CheckSquare className="w-3.5 h-3.5 text-slate-400" />
+                      <CheckSquare className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                       <span>
                         {phase.completedTaskCount || 0} / {phase.taskCount || 0} Tasks
                       </span>

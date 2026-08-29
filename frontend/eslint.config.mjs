@@ -28,6 +28,7 @@ export default tseslint.config(
             "usePermissions",
             "useProjectContext",
             "useToast",
+            "useTheme",
           ],
         },
       ],

@@ -64,23 +64,23 @@ export const ActivateAccountPage: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-1">
-        <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 mb-1">
+        <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900 mb-1">
           <KeyRound className="w-5 h-5" />
         </div>
-        <h3 className="text-xl font-bold text-slate-900">Activate Your Account</h3>
-        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Activate Your Account</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
           Establish your secure password to begin accessing your assigned workspace
         </p>
       </div>
 
       {isActivated ? (
         <div className="text-center space-y-4 py-4">
-          <div className="w-12 h-12 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto">
             <CheckCircle2 className="w-7 h-7" />
           </div>
           <div className="space-y-1">
-            <h4 className="text-base font-bold text-slate-900">Account Successfully Activated</h4>
-            <p className="text-xs text-slate-600 leading-relaxed max-w-sm mx-auto">
+            <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">Account Successfully Activated</h4>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-sm mx-auto">
               Your password has been configured and your role-based credentials are active. You may now log in to access your project workspace.
             </p>
           </div>
@@ -95,11 +95,11 @@ export const ActivateAccountPage: React.FC = () => {
       ) : (
         <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Approval Notice */}
-          <div className="p-3 bg-emerald-50/80 rounded-lg border border-emerald-200/80 flex items-start gap-2.5 text-xs text-emerald-900">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+          <div className="p-3 bg-emerald-50/80 dark:bg-emerald-950/40 rounded-lg border border-emerald-200/80 dark:border-emerald-800 flex items-start gap-2.5 text-xs text-emerald-900 dark:text-emerald-300">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
-              <p className="font-semibold text-emerald-950">Your access request has been approved</p>
-              <p className="text-emerald-800 leading-relaxed">
+              <p className="font-semibold text-emerald-950 dark:text-emerald-200">Your access request has been approved</p>
+              <p className="text-emerald-800 dark:text-emerald-300/80 leading-relaxed">
                 Enter your single-use activation code and configure your permanent password below.
               </p>
             </div>
@@ -138,28 +138,28 @@ export const ActivateAccountPage: React.FC = () => {
           />
 
           {/* Password Requirements Live Checklist */}
-          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1.5">
-            <span className="font-semibold text-slate-700 block text-[11px] uppercase tracking-wider">
+          <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-800 text-xs space-y-1.5">
+            <span className="font-semibold text-slate-700 dark:text-slate-300 block text-[11px] uppercase tracking-wider">
               Password Requirements
             </span>
             <div className="space-y-1 text-xs">
               <div className="flex items-center gap-1.5">
                 {hasMinLength ? (
-                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 ) : (
-                  <X className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <X className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
                 )}
-                <span className={hasMinLength ? "text-emerald-700 font-medium" : "text-slate-500"}>
+                <span className={hasMinLength ? "text-emerald-700 dark:text-emerald-300 font-medium" : "text-slate-500 dark:text-slate-400"}>
                   At least 8 characters in length
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
                 {passwordsMatch ? (
-                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 ) : (
-                  <X className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <X className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
                 )}
-                <span className={passwordsMatch ? "text-emerald-700 font-medium" : "text-slate-500"}>
+                <span className={passwordsMatch ? "text-emerald-700 dark:text-emerald-300 font-medium" : "text-slate-500 dark:text-slate-400"}>
                   Passwords match
                 </span>
               </div>
@@ -180,7 +180,7 @@ export const ActivateAccountPage: React.FC = () => {
           <div className="text-center pt-2">
             <Link
               to="/login"
-              className="text-xs font-semibold text-slate-600 hover:text-brand-600 inline-flex items-center gap-1.5 transition-colors"
+              className="text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 inline-flex items-center gap-1.5 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Sign In
             </Link>

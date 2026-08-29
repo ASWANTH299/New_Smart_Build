@@ -122,10 +122,10 @@ export const PhaseDetailPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-xs text-slate-500">
+      <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
         <Link
           to={`/projects/${projectId}/phases`}
-          className="hover:text-slate-900 inline-flex items-center gap-1"
+          className="hover:text-slate-900 dark:hover:text-slate-100 inline-flex items-center gap-1 transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Back to Phases
         </Link>
@@ -159,9 +159,9 @@ export const PhaseDetailPage: React.FC = () => {
 
       <Card title="Phase Progression Overview">
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-xs text-slate-700">
+          <div className="flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
             <span className="font-semibold">Cumulative Progress</span>
-            <span className="font-bold text-brand-600">{phase.progress}%</span>
+            <span className="font-bold text-brand-600 dark:text-brand-400">{phase.progress}%</span>
           </div>
           <ProgressIndicator progress={phase.progress} size="lg" />
         </div>
@@ -169,8 +169,8 @@ export const PhaseDetailPage: React.FC = () => {
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <CheckSquare className="w-4 h-4 text-brand-600" /> Tasks in Phase ({tasks.length})
+          <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <CheckSquare className="w-4 h-4 text-brand-600 dark:text-brand-400" /> Tasks in Phase ({tasks.length})
           </h2>
         </div>
 
@@ -194,15 +194,15 @@ export const PhaseDetailPage: React.FC = () => {
                 to={`/projects/${projectId}/tasks/${task._id}`}
                 className="block group"
               >
-                <div className="p-4 bg-white rounded-xl border border-slate-200 hover:border-brand-500 hover:shadow-sm transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-brand-500 dark:hover:border-brand-500 hover:shadow-sm transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-slate-900 group-hover:text-brand-600 text-sm">
+                      <h3 className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-brand-600 dark:group-hover:text-brand-400 text-sm transition-colors">
                         {task.title}
                       </h3>
                       <StatusBadge status={task.status} size="sm" />
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-500">
+                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
                       <span>
                         Scope: {task.completedQuantity} / {task.plannedQuantity} {task.unit}
                       </span>
@@ -212,9 +212,9 @@ export const PhaseDetailPage: React.FC = () => {
                   </div>
 
                   <div className="w-full sm:w-48 space-y-1">
-                    <div className="flex justify-between text-[11px] font-semibold text-slate-700">
+                    <div className="flex justify-between text-[11px] font-semibold text-slate-700 dark:text-slate-300">
                       <span>{task.progress}%</span>
-                      <span className="text-slate-400">
+                      <span className="text-slate-400 dark:text-slate-500">
                         Due {new Date(task.plannedEndDate).toLocaleDateString()}
                       </span>
                     </div>

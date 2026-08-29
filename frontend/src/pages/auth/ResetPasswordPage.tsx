@@ -49,18 +49,18 @@ export const ResetPasswordPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="text-center space-y-1">
-        <h3 className="text-xl font-bold text-slate-900">Set New Password</h3>
-        <p className="text-xs text-slate-500">
+        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Set New Password</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
           Ensure your password contains at least 8 characters
         </p>
       </div>
 
       {isSuccess ? (
         <div className="text-center space-y-4 py-3">
-          <div className="inline-flex p-3 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+          <div className="inline-flex p-3 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/40">
             <CheckCircle2 className="w-8 h-8" />
           </div>
-          <p className="text-xs sm:text-sm text-slate-700">
+          <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">
             Your password has been updated successfully.
           </p>
           <Button variant="primary" size="sm" onClick={() => navigate("/login")}>
@@ -107,7 +107,7 @@ export const ResetPasswordPage: React.FC = () => {
           </Button>
 
           <div className="text-center pt-2">
-            <Link to="/login" className="text-xs text-slate-500 hover:text-slate-900">
+            <Link to="/login" className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
               Cancel and return to login
             </Link>
           </div>

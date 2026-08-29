@@ -5,20 +5,23 @@ import { queryClient } from "./app/queryClient.js";
 import { AuthProvider } from "./hooks/useAuth.js";
 import { ProjectProvider } from "./hooks/useProjectContext.js";
 import { ToastProvider } from "./hooks/useToast.js";
+import { ThemeProvider } from "./hooks/useTheme.js";
 import { AppRoutes } from "./routes/AppRoutes.js";
 
 export const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <ProjectProvider>
-            <ToastProvider>
-              <AppRoutes />
-            </ToastProvider>
-          </ProjectProvider>
-        </AuthProvider>
-      </BrowserRouter>
+      <ThemeProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <ProjectProvider>
+              <ToastProvider>
+                <AppRoutes />
+              </ToastProvider>
+            </ProjectProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };

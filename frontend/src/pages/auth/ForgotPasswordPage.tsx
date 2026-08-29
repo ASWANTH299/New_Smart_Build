@@ -34,19 +34,19 @@ export const ForgotPasswordPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="text-center space-y-1">
-        <h3 className="text-xl font-bold text-slate-900">Reset Your Password</h3>
-        <p className="text-xs text-slate-500">
+        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Reset Your Password</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
           Enter your registered work email to receive password reset instructions
         </p>
       </div>
 
       {isSubmitted ? (
         <div className="text-center space-y-4 py-3">
-          <div className="inline-flex p-3 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+          <div className="inline-flex p-3 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/40">
             <CheckCircle2 className="w-8 h-8" />
           </div>
-          <p className="text-xs sm:text-sm text-slate-700">
-            If an account exists for <span className="font-semibold text-slate-900">{email}</span>, a secure password reset link has been dispatched.
+          <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+            If an account exists for <span className="font-semibold text-slate-900 dark:text-slate-100">{email}</span>, a secure password reset link has been dispatched.
           </p>
           <div className="pt-2">
             <Link to="/login">
@@ -76,7 +76,7 @@ export const ForgotPasswordPage: React.FC = () => {
           <div className="text-center pt-2">
             <Link
               to="/login"
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to Login</span>

@@ -247,14 +247,14 @@ export const UsersPage: React.FC = () => {
       header: "User Details",
       accessor: (u: User) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-brand-50 border border-brand-200 text-brand-700 flex items-center justify-center font-bold text-xs shrink-0">
+          <div className="w-8 h-8 rounded-full bg-brand-50 dark:bg-brand-950/80 border border-brand-200 dark:border-brand-800 text-brand-700 dark:text-brand-300 flex items-center justify-center font-bold text-xs shrink-0">
             {u.name ? u.name.charAt(0).toUpperCase() : "U"}
           </div>
           <div className="flex flex-col min-w-0">
-            <Link to={`/admin/users/${u.id}`} className="font-semibold text-slate-900 hover:text-brand-600 hover:underline truncate">
+            <Link to={`/admin/users/${u.id}`} className="font-semibold text-slate-900 dark:text-slate-100 hover:text-brand-600 dark:hover:text-brand-400 hover:underline truncate">
               {u.name}
             </Link>
-            <span className="text-xs text-slate-500 truncate">{u.email}</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 truncate">{u.email}</span>
           </div>
         </div>
       ),
@@ -431,14 +431,14 @@ export const UsersPage: React.FC = () => {
       />
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200 gap-4 text-sm font-semibold">
+      <div className="flex border-b border-slate-200/80 dark:border-slate-800 gap-6 text-sm font-semibold transition-colors duration-150">
         <button
           type="button"
           onClick={() => setActiveTab("users")}
-          className={`pb-3 flex items-center gap-2 border-b-2 transition-colors ${
+          className={`pb-3 flex items-center gap-2 border-b-2 font-display transition-colors ${
             activeTab === "users"
-              ? "border-brand-600 text-brand-600"
-              : "border-transparent text-slate-500 hover:text-slate-700"
+              ? "border-brand-600 dark:border-brand-400 text-brand-600 dark:text-brand-400 font-bold"
+              : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
           }`}
         >
           <Users className="w-4 h-4" />
@@ -447,16 +447,16 @@ export const UsersPage: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab("requests")}
-          className={`pb-3 flex items-center gap-2 border-b-2 transition-colors ${
+          className={`pb-3 flex items-center gap-2 border-b-2 font-display transition-colors ${
             activeTab === "requests"
-              ? "border-brand-600 text-brand-600"
-              : "border-transparent text-slate-500 hover:text-slate-700"
+              ? "border-brand-600 dark:border-brand-400 text-brand-600 dark:text-brand-400 font-bold"
+              : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
           }`}
         >
           <Inbox className="w-4 h-4" />
           <span>Access Requests</span>
           {pendingRequestsCount > 0 && (
-            <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+            <span className="bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-800 font-sans">
               {pendingRequestsCount} new
             </span>
           )}
@@ -597,20 +597,20 @@ export const UsersPage: React.FC = () => {
       >
         {generatedActivationToken ? (
           <div className="space-y-4 py-2">
-            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2">
-              <div className="flex items-center gap-2 text-emerald-800 font-semibold text-sm">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-2xl space-y-2">
+              <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-bold text-sm font-display">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 Account Created (Pending Activation)
               </div>
-              <p className="text-xs text-emerald-700">
-                Share this activation token with the user to establish their account password:
+              <p className="text-xs text-emerald-700 dark:text-emerald-400 leading-relaxed">
+                Share this single-use activation token with the user to establish their secure password:
               </p>
               <div className="flex items-center gap-2 pt-1">
                 <input
                   type="text"
                   readOnly
                   value={generatedActivationToken}
-                  className="w-full font-mono text-xs bg-white border border-emerald-300 rounded px-2.5 py-1.5 text-slate-800"
+                  className="w-full font-mono text-xs bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 select-all"
                 />
                 <Button
                   variant="outline"

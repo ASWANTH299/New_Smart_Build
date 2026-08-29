@@ -95,10 +95,10 @@ export const TaskDetailPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-xs text-slate-500">
+      <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
         <Link
           to={`/projects/${projectId}/tasks`}
-          className="hover:text-slate-900 inline-flex items-center gap-1"
+          className="hover:text-slate-900 dark:hover:text-slate-100 inline-flex items-center gap-1 transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Back to Project Tasks
         </Link>
@@ -146,36 +146,36 @@ export const TaskDetailPage: React.FC = () => {
         <div className="lg:col-span-2 space-y-6">
           <Card title="Quantity Progress Tracking">
             <div className="space-y-4">
-              <div className="flex items-center justify-between text-xs text-slate-700">
+              <div className="flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
                 <span className="font-semibold">Calculated Completion Percentage</span>
-                <span className="font-bold text-brand-600">{task.progress}%</span>
+                <span className="font-bold text-brand-600 dark:text-brand-400">{task.progress}%</span>
               </div>
               <ProgressIndicator progress={task.progress} size="lg" />
 
-              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-slate-100 text-center">
-                <div className="p-3 bg-slate-50 rounded-lg">
-                  <span className="text-[11px] text-slate-500 block">Planned Quantity</span>
-                  <span className="text-sm font-bold text-slate-900">
+              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-center">
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-200/60 dark:border-slate-800">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 block">Planned Quantity</span>
+                  <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
                     {task.plannedQuantity} {task.unit}
                   </span>
                 </div>
-                <div className="p-3 bg-emerald-50 rounded-lg">
-                  <span className="text-[11px] text-emerald-700 block">Completed Quantity</span>
-                  <span className="text-sm font-bold text-emerald-900">
+                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-lg border border-emerald-200/60 dark:border-emerald-900/60">
+                  <span className="text-[11px] text-emerald-700 dark:text-emerald-400 block">Completed Quantity</span>
+                  <span className="text-sm font-bold text-emerald-900 dark:text-emerald-200">
                     {task.completedQuantity} {task.unit}
                   </span>
                 </div>
-                <div className="p-3 bg-amber-50 rounded-lg">
-                  <span className="text-[11px] text-amber-700 block">Remaining Work</span>
-                  <span className="text-sm font-bold text-amber-900">
+                <div className="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-lg border border-amber-200/60 dark:border-amber-900/60">
+                  <span className="text-[11px] text-amber-700 dark:text-amber-400 block">Remaining Work</span>
+                  <span className="text-sm font-bold text-amber-900 dark:text-amber-200">
                     {remainingQty} {task.unit}
                   </span>
                 </div>
               </div>
 
               {task.description && (
-                <div className="pt-2 text-xs text-slate-600">
-                  <span className="font-semibold block text-slate-900 mb-1">Specifications:</span>
+                <div className="pt-2 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800">
+                  <span className="font-semibold block text-slate-900 dark:text-slate-100 mb-1">Specifications:</span>
                   <p>{task.description}</p>
                 </div>
               )}
@@ -185,20 +185,20 @@ export const TaskDetailPage: React.FC = () => {
           {/* Dependencies Card */}
           <Card title="Finish-to-Start Prerequisites">
             {!task.dependencies || task.dependencies.length === 0 ? (
-              <p className="text-xs text-slate-500 italic">No prerequisite dependencies.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic">No prerequisite dependencies.</p>
             ) : (
               <div className="space-y-2">
                 {task.dependencies.map((dep) => (
                   <div
                     key={dep._id}
-                    className="p-3 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between text-xs"
+                    className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs"
                   >
                     <div className="flex items-center gap-2">
-                      <LinkIcon className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="font-bold text-slate-900">{dep.title}</span>
+                      <LinkIcon className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+                      <span className="font-bold text-slate-900 dark:text-slate-100">{dep.title}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-mono text-slate-500">{dep.progress}%</span>
+                      <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">{dep.progress}%</span>
                       <StatusBadge status={dep.status} size="sm" />
                     </div>
                   </div>
@@ -210,26 +210,26 @@ export const TaskDetailPage: React.FC = () => {
           {/* Historical Progress Records */}
           <Card title={`Field Progress Log History (${history.length})`}>
             {history.length === 0 ? (
-              <p className="text-xs text-slate-500 italic">No historical progress recorded yet.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic">No historical progress recorded yet.</p>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {history.map((record) => (
                   <div key={record._id} className="py-3 space-y-1">
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
-                        <History className="w-3.5 h-3.5 text-brand-600" />
-                        <span className="font-bold text-slate-900">
+                        <History className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
+                        <span className="font-bold text-slate-900 dark:text-slate-100">
                           {record.completedQuantity} {record.unit} logged
                         </span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-mono">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono">
                           {record.source}
                         </span>
                       </div>
-                      <span className="text-[11px] text-slate-400">
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500">
                         {new Date(record.date).toLocaleDateString()}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-[11px] text-slate-500">
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                       <span>Logged by {record.enteredBy?.name || "Field User"}</span>
                       {record.notes && <span className="italic">"{record.notes}"</span>}
                     </div>
@@ -245,28 +245,28 @@ export const TaskDetailPage: React.FC = () => {
           <Card title="Task Information">
             <div className="space-y-3 text-xs">
               <div>
-                <span className="text-slate-500 block">Lead Assignee</span>
-                <span className="font-semibold text-slate-900">
+                <span className="text-slate-500 dark:text-slate-400 block">Lead Assignee</span>
+                <span className="font-semibold text-slate-900 dark:text-slate-100">
                   {task.assigneeId ? `${task.assigneeId.name} (${task.assigneeId.primaryRole})` : "Unassigned"}
                 </span>
               </div>
               {task.contractorId && (
                 <div>
-                  <span className="text-slate-500 block">Contractor Lead</span>
-                  <span className="font-semibold text-slate-900">{task.contractorId.name}</span>
+                  <span className="text-slate-500 dark:text-slate-400 block">Contractor Lead</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">{task.contractorId.name}</span>
                 </div>
               )}
               <div>
-                <span className="text-slate-500 block">Construction Phase</span>
-                <span className="font-semibold text-slate-900">
+                <span className="text-slate-500 dark:text-slate-400 block">Construction Phase</span>
+                <span className="font-semibold text-slate-900 dark:text-slate-100">
                   {phaseObj ? `Phase ${phaseObj.sequence || ""}: ${phaseObj.name}` : "General"}
                 </span>
               </div>
-              <div className="pt-2 border-t border-slate-100 space-y-2">
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
                 <div>
-                  <span className="text-slate-500 block text-[11px]">Planned Schedule</span>
-                  <div className="flex items-center gap-1 font-semibold text-slate-900">
-                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Planned Schedule</span>
+                  <div className="flex items-center gap-1 font-semibold text-slate-900 dark:text-slate-100">
+                    <Calendar className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                     <span>
                       {new Date(task.plannedStartDate).toLocaleDateString()} –{" "}
                       {new Date(task.plannedEndDate).toLocaleDateString()}
@@ -275,8 +275,8 @@ export const TaskDetailPage: React.FC = () => {
                 </div>
                 {task.actualStartDate && (
                   <div>
-                    <span className="text-slate-500 block text-[11px]">Actual Execution</span>
-                    <span className="font-semibold text-slate-900">
+                    <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Actual Execution</span>
+                    <span className="font-semibold text-slate-900 dark:text-slate-100">
                       Started {new Date(task.actualStartDate).toLocaleDateString()}
                       {task.actualEndDate && ` • Completed ${new Date(task.actualEndDate).toLocaleDateString()}`}
                     </span>

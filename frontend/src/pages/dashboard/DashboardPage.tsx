@@ -129,7 +129,7 @@ export const DashboardPage: React.FC = () => {
             action={
               <Link
                 to="/projects"
-                className="text-xs font-semibold text-brand-600 hover:text-brand-700 inline-flex items-center gap-1"
+                className="text-xs font-bold text-brand-600 dark:text-brand-400 hover:text-brand-700 inline-flex items-center gap-1 font-display"
               >
                 <span>Full Directory</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -157,36 +157,39 @@ export const DashboardPage: React.FC = () => {
                 }
               />
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="space-y-3">
                 {projects.map((project) => (
-                  <div key={project._id} className="py-4 first:pt-0 last:pb-0 space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                      <div>
+                  <div
+                    key={project._id}
+                    className="p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-150 space-y-3 shadow-2xs"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-slate-500 font-mono">
+                          <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 font-mono px-1.5 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 border border-slate-300/60 dark:border-slate-700">
                             {project.code}
                           </span>
                           <Link
                             to={`/projects/${project._id}`}
-                            className="text-sm font-semibold text-slate-900 hover:text-brand-600 transition-colors"
+                            className="text-sm font-bold text-slate-900 dark:text-slate-100 hover:text-brand-600 dark:hover:text-brand-400 font-display transition-colors"
                           >
                             {project.name}
                           </Link>
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-slate-500 mt-0.5">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />
+                        <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                          <span className="flex items-center gap-1 truncate max-w-[200px]">
+                            <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
                             {project.location}
                           </span>
                           {project.plannedEndDate && (
-                            <span className="flex items-center gap-1">
-                              <Calendar className="w-3 h-3" />
+                            <span className="flex items-center gap-1 shrink-0">
+                              <Calendar className="w-3 h-3 text-slate-400 shrink-0" />
                               Target: {new Date(project.plannedEndDate).toLocaleDateString()}
                             </span>
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 mt-2 sm:mt-0">
+                      <div className="flex items-center gap-2 mt-1 sm:mt-0 shrink-0">
                         <StatusBadge status={project.health} size="sm" />
                         <StatusBadge status={project.status} size="sm" />
                       </div>
@@ -206,37 +209,43 @@ export const DashboardPage: React.FC = () => {
         {/* Phase 6/7 Operational Intelligence Card */}
         <div className="space-y-4">
           <Card
-            title="Operational Overview"
-            subtitle="Platform readiness & phase status"
+            title="Operational Readiness"
+            subtitle="Platform roadmap & capability status"
           >
-            <div className="space-y-3 text-xs text-slate-600">
-              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-1.5">
-                <div className="flex items-center justify-between font-semibold text-slate-800">
+            <div className="space-y-3 text-xs text-slate-600 dark:text-slate-400">
+              <div className="p-3.5 bg-slate-50/80 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-800 space-y-1.5">
+                <div className="flex items-center justify-between font-bold text-slate-800 dark:text-slate-200 font-display">
                   <span>Project & Team Foundation</span>
-                  <span className="text-emerald-700 font-bold">Phase 6</span>
+                  <span className="text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded text-[10px] border border-emerald-200/60 dark:border-emerald-800">
+                    Phase 6 Active
+                  </span>
                 </div>
-                <p className="text-slate-500 text-[11px]">
-                  User management, RBAC authorization, and project memberships are active.
+                <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+                  User management, RBAC authorization, and project memberships are verified.
                 </p>
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-1.5">
-                <div className="flex items-center justify-between font-semibold text-slate-800">
+              <div className="p-3.5 bg-slate-50/80 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-800 space-y-1.5">
+                <div className="flex items-center justify-between font-bold text-slate-800 dark:text-slate-200 font-display">
                   <span>Progress & Milestone Tracking</span>
-                  <span className="text-emerald-700 font-bold">Phase 7</span>
+                  <span className="text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded text-[10px] border border-emerald-200/60 dark:border-emerald-800">
+                    Phase 7 Active
+                  </span>
                 </div>
-                <p className="text-slate-500 text-[11px]">
-                  Quantity progress logging, hierarchical rollups, and rule-based health are active.
+                <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+                  Quantity progress logging, hierarchical rollups, and rule-based health intelligence active.
                 </p>
               </div>
 
-              <div className="p-3 bg-amber-50/60 rounded-lg border border-amber-200/60 space-y-1.5">
-                <div className="flex items-center justify-between font-semibold text-amber-900">
+              <div className="p-3.5 bg-amber-50/40 dark:bg-amber-950/20 rounded-xl border border-amber-200/60 dark:border-amber-900/40 space-y-1.5">
+                <div className="flex items-center justify-between font-bold text-amber-900 dark:text-amber-300 font-display">
                   <span>Materials & Supply Chain</span>
-                  <span className="text-amber-700 font-bold text-[10px] uppercase">Phase 8</span>
+                  <span className="text-amber-700 dark:text-amber-400 font-bold text-[10px] uppercase bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-800">
+                    Phase 8 Next
+                  </span>
                 </div>
-                <p className="text-amber-800/80 text-[11px]">
-                  Material catalog, inventory registers, and GRN workflows unlock in Phase 8.
+                <p className="text-amber-800/80 dark:text-amber-400/80 text-[11px] leading-relaxed">
+                  Material catalog, inventory registers, and site GRN workflows scheduled for Phase 8.
                 </p>
               </div>
             </div>

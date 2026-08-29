@@ -119,8 +119,8 @@ export const UserDetailPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-xs text-slate-500">
-        <Link to="/admin/users" className="hover:text-slate-900 inline-flex items-center gap-1">
+      <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+        <Link to="/admin/users" className="hover:text-slate-900 dark:hover:text-slate-100 inline-flex items-center gap-1 transition-colors">
           <ArrowLeft className="w-3.5 h-3.5" /> Back to Users Directory
         </Link>
       </div>
@@ -146,7 +146,7 @@ export const UserDetailPage: React.FC = () => {
               <Button
                 variant="outline"
                 size="sm"
-                className="text-red-600 border-red-200 hover:bg-red-50"
+                className="text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/60 hover:bg-red-50 dark:hover:bg-red-950/40"
                 leftIcon={<Trash2 className="w-4 h-4" />}
                 onClick={() => setIsDeleteModalOpen(true)}
               >
@@ -163,29 +163,29 @@ export const UserDetailPage: React.FC = () => {
           <Card title="Account Overview">
             <div className="space-y-3 text-xs">
               <div>
-                <span className="text-slate-500 block">Full Name</span>
-                <span className="font-semibold text-slate-900">{user.name}</span>
+                <span className="text-slate-500 dark:text-slate-400 block">Full Name</span>
+                <span className="font-semibold text-slate-900 dark:text-slate-100">{user.name}</span>
               </div>
               <div>
-                <span className="text-slate-500 block">Email Address</span>
-                <span className="font-mono text-slate-700">{user.email}</span>
+                <span className="text-slate-500 dark:text-slate-400 block">Email Address</span>
+                <span className="font-mono text-slate-700 dark:text-slate-300">{user.email}</span>
               </div>
               <div>
-                <span className="text-slate-500 block">Primary Role</span>
+                <span className="text-slate-500 dark:text-slate-400 block">Primary Role</span>
                 <div className="mt-1">
                   <StatusBadge status={user.primaryRole} size="sm" />
                 </div>
               </div>
               <div>
-                <span className="text-slate-500 block">Account Status</span>
+                <span className="text-slate-500 dark:text-slate-400 block">Account Status</span>
                 <div className="mt-1">
                   <StatusBadge status={user.status} size="sm" />
                 </div>
               </div>
               {user.lastLoginAt && (
                 <div>
-                  <span className="text-slate-500 block">Last Active</span>
-                  <span className="text-slate-700">{new Date(user.lastLoginAt).toLocaleString()}</span>
+                  <span className="text-slate-500 dark:text-slate-400 block">Last Active</span>
+                  <span className="text-slate-700 dark:text-slate-300">{new Date(user.lastLoginAt).toLocaleString()}</span>
                 </div>
               )}
             </div>
@@ -193,11 +193,11 @@ export const UserDetailPage: React.FC = () => {
 
           <Card title="Additional Permissions">
             {user.additionalPermissions.length === 0 ? (
-              <p className="text-xs text-slate-500 italic">No additional overrides granted.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic">No additional overrides granted.</p>
             ) : (
               <div className="flex flex-wrap gap-1.5">
                 {user.additionalPermissions.map((perm) => (
-                  <span key={perm} className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                  <span key={perm} className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                     {perm}
                   </span>
                 ))}
@@ -210,23 +210,23 @@ export const UserDetailPage: React.FC = () => {
         <div className="lg:col-span-2 space-y-6">
           <Card title={`Project Assignments (${projectMemberships.length})`}>
             {projectMemberships.length === 0 ? (
-              <p className="text-xs text-slate-500 italic">User is not assigned to any projects currently.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic">User is not assigned to any projects currently.</p>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {projectMemberships.map((m) => {
                   const proj = availableProjects.find((p) => p._id === m.projectId);
                   return (
                     <div key={m.projectId} className="py-3 flex items-center justify-between">
                       <div>
-                        <span className="font-semibold text-xs text-slate-900 block">
+                        <span className="font-semibold text-xs text-slate-900 dark:text-slate-100 block">
                           {proj ? proj.name : m.projectId}
                         </span>
-                        <span className="text-[11px] text-slate-500">
-                          Status: <span className="font-medium text-slate-700">{m.assignmentStatus}</span> • Assigned: {new Date(m.assignedAt).toLocaleDateString()}
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                          Status: <span className="font-medium text-slate-700 dark:text-slate-300">{m.assignmentStatus}</span> • Assigned: {new Date(m.assignedAt).toLocaleDateString()}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-50 border border-slate-200 text-slate-600">
+                        <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400">
                           {proj ? proj.code : "PROJ"}
                         </span>
                         <Button
@@ -248,16 +248,16 @@ export const UserDetailPage: React.FC = () => {
 
           <Card title="Recent Login Activity">
             {recentLogins.length === 0 ? (
-              <p className="text-xs text-slate-500 italic">No recorded login attempts.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic">No recorded login attempts.</p>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {recentLogins.map((log, idx) => (
                   <div key={idx} className="py-2.5 flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full ${log.success ? "bg-emerald-500" : "bg-red-500"}`} />
-                      <span className="font-medium text-slate-700">{log.success ? "Successful Sign In" : "Failed Sign In"}</span>
+                      <span className="font-medium text-slate-700 dark:text-slate-300">{log.success ? "Successful Sign In" : "Failed Sign In"}</span>
                     </div>
-                    <div className="text-[11px] text-slate-400">
+                    <div className="text-[11px] text-slate-400 dark:text-slate-500">
                       <span>{log.ipAddress}</span> • <span>{new Date(log.timestamp).toLocaleString()}</span>
                     </div>
                   </div>

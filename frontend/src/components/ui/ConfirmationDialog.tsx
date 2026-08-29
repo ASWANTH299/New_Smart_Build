@@ -50,7 +50,9 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       <div className="flex items-start gap-4">
         <div
           className={`shrink-0 rounded-full p-2.5 ${
-            variant === "danger" ? "bg-red-50 text-red-600" : "bg-brand-50 text-brand-600"
+            variant === "danger"
+              ? "bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400"
+              : "bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400"
           }`}
         >
           {variant === "danger" ? (
@@ -60,8 +62,8 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           )}
         </div>
         <div className="space-y-1">
-          <h4 className="text-sm font-semibold text-slate-900">{title}</h4>
-          <p className="text-xs text-slate-600 leading-relaxed">{message}</p>
+          <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{title}</h4>
+          <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{message}</p>
         </div>
       </div>
     </Modal>
