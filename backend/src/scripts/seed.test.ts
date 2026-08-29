@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { seedDatabase } from "./seed.js";
 import { UserModel, IUser } from "../modules/users/user.model.js";
 import { ProjectTypeModel } from "../modules/project-types/projectType.model.js";
+import { LoginHistoryModel } from "../modules/auth/loginHistory.model.js";
+import { AuditLogModel } from "../modules/audit/auditLog.model.js";
 import { authService } from "../modules/auth/auth.service.js";
 import { hashPassword } from "../utils/password.js";
 import { UnauthorizedError } from "../utils/AppError.js";
@@ -9,6 +11,8 @@ import { UnauthorizedError } from "../utils/AppError.js";
 describe("Admin Bootstrap & Seed Tests", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    vi.spyOn(LoginHistoryModel, "create").mockResolvedValue({} as unknown as ReturnType<typeof LoginHistoryModel.create>);
+    vi.spyOn(AuditLogModel, "create").mockResolvedValue({} as unknown as ReturnType<typeof AuditLogModel.create>);
     process.env.INITIAL_ADMIN_EMAIL = "admin@smartbuild.com";
     process.env.INITIAL_ADMIN_PASSWORD = "Admin@123456";
     process.env.INITIAL_ADMIN_NAME = "System Administrator";

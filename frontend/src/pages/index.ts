@@ -2,6 +2,7 @@ export * from "./auth/LoginPage.js";
 export * from "./auth/ForgotPasswordPage.js";
 export * from "./auth/ResetPasswordPage.js";
 export * from "./auth/ActivateAccountPage.js";
+export * from "./auth/RequestAccessPage.js";
 export * from "./dashboard/DashboardPage.js";
 export * from "./projects/ProjectsPage.js";
 export * from "./projects/CreateProjectPage.js";
@@ -18,4 +19,3 @@ export * from "./admin/EditUserPage.js";
 export * from "./shared/NotFoundPage.js";
 export * from "./shared/PermissionDeniedPage.js";
 export * from "./profile/ProfilePage.js";
-

@@ -1011,19 +1011,37 @@ Application logs and audit logs remain separate concepts.
 
 ### 9.1 User Onboarding
 
+The initial `ADMIN` user is bootstrapped automatically via environment-driven configuration. All other platform users join through the approved access workflow:
+
 ```text
-Admin
+Public User (Request Access)
  ↓
-Create / Invite User
+Submit Name, Email, Requested Role, Organization, Purpose
  ↓
-Assign Primary Role
+Status: PENDING (User is NOT active)
  ↓
-Assign Project(s)
+Admin Review in User Management Area
  ↓
-Grant Additional Permissions
+Admin Approves / Rejects & Confirms Final Role (from 6 Locked Roles)
  ↓
-User Activates Account
+Account Created with Status: PENDING_ACTIVATION
+ ↓
+Activation Token Dispatched to Requester
+ ↓
+User Accesses Activation Flow & Sets Secure Password
+ ↓
+Account Status Becomes: ACTIVE
+ ↓
+User Logs In & Receives Role-Scoped Access
 ```
+
+The 6 locked system roles are:
+1. `ADMIN`
+2. `PROJECT_MANAGER`
+3. `SITE_ENGINEER`
+4. `STORE_MANAGER`
+5. `CONTRACTOR`
+6. `CLIENT`
 
 ### 9.2 Project Creation
 

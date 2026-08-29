@@ -37,6 +37,7 @@ export const ProjectSwitcher: React.FC = () => {
     return () => {
       isMounted = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setActiveProject]);
 
   const handleSelect = (p: ProjectDetail) => {

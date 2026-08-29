@@ -1,26 +1,32 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Shield, FolderPlus, Trash2 } from "lucide-react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, FolderPlus, Trash2 } from "lucide-react";
 import { PageHeader } from "../../components/ui/PageHeader.js";
 import { Card } from "../../components/ui/Card.js";
 import { StatusBadge } from "../../components/ui/StatusBadge.js";
 import { Button } from "../../components/ui/Button.js";
 import { Modal } from "../../components/ui/Modal.js";
+import { ConfirmationDialog } from "../../components/ui/ConfirmationDialog.js";
 import { Select } from "../../components/ui/Select.js";
 import { LoadingState } from "../../components/ui/LoadingState.js";
 import { ErrorState } from "../../components/ui/ErrorState.js";
+import { useAuth } from "../../hooks/useAuth.js";
 import { useToast } from "../../hooks/useToast.js";
 import { userService, UserDetailResponse } from "../../services/userService.js";
 import { projectService, ProjectDetail } from "../../services/projectService.js";
 
 export const UserDetailPage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
+  const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
   const [data, setData] = useState<UserDetailResponse | null>(null);
   const [availableProjects, setAvailableProjects] = useState<ProjectDetail[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isAssigning, setIsAssigning] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { showSuccess, showError } = useToast();
 
   const loadData = React.useCallback(async () => {
@@ -80,10 +86,36 @@ export const UserDetailPage: React.FC = () => {
     }
   };
 
+  const handleDeleteUser = async () => {
+    if (!userId || !data) return;
+    if (currentUser?.id === userId) {
+      showError("Action Denied", "Administrators cannot delete their own account.");
+      setIsDeleteModalOpen(false);
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const res = await userService.deleteUser(userId);
+      if (res.success) {
+        showSuccess("Account Removed", `User ${data.user.email} has been deactivated and removed from active project assignments.`);
+        navigate("/admin/users");
+      } else {
+        showError("Deletion Failed", res.message || "Failed to delete user account.");
+      }
+    } catch (error) {
+      showError("Deletion Failed", error instanceof Error ? error.message : "Error deleting user account.");
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
+    }
+  };
+
   if (isLoading) return <LoadingState message="Loading user profile..." />;
   if (!data) return <ErrorState title="User Not Found" message="Could not find the requested user." />;
 
   const { user, projectMemberships, recentLogins } = data;
+  const isSelf = currentUser?.id === user.id;
 
   return (
     <div className="space-y-6">
@@ -110,6 +142,17 @@ export const UserDetailPage: React.FC = () => {
             >
               Assign Project
             </Button>
+            {!isSelf && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-red-600 border-red-200 hover:bg-red-50"
+                leftIcon={<Trash2 className="w-4 h-4" />}
+                onClick={() => setIsDeleteModalOpen(true)}
+              >
+                Deactivate Account
+              </Button>
+            )}
           </div>
         }
       />
@@ -120,20 +163,23 @@ export const UserDetailPage: React.FC = () => {
           <Card title="Account Overview">
             <div className="space-y-3 text-xs">
               <div>
+                <span className="text-slate-500 block">Full Name</span>
+                <span className="font-semibold text-slate-900">{user.name}</span>
+              </div>
+              <div>
                 <span className="text-slate-500 block">Email Address</span>
-                <span className="font-semibold text-slate-900">{user.email}</span>
+                <span className="font-mono text-slate-700">{user.email}</span>
               </div>
               <div>
                 <span className="text-slate-500 block">Primary Role</span>
-                <div className="flex items-center gap-1.5 font-semibold text-slate-900 mt-0.5">
-                  <Shield className="w-4 h-4 text-brand-600" />
-                  <span>{user.primaryRole.replace(/_/g, " ")}</span>
+                <div className="mt-1">
+                  <StatusBadge status={user.primaryRole} size="sm" />
                 </div>
               </div>
               <div>
                 <span className="text-slate-500 block">Account Status</span>
                 <div className="mt-1">
-                  <StatusBadge status={user.status} />
+                  <StatusBadge status={user.status} size="sm" />
                 </div>
               </div>
               {user.lastLoginAt && (
@@ -175,19 +221,24 @@ export const UserDetailPage: React.FC = () => {
                         <span className="font-semibold text-xs text-slate-900 block">
                           {proj ? proj.name : m.projectId}
                         </span>
-                        <span className="text-[10px] text-slate-400">
-                          Assigned on {new Date(m.assignedAt).toLocaleDateString()}
+                        <span className="text-[11px] text-slate-500">
+                          Status: <span className="font-medium text-slate-700">{m.assignmentStatus}</span> • Assigned: {new Date(m.assignedAt).toLocaleDateString()}
                         </span>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => handleRemoveAssignment(m.projectId)}
-                        title="Remove project assignment"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-50 border border-slate-200 text-slate-600">
+                          {proj ? proj.code : "PROJ"}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-slate-400 hover:text-red-600 p-1"
+                          onClick={() => handleRemoveAssignment(m.projectId)}
+                          title="Remove project assignment"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
                     </div>
                   );
                 })}
@@ -244,6 +295,19 @@ export const UserDetailPage: React.FC = () => {
           </div>
         </form>
       </Modal>
+
+      {/* Safe Deactivate User Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteUser}
+        title="Deactivate & Remove Account"
+        message={`Are you sure you want to remove the account for ${user.name} (${user.email})? This will deactivate login credentials and safely remove the user from all active project assignments. Historical audit and progress logs will be preserved.`}
+        confirmLabel="Deactivate & Remove Account"
+        cancelLabel="Cancel"
+        variant="danger"
+        isLoading={isDeleting}
+      />
     </div>
   );
 };

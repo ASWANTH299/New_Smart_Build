@@ -1003,14 +1003,17 @@ At minimum, automate these journeys:
 ### E2E-01 User onboarding
 
 ``` text
-Admin login
- → create/invite user
- → assign role
- → assign project
- → grant permission
- → activation
- → user login
- → role dashboard
+Public user submits access request (/request-access)
+ → status: PENDING
+ → Admin logs in & opens Access Requests (/admin/users)
+ → Admin reviews & approves request, confirming role from 6 locked roles
+ → Account created with status: PENDING_ACTIVATION
+ → Activation token generated & dispatched
+ → User visits /activate with token
+ → User sets secure password
+ → Account status transitions to ACTIVE
+ → User logs in (/login)
+ → System enforces role-scoped dashboard and project access
 ```
 
 ### E2E-02 Project creation

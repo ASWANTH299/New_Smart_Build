@@ -16,6 +16,22 @@ export interface UserDetailResponse {
   recentLogins: Array<{ success: boolean; ipAddress: string; timestamp: string }>;
 }
 
+export interface AccessRequest {
+  _id: string;
+  name: string;
+  email: string;
+  requestedRole: UserRole;
+  organization?: string;
+  reason?: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  reviewedBy?: { _id: string; name: string; email: string };
+  reviewedAt?: string;
+  rejectionReason?: string;
+  assignedRole?: UserRole;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const userService = {
   async getUsers(params?: {
     search?: string;
@@ -71,6 +87,45 @@ export const userService = {
     projectId: string
   ): Promise<ApiResponse<{ message: string }>> {
     return await apiClient.delete<{ message: string }>(`/users/${userId}/projects/${projectId}`);
+  },
+
+  async deleteUser(userId: string): Promise<ApiResponse<User>> {
+    return await apiClient.delete<User>(`/users/${userId}`);
+  },
+
+  // Access Requests management (ADMIN only)
+  async getAccessRequests(params?: {
+    status?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<ApiResponse<AccessRequest[]>> {
+    const query = new URLSearchParams();
+    if (params?.status) query.set("status", params.status);
+    if (params?.page) query.set("page", params.page.toString());
+    if (params?.limit) query.set("limit", params.limit.toString());
+
+    const qs = query.toString() ? `?${query.toString()}` : "";
+    return await apiClient.get<AccessRequest[]>(`/users/access-requests${qs}`);
+  },
+
+  async approveAccessRequest(
+    id: string,
+    data: { assignedRole: UserRole; additionalPermissions?: string[]; projectIds?: string[] }
+  ): Promise<ApiResponse<{ accessRequest: AccessRequest; activationToken: string }>> {
+    return await apiClient.post<{ accessRequest: AccessRequest; activationToken: string }>(
+      `/users/access-requests/${id}/approve`,
+      data
+    );
+  },
+
+  async rejectAccessRequest(
+    id: string,
+    data: { reason: string }
+  ): Promise<ApiResponse<{ accessRequest: AccessRequest }>> {
+    return await apiClient.post<{ accessRequest: AccessRequest }>(
+      `/users/access-requests/${id}/reject`,
+      data
+    );
   },
 };
 

@@ -713,28 +713,27 @@ Examples:
 
 The implementation must include:
 
-- Secure password hashing
-- JWT authentication
-- Authorization middleware
-- Project-level authorization
-- Input validation
+- Secure password hashing (bcrypt with cost factor 10+)
+- JWT authentication with role and permissions encoded
+- Time-limited, single-use, cryptographically secure account activation tokens (7-day validity)
+- Request access workflow with public role selection constrained strictly to the 6 locked roles
+- Backend authorization as the final security boundary for access request review and approval
+- Authorization middleware (`requireRoles`, `requirePermissions`, `requireProjectAccess`)
+- Project-level authorization and client portal data isolation
+- Input validation via Zod schemas for all public and authenticated endpoints
 - Secure file handling
 - Centralized error handling
-- Audit logging
-- Login history
-- Failed-login tracking
-- Rate limiting for sensitive endpoints where appropriate
-- Secure HTTP configuration
-- CORS configuration
-- Environment-based secrets
-- No sensitive information in logs
+- Audit logging for user creation, request approval/rejection, role assignment, and password modifications
+- Login history and failed-login lockout tracking
+- Environment-based secrets with no hardcoded credentials
+- No sensitive information in logs or API responses
 
-Sensitive values that must not appear in logs include:
+Sensitive values that must not appear in logs or unauthenticated responses include:
 
-- Passwords
+- Passwords and password hashes
+- Raw activation tokens
 - Password reset tokens
 - JWT secrets
-- Full authentication tokens
 - Encryption secrets
 - Unnecessary personal data
 

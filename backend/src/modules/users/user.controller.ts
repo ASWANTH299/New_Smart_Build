@@ -112,6 +112,17 @@ export class UserController {
       next(error);
     }
   }
+
+  async deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = String(req.params.userId);
+      const adminUserId = req.user!._id.toString();
+      const result = await userService.deleteUser(userId, adminUserId);
+      sendSuccess(res, result, undefined, 200, "User account deactivated and removed successfully");
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const userController = new UserController();

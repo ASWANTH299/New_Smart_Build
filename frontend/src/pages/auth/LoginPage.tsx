@@ -110,6 +110,16 @@ export const LoginPage: React.FC = () => {
         >
           Sign In
         </Button>
+
+        <div className="text-center text-xs text-slate-500 pt-3 border-t border-slate-100 mt-4">
+          <span>Don't have an account? </span>
+          <Link
+            to="/request-access"
+            className="font-semibold text-brand-600 hover:text-brand-700 hover:underline"
+          >
+            Request Access
+          </Link>
+        </div>
       </form>
     </div>
   );

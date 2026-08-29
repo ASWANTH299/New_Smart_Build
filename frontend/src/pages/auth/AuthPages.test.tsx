@@ -5,6 +5,7 @@ import { LoginPage } from "./LoginPage.js";
 import { ForgotPasswordPage } from "./ForgotPasswordPage.js";
 import { ResetPasswordPage } from "./ResetPasswordPage.js";
 import { ActivateAccountPage } from "./ActivateAccountPage.js";
+import { RequestAccessPage } from "./RequestAccessPage.js";
 import { AuthProvider } from "../../hooks/useAuth.js";
 import { ToastProvider } from "../../hooks/useToast.js";
 import authService from "../../services/authService.js";
@@ -19,7 +20,7 @@ const renderWithProviders = (component: React.ReactNode) => {
   );
 };
 
-describe("Authentication Pages Integration Tests (Phase 4)", () => {
+describe("Authentication & Onboarding Pages Integration Tests", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     localStorage.clear();
@@ -81,6 +82,70 @@ describe("Authentication Pages Integration Tests (Phase 4)", () => {
     });
   });
 
+  describe("RequestAccessPage", () => {
+    it("renders access request form and submits payload", async () => {
+      vi.spyOn(authService, "requestAccess").mockResolvedValueOnce({
+        success: true,
+        data: { message: "Submitted" },
+      });
+
+      renderWithProviders(<RequestAccessPage />);
+
+      expect(screen.getByText("Request Platform Access")).toBeInTheDocument();
+
+      fireEvent.change(screen.getByLabelText(/Full Name/i), {
+        target: { value: "Jane Engineer" },
+      });
+      fireEvent.change(screen.getByLabelText(/Email Address/i), {
+        target: { value: "jane@engineer.com" },
+      });
+      fireEvent.change(screen.getByLabelText(/Organization/i), {
+        target: { value: "Metro Civil" },
+      });
+
+      fireEvent.click(screen.getByRole("button", { name: /Submit Access Request/i }));
+
+      await waitFor(() => {
+        expect(authService.requestAccess).toHaveBeenCalledWith(
+          expect.objectContaining({
+            name: "Jane Engineer",
+            email: "jane@engineer.com",
+            organization: "Metro Civil",
+          })
+        );
+        expect(screen.getByText("Access Request Submitted")).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe("ActivateAccountPage", () => {
+    it("submits activation token and new password", async () => {
+      vi.spyOn(authService, "activateAccount").mockResolvedValueOnce({
+        success: true,
+        data: { message: "Activated" },
+      });
+
+      renderWithProviders(<ActivateAccountPage />);
+
+      fireEvent.change(screen.getByLabelText(/Activation Token/i), {
+        target: { value: "valid-token-123" },
+      });
+      fireEvent.change(screen.getByLabelText(/Create New Password/i), {
+        target: { value: "InitialPass123!" },
+      });
+      fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+        target: { value: "InitialPass123!" },
+      });
+
+      fireEvent.click(screen.getByRole("button", { name: /Activate Account/i }));
+
+      await waitFor(() => {
+        expect(authService.activateAccount).toHaveBeenCalledWith("valid-token-123", "InitialPass123!");
+        expect(screen.getByText("Account Successfully Activated")).toBeInTheDocument();
+      });
+    });
+  });
+
   describe("ForgotPasswordPage", () => {
     it("submits email and displays confirmation message upon success", async () => {
       vi.spyOn(authService, "forgotPassword").mockResolvedValueOnce({
@@ -124,27 +189,6 @@ describe("Authentication Pages Integration Tests (Phase 4)", () => {
       await waitFor(() => {
         expect(authService.resetPassword).toHaveBeenCalledWith("rst-token-123", "NewSecure123!");
         expect(screen.getByText(/password has been updated successfully/i)).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe("ActivateAccountPage", () => {
-    it("submits activation code and new password", async () => {
-      vi.spyOn(authService, "activateAccount").mockResolvedValueOnce({
-        success: true,
-        data: { message: "Activated" },
-      });
-
-      renderWithProviders(<ActivateAccountPage />);
-
-      fireEvent.change(screen.getByLabelText(/Activation Code/i), { target: { value: "ACT-123" } });
-      fireEvent.change(screen.getByLabelText(/^Set Password/i), { target: { value: "InitialPass123!" } });
-      fireEvent.change(screen.getByLabelText(/Confirm Password/i), { target: { value: "InitialPass123!" } });
-
-      fireEvent.click(screen.getByRole("button", { name: /Activate Account/i }));
-
-      await waitFor(() => {
-        expect(authService.activateAccount).toHaveBeenCalledWith("ACT-123", "InitialPass123!");
       });
     });
   });

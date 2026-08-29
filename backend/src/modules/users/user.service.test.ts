@@ -114,4 +114,49 @@ describe("UserService Unit Tests (Phase 6)", () => {
     expect(ProjectMembershipModel.findOneAndUpdate).toHaveBeenCalled();
     expect(AuditLogModel.create).toHaveBeenCalled();
   });
+
+  it("should prevent admin from deleting their own account", async () => {
+    await expect(
+      userService.deleteUser("admin-123", "admin-123")
+    ).rejects.toThrow("Administrators cannot delete their own account.");
+  });
+
+  it("should safely delete user by deactivating status and removing project memberships", async () => {
+    const mockTargetUser = {
+      _id: "507f1f77bcf86cd799439020",
+      name: "Contractor User",
+      email: "contractor@vendor.com",
+      primaryRole: "CONTRACTOR",
+      additionalPermissions: [],
+      status: "ACTIVE",
+      deactivatedAt: null as Date | null,
+      passwordChangedAt: null as Date | null,
+      save: vi.fn().mockResolvedValue(true),
+    };
+
+    vi.spyOn(UserModel, "findById").mockReturnValue({
+      exec: vi.fn().mockResolvedValue(mockTargetUser),
+    } as unknown as ReturnType<typeof UserModel.findById>);
+
+    vi.spyOn(ProjectMembershipModel, "updateMany").mockResolvedValue({} as unknown as ReturnType<typeof ProjectMembershipModel.updateMany>);
+    vi.spyOn(AuditLogModel, "create").mockResolvedValue({} as unknown as IAuditLog);
+
+    const result = await userService.deleteUser(
+      "507f1f77bcf86cd799439020",
+      "507f1f77bcf86cd799439001"
+    );
+
+    expect(mockTargetUser.status).toBe("DEACTIVATED");
+    expect(mockTargetUser.deactivatedAt).not.toBeNull();
+    expect(mockTargetUser.passwordChangedAt).not.toBeNull();
+    expect(mockTargetUser.save).toHaveBeenCalled();
+    expect(ProjectMembershipModel.updateMany).toHaveBeenCalledWith(
+      { userId: mockTargetUser._id, assignmentStatus: "ACTIVE" },
+      expect.objectContaining({ assignmentStatus: "REMOVED" })
+    );
+    expect(AuditLogModel.create).toHaveBeenCalledWith(
+      expect.objectContaining({ action: "USER_DELETED" })
+    );
+    expect(result.status).toBe("DEACTIVATED");
+  });
 });

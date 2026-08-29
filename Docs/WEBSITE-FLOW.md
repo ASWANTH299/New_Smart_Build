@@ -103,7 +103,37 @@ The application uses a version-independent frontend route structure.
 /login
 /forgot-password
 /reset-password
+/activate
 /activate-account
+/request-access
+```
+
+### 4.1.1 User Onboarding & Access Flow
+
+The user onboarding screen flow progresses as follows:
+
+```text
+Public Visitor
+  ↓
+/request-access (Enters Name, Email, Requested Role [from 6 locked roles], Organization, Scope)
+  ↓
+Success Confirmation Screen (Request status: PENDING)
+  ↓
+ADMIN Workspace (/admin/users -> Access Requests Tab)
+  ↓
+ADMIN Reviews Request Details -> Approves / Rejects -> Confirms Assigned Role
+  ↓
+Account Created in PENDING_ACTIVATION State + Activation Token Dispatched
+  ↓
+Approved User Navigates to /activate or /activate-account?token=...
+  ↓
+User Validates Token & Sets Secure Password (min. 8 characters)
+  ↓
+Account Status Transitions to ACTIVE
+  ↓
+User Logs in at /login with Email + Password
+  ↓
+Redirected to Role-Scoped Dashboard (/dashboard or /client-portal)
 ```
 
 ## 4.2 Internal Application Routes

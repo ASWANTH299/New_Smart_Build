@@ -19,6 +19,16 @@ export const authService = {
     });
   },
 
+  async requestAccess(data: {
+    name: string;
+    email: string;
+    requestedRole: string;
+    organization?: string;
+    reason?: string;
+  }): Promise<ApiResponse<{ message: string }>> {
+    return await apiClient.post<{ message: string }>("/auth/request-access", data);
+  },
+
   async logout(): Promise<ApiResponse<MessageResponseData>> {
     return await apiClient.post<MessageResponseData>("/auth/logout");
   },

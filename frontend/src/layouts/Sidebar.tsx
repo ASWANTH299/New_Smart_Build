@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   Building2,
   Settings,
+  Users,
   X,
 } from "lucide-react";
 import { usePermissions } from "../hooks/useAuth.js";
@@ -69,6 +70,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       : []),
     ...(isAdmin
       ? [
+          {
+            name: "User Management",
+            href: "/admin/users",
+            icon: <Users className="w-4 h-4 shrink-0" />,
+          },
           {
             name: "System Settings",
             href: "/settings",

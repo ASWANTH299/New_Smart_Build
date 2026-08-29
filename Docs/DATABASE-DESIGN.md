@@ -137,11 +137,15 @@ email
 passwordHash
 primaryRole
 additionalPermissions[]
-status
+status (ACTIVE | DEACTIVATED | LOCKED | PENDING_ACTIVATION)
 accountLockedUntil
 passwordChangedAt
 lastLoginAt
 failedLoginCount
+activationToken
+activationExpires
+resetPasswordToken
+resetPasswordExpires
 createdAt
 updatedAt
 deactivatedAt
@@ -162,7 +166,7 @@ Constraints:
 
 -   Email must be unique.
 -   Password is never stored in plaintext.
--   Deactivated users cannot authenticate.
+-   Deactivated and pending activation users cannot authenticate.
 -   Historical records remain after deactivation.
 
 Indexes:
@@ -171,6 +175,46 @@ Indexes:
 unique: email
 status
 primaryRole
+activationToken
+resetPasswordToken
+```
+
+------------------------------------------------------------------------
+
+### 5.1.1 `access_requests`
+
+Purpose: public registration & administrator review queue before account provisioning.
+
+Fields:
+
+``` text
+_id
+name
+email
+requestedRole (ADMIN | PROJECT_MANAGER | SITE_ENGINEER | STORE_MANAGER | CONTRACTOR | CLIENT)
+organization
+reason
+status (PENDING | APPROVED | REJECTED)
+reviewedBy (userId reference)
+reviewedAt
+rejectionReason
+assignedRole
+userId (created user reference upon approval)
+createdAt
+updatedAt
+```
+
+Constraints:
+
+-   Cannot submit duplicate access requests while a request is pending for the same email.
+-   Approval provisions a user in `PENDING_ACTIVATION` state and generates a single-use time-limited activation token.
+
+Indexes:
+
+``` text
+email
+status
+{ email, status }
 ```
 
 ------------------------------------------------------------------------

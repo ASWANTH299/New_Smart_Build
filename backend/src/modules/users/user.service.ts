@@ -7,6 +7,7 @@ import { hashPassword, generateSecureToken } from "../../utils/password.js";
 import {
   ConflictError,
   NotFoundError,
+  BadRequestError,
 } from "../../utils/AppError.js";
 import { sanitizeUser, UserResponse } from "../auth/auth.service.js";
 
@@ -307,6 +308,43 @@ export class UserService {
       projectId,
       metadata: { userId: user._id.toString() },
     });
+  }
+
+  async deleteUser(userId: string, adminUserId: string): Promise<UserResponse> {
+    if (userId === adminUserId) {
+      throw new BadRequestError("Administrators cannot delete their own account.");
+    }
+
+    const user = await UserModel.findById(userId).exec();
+    if (!user) {
+      throw new NotFoundError("User not found.");
+    }
+
+    // Safe deactivation lifecycle: retain user record for audit logs & referential integrity
+    user.status = "DEACTIVATED";
+    user.deactivatedAt = new Date();
+    user.passwordChangedAt = new Date();
+    await user.save();
+
+    // Mark all active project memberships as removed
+    await ProjectMembershipModel.updateMany(
+      { userId: user._id, assignmentStatus: "ACTIVE" },
+      { assignmentStatus: "REMOVED", removedAt: new Date() }
+    );
+
+    await logAuditAction({
+      actorUserId: adminUserId,
+      action: "USER_DELETED",
+      entityType: "USER",
+      entityId: user._id.toString(),
+      metadata: {
+        email: user.email,
+        name: user.name,
+        primaryRole: user.primaryRole,
+      },
+    });
+
+    return sanitizeUser(user);
   }
 }
 

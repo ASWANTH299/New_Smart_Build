@@ -584,18 +584,20 @@ Implement complete authentication including login, password hashing, JWT token m
 ### Scope
 
 - `users` collection (initial schema for authentication-relevant fields only; full user management in Phase 6).
-- `login_history` collection.
-- Password hashing (bcrypt or argon2).
+- `access_requests` collection (public access requests, admin review, role assignment, and activation token generation).
+- Password hashing (bcrypt).
 - JWT token generation and verification with configurable secret and expiration.
+- Public Request Access endpoint (`POST /api/v1/auth/request-access`) with validation for the 6 locked roles.
+- Admin Access Request review endpoints (`GET /api/v1/users/access-requests`, `POST /api/v1/users/access-requests/:id/approve`, `POST /api/v1/users/access-requests/:id/reject`).
 - Login endpoint with credential validation, account status check, lock check, failed-login tracking, login history recording, and session/token creation.
 - Logout endpoint with session/token invalidation.
 - Password reset request and execution flow.
-- Account activation flow (user receives invitation, opens activation page, sets credentials, account becomes active).
+- Account activation flow (`POST /api/v1/auth/activate`: user submits activation token, sets secure credentials, account transitions to ACTIVE).
 - Password change for authenticated users.
 - Authentication middleware that validates JWT on every protected request, checks account status, and attaches user context to the request.
 - Session expiration handling.
 - Account lock after configurable failed attempts.
-- Frontend: Login page, Forgot Password page, Reset Password page, Activate Account page, authentication state management, protected route integration.
+- Frontend: Login page, Request Access page, Forgot Password page, Reset Password page, Activate Account page, Admin Access Requests review tab, authentication state management, protected route integration.
 
 ### Backend Implementation
 

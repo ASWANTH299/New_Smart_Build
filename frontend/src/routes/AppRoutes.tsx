@@ -11,6 +11,7 @@ import {
   ForgotPasswordPage,
   ResetPasswordPage,
   ActivateAccountPage,
+  RequestAccessPage,
   DashboardPage,
   ProjectsPage,
   CreateProjectPage,
@@ -32,7 +33,7 @@ import {
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* 1. Public Authentication Routes */}
+      {/* 1. Public Authentication & Onboarding Routes */}
       <Route
         element={
           <PublicRoute>
@@ -43,7 +44,9 @@ export const AppRoutes: React.FC = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/activate" element={<ActivateAccountPage />} />
         <Route path="/activate-account" element={<ActivateAccountPage />} />
+        <Route path="/request-access" element={<RequestAccessPage />} />
       </Route>
 
       {/* 2. Client Portal Routes */}

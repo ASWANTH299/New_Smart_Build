@@ -1,5 +1,6 @@
 import { Router } from "express";
 import authController from "./auth.controller.js";
+import accessRequestController from "../users/accessRequest.controller.js";
 import { validateRequest } from "../../middleware/validate.js";
 import { authenticate } from "../../middleware/authenticate.js";
 import {
@@ -9,10 +10,11 @@ import {
   activateAccountSchema,
   changePasswordSchema,
 } from "./auth.validator.js";
+import { createAccessRequestSchema } from "../users/accessRequest.validator.js";
 
 const router = Router();
 
-// Public Authentication Endpoints
+// Public Authentication & Onboarding Endpoints
 router.post("/login", validateRequest(loginSchema), (req, res, next) =>
   authController.login(req, res, next)
 );
@@ -24,6 +26,12 @@ router.post("/reset-password", validateRequest(resetPasswordSchema), (req, res, 
 );
 router.post("/activate-account", validateRequest(activateAccountSchema), (req, res, next) =>
   authController.activateAccount(req, res, next)
+);
+router.post("/activate", validateRequest(activateAccountSchema), (req, res, next) =>
+  authController.activateAccount(req, res, next)
+);
+router.post("/request-access", validateRequest(createAccessRequestSchema), (req, res, next) =>
+  accessRequestController.createAccessRequest(req, res, next)
 );
 
 // Protected Authentication Endpoints
