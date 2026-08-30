@@ -7,6 +7,7 @@ import projectTypeRoutes from "../modules/project-types/projectType.routes.js";
 import projectTemplateRoutes from "../modules/project-templates/projectTemplate.routes.js";
 import materialRoutes from "../modules/materials/material.routes.js";
 import inventoryRoutes from "../modules/inventory/inventory.routes.js";
+import vendorRoutes from "../modules/vendors/vendor.routes.js";
 
 const router = Router();
 
@@ -28,6 +29,9 @@ router.use("/materials", materialRoutes);
 
 // Mount inventory management routes at /api/v1/inventory
 router.use("/inventory", inventoryRoutes);
+
+// Mount vendor management routes at /api/v1/vendors
+router.use("/vendors", vendorRoutes);
 
 // Mount project operations routes at /api/v1/projects
 router.use("/projects", projectRoutes);

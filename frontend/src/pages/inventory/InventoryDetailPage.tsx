@@ -6,7 +6,6 @@ import {
   InventoryBalance,
   InventoryTransaction,
 } from "../../types/material.js";
-import { useAuth } from "../../hooks/useAuth.js";
 import { useToast } from "../../hooks/useToast.js";
 import Card from "../../components/ui/Card.js";
 import StatusBadge from "../../components/ui/StatusBadge.js";
@@ -15,7 +14,6 @@ import ErrorState from "../../components/ui/ErrorState.js";
 
 export const InventoryDetailPage: React.FC = () => {
   const { locationId } = useParams<{ locationId: string }>();
-  const { user: _user } = useAuth();
   const { showError } = useToast();
 
   const [location, setLocation] = useState<InventoryLocation | null>(null);

@@ -32,6 +32,12 @@ import {
   UsersPage,
   UserDetailPage,
   EditUserPage,
+  VendorsPage,
+  VendorDetailPage,
+  ProcurementRequestsPage,
+  PurchaseOrdersPage,
+  PurchaseOrderDetailPage,
+  ReceivingPage,
   ProfilePage,
   NotFoundPage,
   PermissionDeniedPage,
@@ -115,6 +121,16 @@ export const AppRoutes: React.FC = () => {
         {/* Master Materials Catalog */}
         <Route path="/materials" element={<MaterialCatalogPage />} />
         <Route path="/materials/:materialId" element={<MaterialDetailPage />} />
+
+        {/* Master Vendors Directory (Phase 9) */}
+        <Route path="/vendors" element={<VendorsPage />} />
+        <Route path="/vendors/:vendorId" element={<VendorDetailPage />} />
+
+        {/* Project Procurement & Purchasing (Phase 9) */}
+        <Route path="/projects/:projectId/procurement-requests" element={<ProcurementRequestsPage />} />
+        <Route path="/projects/:projectId/purchase-orders" element={<PurchaseOrdersPage />} />
+        <Route path="/projects/:projectId/purchase-orders/:orderId" element={<PurchaseOrderDetailPage />} />
+        <Route path="/projects/:projectId/receiving" element={<ReceivingPage />} />
 
         {/* Multi-Location Inventory & Warehouse Operations */}
         <Route path="/inventory" element={<InventoryPage />} />

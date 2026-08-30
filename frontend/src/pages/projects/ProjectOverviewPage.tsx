@@ -203,6 +203,21 @@ export const ProjectOverviewPage: React.FC = () => {
             Material Requests
           </Button>
         </Link>
+        <Link to={`/projects/${projectId}/procurement-requests`} className="shrink-0">
+          <Button variant="outline" size="sm" leftIcon={<Layers className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
+            Procurement Requests
+          </Button>
+        </Link>
+        <Link to={`/projects/${projectId}/purchase-orders`} className="shrink-0">
+          <Button variant="outline" size="sm" leftIcon={<Package className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
+            Purchase Orders
+          </Button>
+        </Link>
+        <Link to={`/projects/${projectId}/receiving`} className="shrink-0">
+          <Button variant="outline" size="sm" leftIcon={<CheckCircle2 className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
+            Receiving & GRN
+          </Button>
+        </Link>
       </div>
 
       {/* Overview Metrics Cards */}

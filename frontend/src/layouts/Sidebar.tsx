@@ -7,6 +7,7 @@ import {
   Package,
   ShieldCheck,
   Building2,
+  Truck,
   Settings,
   Users,
   X,
@@ -52,6 +53,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       href: "/materials",
       icon: <Package className="w-4 h-4 shrink-0" />,
       roles: ["ADMIN", "PROJECT_MANAGER", "STORE_MANAGER", "SITE_ENGINEER"],
+    },
+    {
+      name: "Vendors & Suppliers",
+      href: "/vendors",
+      icon: <Truck className="w-4 h-4 shrink-0" />,
+      roles: ["ADMIN", "PROJECT_MANAGER", "STORE_MANAGER"],
     },
     {
       name: "Inventory & Materials",
