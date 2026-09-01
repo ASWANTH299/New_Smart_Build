@@ -38,6 +38,7 @@ export const InventoryPage: React.FC = () => {
 
   // Modals
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
+  const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -48,6 +49,13 @@ export const InventoryPage: React.FC = () => {
     materialId: "",
     quantity: 1,
     unitCost: 0,
+    reason: "",
+  });
+
+  const [issueData, setIssueData] = useState({
+    locationId: "",
+    materialId: "",
+    quantity: 1,
     reason: "",
   });
 
@@ -70,7 +78,8 @@ export const InventoryPage: React.FC = () => {
   const canManage =
     user?.primaryRole === "ADMIN" ||
     user?.primaryRole === "STORE_MANAGER" ||
-    user?.primaryRole === "PROJECT_MANAGER";
+    user?.primaryRole === "PROJECT_MANAGER" ||
+    user?.primaryRole === "SITE_ENGINEER";
 
   const fetchInventoryData = useCallback(async () => {
     try {
@@ -130,6 +139,35 @@ export const InventoryPage: React.FC = () => {
       }
     } catch (err: unknown) {
       showError("Error", err instanceof Error ? err.message : "Failed to receive materials");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  // Issue Submit
+  const handleIssueSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!issueData.locationId || !issueData.materialId || issueData.quantity <= 0) {
+      showError("Validation Error", "Please fill in location, material and a valid quantity.");
+      return;
+    }
+
+    try {
+      setProcessing(true);
+      const res = await materialService.issueMaterials({
+        ...issueData,
+        quantity: Number(issueData.quantity),
+        reason: issueData.reason.trim() || "Stock issuance from warehouse",
+      });
+
+      if (res.success) {
+        showSuccess("Stock Issued", "Materials issued from store successfully.");
+        setIsIssueModalOpen(false);
+        setIssueData({ locationId: "", materialId: "", quantity: 1, reason: "" });
+        fetchInventoryData();
+      }
+    } catch (err: unknown) {
+      showError("Error", err instanceof Error ? err.message : "Failed to issue materials");
     } finally {
       setProcessing(false);
     }
@@ -222,6 +260,13 @@ export const InventoryPage: React.FC = () => {
               onClick={() => setIsReceiveModalOpen(true)}
             >
               + Receive Stock
+            </Button>
+            <Button
+              id="issue-materials-btn"
+              variant="outline"
+              onClick={() => setIsIssueModalOpen(true)}
+            >
+              - Issue Stock
             </Button>
             <Button
               id="transfer-materials-btn"
@@ -669,6 +714,72 @@ export const InventoryPage: React.FC = () => {
             </Button>
             <Button variant="primary" type="submit" isLoading={processing}>
               Apply Adjustment
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Issue Stock Modal */}
+      <Modal
+        isOpen={isIssueModalOpen}
+        onClose={() => setIsIssueModalOpen(false)}
+        title="Issue / Requisition Materials"
+        description="Issue construction materials from storage location for site execution or requisition."
+      >
+        <form onSubmit={handleIssueSubmit} className="space-y-4">
+          <Select
+            id="issue-location-select"
+            label="Storage Location *"
+            value={issueData.locationId}
+            onChange={(e) => setIssueData({ ...issueData, locationId: e.target.value })}
+            options={[
+              { value: "", label: "-- Select Location --" },
+              ...locations.map((loc) => ({ value: loc._id, label: loc.name })),
+            ]}
+            required
+          />
+
+          <Select
+            id="issue-material-select"
+            label="Material *"
+            value={issueData.materialId}
+            onChange={(e) => setIssueData({ ...issueData, materialId: e.target.value })}
+            options={[
+              { value: "", label: "-- Select Material --" },
+              ...materials.map((m) => ({
+                value: m._id,
+                label: `${m.code} - ${m.name} (${m.unit})`,
+              })),
+            ]}
+            required
+          />
+
+          <Input
+            id="issue-quantity"
+            label="Quantity to Issue *"
+            type="number"
+            min="0.01"
+            step="any"
+            value={issueData.quantity}
+            onChange={(e) => setIssueData({ ...issueData, quantity: Number(e.target.value) })}
+            required
+          />
+
+          <Input
+            id="issue-reason"
+            label="Issuance Reason / Work Reference *"
+            placeholder="e.g. Dispatched to Site Engineer for slab reinforcement"
+            value={issueData.reason}
+            onChange={(e) => setIssueData({ ...issueData, reason: e.target.value })}
+            required
+          />
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+            <Button variant="outline" type="button" onClick={() => setIsIssueModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit" isLoading={processing}>
+              Confirm Stock Issuance
             </Button>
           </div>
         </form>

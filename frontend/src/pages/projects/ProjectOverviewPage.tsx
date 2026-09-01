@@ -11,6 +11,11 @@ import {
   AlertTriangle,
   HeartPulse,
   Package,
+  UserPlus,
+  UserX,
+  Sparkles,
+  Users,
+  Shield,
 } from "lucide-react";
 import { PageHeader } from "../../components/ui/PageHeader.js";
 import { Card } from "../../components/ui/Card.js";
@@ -31,7 +36,8 @@ import {
 } from "../../services/projectService.js";
 import { phaseService, Phase } from "../../services/phaseService.js";
 import { milestoneService, Milestone } from "../../services/milestoneService.js";
-import { ProjectContextType } from "../../types/index.js";
+import { userService } from "../../services/userService.js";
+import { ProjectContextType, User } from "../../types/index.js";
 
 export const ProjectOverviewPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -45,14 +51,25 @@ export const ProjectOverviewPage: React.FC = () => {
       assignedAt: string;
     }>
   >([]);
+  const [allRegisteredUsers, setAllRegisteredUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitializingPhases, setIsInitializingPhases] = useState(false);
+
+  // Status Modal State
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [nextStatus, setNextStatus] = useState<ProjectContextType["status"]>("ACTIVE");
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
+  // Add Team Member Modal State
+  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+  const [selectedUserToAdd, setSelectedUserToAdd] = useState("");
+  const [isAddingMember, setIsAddingMember] = useState(false);
+  const [removingUserId, setRemovingUserId] = useState<string | null>(null);
+
   const { activeProject, setActiveProject } = useProjectContext();
   const { showSuccess, showError } = useToast();
   const { isAdmin, isProjectManager } = usePermissions();
+  const canManage = isAdmin || isProjectManager;
 
   const loadData = useCallback(async () => {
     if (!projectId) return;
@@ -87,6 +104,85 @@ export const ProjectOverviewPage: React.FC = () => {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  const handleOpenAddMemberModal = async () => {
+    setIsAddMemberModalOpen(true);
+    try {
+      const res = await userService.getUsers({ status: "ACTIVE", limit: 100 });
+      if (res.success && res.data) {
+        setAllRegisteredUsers(res.data);
+        const available = res.data.filter((u) => !team.some((t) => t.user.id === u.id));
+        if (available.length > 0) {
+          setSelectedUserToAdd(available[0].id);
+        }
+      }
+    } catch {
+      showError("Error", "Failed to load platform users directory.");
+    }
+  };
+
+  const handleAddMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!projectId || !selectedUserToAdd) {
+      showError("Validation Error", "Please select a registered user to assign.");
+      return;
+    }
+
+    setIsAddingMember(true);
+    try {
+      const res = await projectService.addTeamMember(projectId, selectedUserToAdd);
+      if (res.success && res.data) {
+        showSuccess("Member Assigned", res.data.message);
+        setIsAddMemberModalOpen(false);
+        loadData();
+      }
+    } catch (error) {
+      showError(
+        "Assignment Failed",
+        error instanceof Error ? error.message : "Error assigning user to project."
+      );
+    } finally {
+      setIsAddingMember(false);
+    }
+  };
+
+  const handleRemoveMember = async (targetUserId: string, targetName: string) => {
+    if (!projectId) return;
+    if (!confirm(`Are you sure you want to remove ${targetName} from this project?`)) return;
+
+    setRemovingUserId(targetUserId);
+    try {
+      await projectService.removeTeamMember(projectId, targetUserId);
+      showSuccess("Member Removed", `Removed ${targetName} from the project roster.`);
+      loadData();
+    } catch (error) {
+      showError(
+        "Removal Failed",
+        error instanceof Error ? error.message : "Error removing team member."
+      );
+    } finally {
+      setRemovingUserId(null);
+    }
+  };
+
+  const handleInitializeDefaultPhases = async () => {
+    if (!projectId) return;
+    setIsInitializingPhases(true);
+    try {
+      const res = await phaseService.initializeDefaultPhases(projectId);
+      if (res.success && res.data) {
+        showSuccess("Phases Initialized", "Baseline construction phases generated successfully.");
+        setPhases(res.data);
+      }
+    } catch (error) {
+      showError(
+        "Initialization Failed",
+        error instanceof Error ? error.message : "Error initializing construction phases."
+      );
+    } finally {
+      setIsInitializingPhases(false);
+    }
+  };
 
   const handleSetCurrentContext = () => {
     if (!data) return;
@@ -127,7 +223,7 @@ export const ProjectOverviewPage: React.FC = () => {
 
   const { project, daysRemaining } = data;
   const isCurrentActive = activeProject?.id === project._id;
-  const canManage = isAdmin || isProjectManager;
+  const availableUsersToAdd = allRegisteredUsers.filter((u) => !team.some((t) => t.user.id === u.id));
 
   return (
     <div className="space-y-6">
@@ -244,7 +340,7 @@ export const ProjectOverviewPage: React.FC = () => {
           label="Assigned Team"
           value={`${team.length}`}
           subtext="Active members on site"
-          icon={<Layers className="w-5 h-5" />}
+          icon={<Users className="w-5 h-5" />}
         />
       </div>
 
@@ -271,13 +367,37 @@ export const ProjectOverviewPage: React.FC = () => {
           <Card
             title={`Construction Phases Roadmap (${phases.length})`}
             action={
-              <Link to={`/projects/${projectId}/phases`} className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline">
-                View All
-              </Link>
+              <div className="flex items-center gap-2">
+                {phases.length === 0 && canManage && (
+                  <button
+                    type="button"
+                    onClick={handleInitializeDefaultPhases}
+                    className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline inline-flex items-center gap-1"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Auto-Initialize
+                  </button>
+                )}
+                <Link to={`/projects/${projectId}/phases`} className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+                  View All
+                </Link>
+              </div>
             }
           >
             {phases.length === 0 ? (
-              <p className="text-xs text-slate-500 dark:text-slate-400 italic">No phases defined.</p>
+              <div className="py-4 text-center space-y-3">
+                <p className="text-xs text-slate-500 dark:text-slate-400 italic">No phases defined for this project.</p>
+                {canManage && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    isLoading={isInitializingPhases}
+                    onClick={handleInitializeDefaultPhases}
+                    leftIcon={<Sparkles className="w-3.5 h-3.5 text-amber-500" />}
+                  >
+                    Initialize 4 Default Construction Phases
+                  </Button>
+                )}
+              </div>
             ) : (
               <div className="space-y-3">
                 {phases.slice(0, 4).map((p) => (
@@ -413,32 +533,124 @@ export const ProjectOverviewPage: React.FC = () => {
               </div>
             </div>
           </Card>
-
-          <Card title={`Project Team Roster (${team.length})`}>
-            {team.length === 0 ? (
-              <p className="text-xs text-slate-500 dark:text-slate-400 italic">No team members assigned.</p>
-            ) : (
-              <div className="space-y-2">
-                {team.map((member) => (
-                  <div
-                    key={member.membershipId}
-                    className="p-2 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between text-xs"
-                  >
-                    <div>
-                      <span className="font-semibold text-slate-900 dark:text-slate-100 block">{member.user.name}</span>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">{member.user.email}</span>
-                    </div>
-                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-brand-50 dark:bg-brand-950/80 text-brand-700 dark:text-brand-300 uppercase">
-                      {member.user.primaryRole.replace(/_/g, " ")}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
         </div>
       </div>
 
+      {/* Dedicated Project Team & Members Section */}
+      <Card
+        title={`Project Team & Operational Workforce (${team.length})`}
+        action={
+          canManage ? (
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<UserPlus className="w-3.5 h-3.5" />}
+              onClick={handleOpenAddMemberModal}
+            >
+              Add Member to Project
+            </Button>
+          ) : undefined
+        }
+      >
+        {team.length === 0 ? (
+          <div className="py-6 text-center space-y-2">
+            <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+              No team members are currently assigned to this project.
+            </p>
+            {canManage && (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleOpenAddMemberModal}
+                leftIcon={<UserPlus className="w-4 h-4" />}
+              >
+                Assign First Member
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {team.map((member) => (
+              <div
+                key={member.membershipId}
+                className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-between gap-3 text-xs"
+              >
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-slate-900 dark:text-slate-100 truncate">
+                      {member.user.name}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 block truncate font-mono">
+                    {member.user.email}
+                  </span>
+                  <div className="flex items-center gap-1 text-[10px] font-semibold text-brand-700 dark:text-brand-300">
+                    <Shield className="w-3 h-3" />
+                    <span>{member.user.primaryRole.replace(/_/g, " ")}</span>
+                  </div>
+                </div>
+
+                {canManage && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 shrink-0 p-1.5 h-auto"
+                    title={`Remove ${member.user.name} from project`}
+                    isLoading={removingUserId === member.user.id}
+                    onClick={() => handleRemoveMember(member.user.id, member.user.name)}
+                  >
+                    <UserX className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+
+      {/* Add Team Member Modal */}
+      <Modal
+        isOpen={isAddMemberModalOpen}
+        onClose={() => setIsAddMemberModalOpen(false)}
+        title="Assign User to Project Team"
+        description="Select an active platform user (Site Engineer, Store Manager, Contractor, Client, etc.) to assign."
+      >
+        <form onSubmit={handleAddMember} className="space-y-4">
+          {availableUsersToAdd.length === 0 ? (
+            <p className="text-xs text-slate-500 italic py-2">
+              All active registered platform users are already assigned to this project team.
+            </p>
+          ) : (
+            <Select
+              label="Select Platform User"
+              options={availableUsersToAdd.map((u) => ({
+                value: u.id,
+                label: `${u.name} (${u.email}) — ${u.primaryRole.replace(/_/g, " ")}`,
+              }))}
+              value={selectedUserToAdd}
+              onChange={(e) => setSelectedUserToAdd(e.target.value)}
+            />
+          )}
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" type="button" onClick={() => setIsAddMemberModalOpen(false)}>
+              Cancel
+            </Button>
+            {availableUsersToAdd.length > 0 && (
+              <Button
+                variant="primary"
+                type="submit"
+                isLoading={isAddingMember}
+                leftIcon={<UserPlus className="w-4 h-4" />}
+              >
+                Add Member to Project
+              </Button>
+            )}
+          </div>
+        </form>
+      </Modal>
+
+      {/* Status Lifecycle Modal */}
       <Modal
         isOpen={isStatusModalOpen}
         onClose={() => setIsStatusModalOpen(false)}

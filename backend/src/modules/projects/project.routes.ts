@@ -80,6 +80,20 @@ router.get(
   (req, res, next) => projectController.getProjectTeam(req, res, next)
 );
 
+router.post(
+  "/:projectId/team",
+  requireProjectAccess("projectId"),
+  requireRoles("ADMIN", "PROJECT_MANAGER"),
+  (req, res, next) => projectController.addTeamMember(req, res, next)
+);
+
+router.delete(
+  "/:projectId/team/:userId",
+  requireProjectAccess("projectId"),
+  requireRoles("ADMIN", "PROJECT_MANAGER"),
+  (req, res, next) => projectController.removeTeamMember(req, res, next)
+);
+
 router.get(
   "/:projectId/health",
   requireProjectAccess("projectId"),

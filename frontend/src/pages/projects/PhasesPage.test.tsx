@@ -75,7 +75,7 @@ describe("PhasesPage Integration Tests (Phase 7)", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Substructure & Foundation")).toBeInTheDocument();
-      expect(screen.getByText("Phase Progression:")).toBeInTheDocument();
+      expect(screen.getByText("Phase Progress")).toBeInTheDocument();
       expect(screen.getByText("Excavation, footing, plinth")).toBeInTheDocument();
     });
   });

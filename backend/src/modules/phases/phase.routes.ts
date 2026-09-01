@@ -20,6 +20,12 @@ router.post(
   (req, res, next) => phaseController.createPhase(req, res, next)
 );
 
+router.post(
+  "/initialize-defaults",
+  requireRoles("ADMIN", "PROJECT_MANAGER"),
+  (req, res, next) => phaseController.initializeDefaultPhases(req, res, next)
+);
+
 router.get("/:phaseId", (req, res, next) =>
   phaseController.getPhaseById(req, res, next)
 );

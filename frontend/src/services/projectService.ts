@@ -117,6 +117,20 @@ export const projectService = {
     return await apiClient.get(`/projects/${projectId}/team`);
   },
 
+  async addTeamMember(
+    projectId: string,
+    userId: string
+  ): Promise<ApiResponse<{ message: string; user: { id: string; name: string; email: string; primaryRole: string } }>> {
+    return await apiClient.post(`/projects/${projectId}/team`, { userId });
+  },
+
+  async removeTeamMember(
+    projectId: string,
+    userId: string
+  ): Promise<ApiResponse<{ message: string }>> {
+    return await apiClient.delete(`/projects/${projectId}/team/${userId}`);
+  },
+
   async getProjectTypes(): Promise<ApiResponse<ProjectType[]>> {
     return await apiClient.get<ProjectType[]>("/project-types");
   },

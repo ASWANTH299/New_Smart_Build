@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Plus, ArrowLeft, Layers, Calendar, CheckSquare } from "lucide-react";
+import { Plus, ArrowLeft, Layers, Calendar, CheckSquare, Sparkles } from "lucide-react";
 import { PageHeader } from "../../components/ui/PageHeader.js";
 import { Card } from "../../components/ui/Card.js";
 import { StatusBadge } from "../../components/ui/StatusBadge.js";
@@ -21,6 +21,7 @@ export const PhasesPage: React.FC = () => {
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [phases, setPhases] = useState<Phase[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -56,6 +57,25 @@ export const PhasesPage: React.FC = () => {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  const handleInitializeDefaultPhases = async () => {
+    if (!projectId) return;
+    setIsInitializing(true);
+    try {
+      const res = await phaseService.initializeDefaultPhases(projectId);
+      if (res.success && res.data) {
+        showSuccess("Phases Initialized", "Baseline construction phases generated successfully.");
+        setPhases(res.data);
+      }
+    } catch (error) {
+      showError(
+        "Initialization Failed",
+        error instanceof Error ? error.message : "Error initializing construction phases."
+      );
+    } finally {
+      setIsInitializing(false);
+    }
+  };
 
   const handleCreatePhase = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,13 +129,25 @@ export const PhasesPage: React.FC = () => {
         description="Sequential construction roadmap, milestones, and task progression rollups."
         actions={
           canManage ? (
-            <Button
-              variant="primary"
-              leftIcon={<Plus className="w-4 h-4" />}
-              onClick={() => setIsModalOpen(true)}
-            >
-              Add Project Phase
-            </Button>
+            <div className="flex items-center gap-2 flex-wrap">
+              {phases.length === 0 && (
+                <Button
+                  variant="outline"
+                  leftIcon={<Sparkles className="w-4 h-4 text-amber-500" />}
+                  isLoading={isInitializing}
+                  onClick={handleInitializeDefaultPhases}
+                >
+                  Initialize Baseline Phases
+                </Button>
+              )}
+              <Button
+                variant="primary"
+                leftIcon={<Plus className="w-4 h-4" />}
+                onClick={() => setIsModalOpen(true)}
+              >
+                Add Project Phase
+              </Button>
+            </div>
           ) : undefined
         }
       />
@@ -123,12 +155,22 @@ export const PhasesPage: React.FC = () => {
       {phases.length === 0 ? (
         <EmptyState
           title="No Phases Defined"
-          description="Create structured phases (e.g. Substructure, Superstructure, MEP, Finishing) to organize project execution."
+          description="Create structured phases (e.g. Substructure, Superstructure, MEP, Finishing) or initialize baseline construction blueprints."
           action={
             canManage ? (
-              <Button variant="primary" onClick={() => setIsModalOpen(true)}>
-                Add First Phase
-              </Button>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="primary"
+                  isLoading={isInitializing}
+                  onClick={handleInitializeDefaultPhases}
+                  leftIcon={<Sparkles className="w-4 h-4" />}
+                >
+                  Initialize 4 Baseline Phases
+                </Button>
+                <Button variant="outline" onClick={() => setIsModalOpen(true)}>
+                  Add Custom Phase
+                </Button>
+              </div>
             ) : undefined
           }
         />
@@ -160,27 +202,27 @@ export const PhasesPage: React.FC = () => {
                     </p>
                   )}
 
-                  <div className="space-y-2 pt-2">
-                    <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
-                      <span className="font-medium">Phase Progression:</span>
-                      <span className="font-bold text-slate-900 dark:text-slate-100">{phase.progress}%</span>
+                  <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex justify-between text-xs text-slate-700 dark:text-slate-300 font-medium">
+                      <span>Phase Progress</span>
+                      <span className="font-bold text-brand-600 dark:text-brand-400">
+                        {phase.progress}%
+                      </span>
                     </div>
-                    <ProgressIndicator progress={phase.progress} size="md" />
+                    <ProgressIndicator progress={phase.progress} size="sm" />
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-3 border-t border-slate-100 dark:border-slate-800">
-                    <div className="flex items-center gap-1">
+                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2">
+                    <div className="flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5" />
                       <span>
-                        {new Date(phase.plannedStartDate).toLocaleDateString()} –{" "}
+                        {new Date(phase.plannedStartDate).toLocaleDateString()} -{" "}
                         {new Date(phase.plannedEndDate).toLocaleDateString()}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <CheckSquare className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-                      <span>
-                        {phase.completedTaskCount || 0} / {phase.taskCount || 0} Tasks
-                      </span>
+                      <CheckSquare className="w-3.5 h-3.5" />
+                      <span>{phase.taskCount || 0} tasks</span>
                     </div>
                   </div>
                 </div>
@@ -190,27 +232,20 @@ export const PhasesPage: React.FC = () => {
         </div>
       )}
 
+      {/* Create Phase Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title="Add Project Construction Phase"
-        description="Define milestone timeline boundaries for the execution roadmap."
+        description="Define phase name, chronological sequence, and milestone boundaries."
       >
         <form onSubmit={handleCreatePhase} className="space-y-4">
           <Input
             label="Phase Name"
             required
-            placeholder="e.g. Substructure & Foundation"
+            placeholder="e.g. Superstructure Concrete Frame"
             value={name}
             onChange={(e) => setName(e.target.value)}
-          />
-
-          <Textarea
-            label="Phase Description / Scope"
-            placeholder="Excavation, footings, plinth beam, and anti-termite treatment..."
-            rows={3}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -230,6 +265,14 @@ export const PhasesPage: React.FC = () => {
             />
           </div>
 
+          <Textarea
+            label="Phase Scope & Specifications"
+            placeholder="Key civil engineering specifications, trade handoffs, and deliverables..."
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>
               Cancel
@@ -240,7 +283,7 @@ export const PhasesPage: React.FC = () => {
               isLoading={isSubmitting}
               leftIcon={<Layers className="w-4 h-4" />}
             >
-              Create Phase
+              Add Phase
             </Button>
           </div>
         </form>

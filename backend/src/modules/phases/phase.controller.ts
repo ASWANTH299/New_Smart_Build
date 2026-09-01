@@ -14,6 +14,17 @@ export class PhaseController {
     }
   }
 
+  async initializeDefaultPhases(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const projectId = String(req.params.projectId);
+      const userId = req.user!._id.toString();
+      const phases = await phaseService.initializeDefaultPhases(projectId, userId);
+      sendSuccess(res, phases, undefined, 201, "Default phases initialized successfully");
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getPhases(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const projectId = String(req.params.projectId);

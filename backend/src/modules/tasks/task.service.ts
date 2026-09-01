@@ -257,13 +257,17 @@ export class TaskService {
             `Cannot start task: Prerequisite task '${unmet[0].title}' is not completed yet.`
           );
         }
+        task.completedAt = null;
         if (!task.actualStartDate) task.actualStartDate = new Date();
-      }
-      if (updates.status === "COMPLETED") {
+      } else if (updates.status === "COMPLETED") {
         task.progress = 100;
         task.completedQuantity = task.plannedQuantity;
         task.completedAt = new Date();
         if (!task.actualEndDate) task.actualEndDate = new Date();
+      } else if (updates.status === "TODO") {
+        task.progress = 0;
+        task.completedQuantity = 0;
+        task.completedAt = null;
       }
       task.status = updates.status;
     }

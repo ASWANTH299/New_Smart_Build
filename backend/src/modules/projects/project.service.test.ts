@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ProjectService } from "./project.service.js";
 import { ProjectModel, IProject } from "./project.model.js";
 import { ProjectMembershipModel, IProjectMembership } from "../auth/projectMembership.model.js";
+import { UserModel } from "../users/user.model.js";
 import { AuditLogModel, IAuditLog } from "../audit/auditLog.model.js";
 import { ConflictError, BadRequestError } from "../../utils/AppError.js";
 
@@ -25,6 +26,8 @@ describe("ProjectService & Lifecycle State Machine Tests (Phase 6)", () => {
       status: "PLANNING",
       health: "HEALTHY",
       progress: 0,
+      plannedStartDate: new Date("2026-09-01"),
+      plannedEndDate: new Date("2027-09-01"),
     };
 
     vi.spyOn(ProjectModel, "create").mockResolvedValue(mockProject as unknown as IProject);
@@ -46,6 +49,60 @@ describe("ProjectService & Lifecycle State Machine Tests (Phase 6)", () => {
     expect(result.code).toBe("PRJ-BLR-001");
     expect(ProjectMembershipModel.insertMany).toHaveBeenCalled();
     expect(AuditLogModel.create).toHaveBeenCalled();
+  });
+
+  it("should add a registered user to project team", async () => {
+    vi.spyOn(ProjectModel, "findById").mockReturnValue({
+      exec: vi.fn().mockResolvedValue({ _id: "507f1f77bcf86cd799439011" }),
+    } as unknown as ReturnType<typeof ProjectModel.findById>);
+
+    vi.spyOn(UserModel, "findById").mockReturnValue({
+      exec: vi.fn().mockResolvedValue({
+        _id: "507f1f77bcf86cd799439099",
+        name: "Site Eng Amit",
+        email: "amit@site.com",
+        primaryRole: "SITE_ENGINEER",
+      }),
+    } as unknown as ReturnType<typeof UserModel.findById>);
+
+    vi.spyOn(ProjectMembershipModel, "findOneAndUpdate").mockResolvedValue({} as any);
+    vi.spyOn(AuditLogModel, "create").mockResolvedValue({} as unknown as IAuditLog);
+
+    const result = await projectService.addTeamMember(
+      "507f1f77bcf86cd799439011",
+      "507f1f77bcf86cd799439099",
+      "507f1f77bcf86cd799439013"
+    );
+
+    expect(result.user.name).toBe("Site Eng Amit");
+    expect(ProjectMembershipModel.findOneAndUpdate).toHaveBeenCalled();
+  });
+
+  it("should remove a team member from project", async () => {
+    vi.spyOn(ProjectModel, "findById").mockReturnValue({
+      exec: vi.fn().mockResolvedValue({ _id: "507f1f77bcf86cd799439011" }),
+    } as unknown as ReturnType<typeof ProjectModel.findById>);
+
+    const mockMembership = {
+      assignmentStatus: "ACTIVE",
+      removedAt: null,
+      save: vi.fn().mockResolvedValue(true),
+    };
+
+    vi.spyOn(ProjectMembershipModel, "findOne").mockReturnValue({
+      exec: vi.fn().mockResolvedValue(mockMembership),
+    } as unknown as ReturnType<typeof ProjectMembershipModel.findOne>);
+
+    vi.spyOn(AuditLogModel, "create").mockResolvedValue({} as unknown as IAuditLog);
+
+    await projectService.removeTeamMember(
+      "507f1f77bcf86cd799439011",
+      "507f1f77bcf86cd799439099",
+      "507f1f77bcf86cd799439013"
+    );
+
+    expect(mockMembership.assignmentStatus).toBe("REMOVED");
+    expect(mockMembership.save).toHaveBeenCalled();
   });
 
   it("should reject duplicate project code with ConflictError", async () => {

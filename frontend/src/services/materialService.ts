@@ -191,12 +191,24 @@ export const materialService = {
     return apiClient.post<{ transaction: InventoryTransaction; balance: InventoryBalance }>("/inventory/receive", data);
   },
 
+  async issueMaterials(data: { locationId: string; materialId: string; quantity: number; referenceType?: string; referenceId?: string; projectId?: string; reason?: string }): Promise<ApiResponse<{ transaction: InventoryTransaction; balance: InventoryBalance }>> {
+    return apiClient.post<{ transaction: InventoryTransaction; balance: InventoryBalance }>("/inventory/issue", data);
+  },
+
   async transferMaterials(data: { fromLocationId: string; toLocationId: string; materialId: string; quantity: number; projectId?: string; reason?: string }): Promise<ApiResponse<{ outTransaction: InventoryTransaction; inTransaction: InventoryTransaction; fromBalance: InventoryBalance; toBalance: InventoryBalance }>> {
     return apiClient.post<{ outTransaction: InventoryTransaction; inTransaction: InventoryTransaction; fromBalance: InventoryBalance; toBalance: InventoryBalance }>("/inventory/transfer", data);
   },
 
   async adjustStock(data: { locationId: string; materialId: string; adjustedQuantity: number; adjustmentType?: "DELTA" | "SET_TOTAL"; reason: string; projectId?: string }): Promise<ApiResponse<{ transaction: InventoryTransaction; balance: InventoryBalance }>> {
     return apiClient.post<{ transaction: InventoryTransaction; balance: InventoryBalance }>("/inventory/adjust", data);
+  },
+
+  async returnMaterials(data: { locationId: string; materialId: string; quantity: number; referenceType?: string; referenceId?: string; projectId?: string; reason?: string }): Promise<ApiResponse<{ transaction: InventoryTransaction; balance: InventoryBalance }>> {
+    return apiClient.post<{ transaction: InventoryTransaction; balance: InventoryBalance }>("/inventory/return", data);
+  },
+
+  async consumeMaterials(data: { locationId: string; materialId: string; quantity: number; projectId: string; taskId?: string; reason?: string }): Promise<ApiResponse<{ transaction: InventoryTransaction; balance: InventoryBalance }>> {
+    return apiClient.post<{ transaction: InventoryTransaction; balance: InventoryBalance }>("/inventory/consume", data);
   },
 };
 

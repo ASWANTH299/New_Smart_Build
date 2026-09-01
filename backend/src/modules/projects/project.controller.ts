@@ -64,13 +64,12 @@ export class ProjectController {
   async updateProjectStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const projectId = String(req.params.projectId);
-      const { status, reason } = req.body;
+      const { status } = req.body;
       const userId = req.user!._id.toString();
       const project = await projectService.updateProjectStatus(
         projectId,
         status,
-        userId,
-        reason
+        userId
       );
       sendSuccess(
         res,
@@ -99,6 +98,30 @@ export class ProjectController {
       const projectId = String(req.params.projectId);
       const team = await projectService.getProjectTeam(projectId);
       sendSuccess(res, team);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addTeamMember(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const projectId = String(req.params.projectId);
+      const targetUserId = req.body.userId;
+      const assignedBy = req.user!._id.toString();
+      const result = await projectService.addTeamMember(projectId, targetUserId, assignedBy);
+      sendSuccess(res, result, undefined, 201, result.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async removeTeamMember(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const projectId = String(req.params.projectId);
+      const targetUserId = String(req.params.userId);
+      const removedBy = req.user!._id.toString();
+      await projectService.removeTeamMember(projectId, targetUserId, removedBy);
+      sendSuccess(res, { message: "Team member removed from project successfully" }, undefined, 200);
     } catch (error) {
       next(error);
     }

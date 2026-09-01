@@ -25,6 +25,18 @@ export const receiveMaterialsSchema = {
   }),
 };
 
+export const issueMaterialsSchema = {
+  body: z.object({
+    locationId: z.string().min(1, "Location ID is required"),
+    materialId: z.string().min(1, "Material ID is required"),
+    quantity: z.number().min(0.0001, "Quantity must be greater than 0"),
+    referenceType: z.enum(["MATERIAL_REQUEST", "TASK_CONSUMPTION", "DIRECT_ISSUE"]).default("DIRECT_ISSUE"),
+    referenceId: z.string().optional(),
+    projectId: z.string().optional(),
+    reason: z.string().max(500).optional(),
+  }),
+};
+
 export const transferMaterialsSchema = {
   body: z.object({
     fromLocationId: z.string().min(1, "Source location ID is required"),
@@ -40,7 +52,7 @@ export const adjustStockSchema = {
   body: z.object({
     locationId: z.string().min(1, "Location ID is required"),
     materialId: z.string().min(1, "Material ID is required"),
-    adjustedQuantity: z.number(), // can be positive or negative adjustment delta OR new total
+    adjustedQuantity: z.number(),
     adjustmentType: z.enum(["DELTA", "SET_TOTAL"]).default("DELTA"),
     reason: z.string().min(2, "Reason is mandatory for stock adjustments").max(500),
     projectId: z.string().optional(),

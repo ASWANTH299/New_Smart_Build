@@ -21,7 +21,7 @@ const renderComponent = () =>
     </MemoryRouter>
   );
 
-describe("TasksPage Integration Tests (Phase 7)", () => {
+describe("TasksPage Integration Tests (Phase 7 & Fixes)", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
@@ -84,6 +84,53 @@ describe("TasksPage Integration Tests (Phase 7)", () => {
     await waitFor(() => {
       expect(screen.getByText(/Log Progress: Footing Concreting/i)).toBeInTheDocument();
       expect(screen.getByText(/Planned Work Scope:/i)).toBeInTheDocument();
+    });
+  });
+
+  it("displays alert banner when phases are empty and allows auto-initializing default phases", async () => {
+    vi.spyOn(phaseService, "getPhases").mockResolvedValue({
+      success: true,
+      data: [],
+    });
+
+    vi.spyOn(projectService, "getProjectTeam").mockResolvedValue({
+      success: true,
+      data: [],
+    });
+
+    vi.spyOn(taskService, "getTasks").mockResolvedValue({
+      success: true,
+      data: [],
+    });
+
+    vi.spyOn(phaseService, "initializeDefaultPhases").mockResolvedValue({
+      success: true,
+      data: [
+        {
+          _id: "phase-default-1",
+          projectId: "p-100",
+          name: "Substructure & Deep Foundation",
+          sequence: 1,
+          plannedStartDate: "2026-09-01",
+          plannedEndDate: "2026-10-01",
+          status: "IN_PROGRESS",
+          progress: 0,
+          createdAt: "2026-08-01",
+          updatedAt: "2026-08-01",
+        },
+      ],
+    });
+
+    renderComponent();
+
+    const banner = await screen.findByText(/No Construction Phases Configured/i);
+    expect(banner).toBeInTheDocument();
+
+    const initBtn = screen.getByRole("button", { name: /Initialize Default Phases/i });
+    fireEvent.click(initBtn);
+
+    await waitFor(() => {
+      expect(phaseService.initializeDefaultPhases).toHaveBeenCalledWith("p-100");
     });
   });
 });

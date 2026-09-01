@@ -8,7 +8,7 @@ import { healthService } from "../projects/health.service.js";
 import { AuditLogModel, IAuditLog } from "../audit/auditLog.model.js";
 import { BadRequestError } from "../../utils/AppError.js";
 
-describe("ProgressService Unit & Rollup Tests (Phase 7)", () => {
+describe("ProgressService Unit & Rollup Tests (Phase 7 & Fixes)", () => {
   let progressService: ProgressService;
 
   beforeEach(() => {
@@ -32,8 +32,8 @@ describe("ProgressService Unit & Rollup Tests (Phase 7)", () => {
       expect(result).toBe(0);
     });
 
-    it("should cap at 100% when completed equals planned", () => {
-      const result = progressService.calculateTaskProgress(250, 250);
+    it("should cap at 100% when completed equals planned (e.g. 100.01 / 100.01)", () => {
+      const result = progressService.calculateTaskProgress(100.01, 100.01);
       expect(result).toBe(100);
     });
 
@@ -139,6 +139,49 @@ describe("ProgressService Unit & Rollup Tests (Phase 7)", () => {
       expect(mockPhase.status).toBe("IN_PROGRESS");
       expect(mockProject.progress).toBe(50);
       expect(ProgressRecordModel.create).toHaveBeenCalled();
+    });
+
+    it("should auto-reconcile status to COMPLETED when 100% quantity is logged", async () => {
+      const mockTask = {
+        _id: "507f1f77bcf86cd799439020",
+        projectId: "507f1f77bcf86cd799439011",
+        phaseId: "507f1f77bcf86cd799439015",
+        title: "Slab Casting",
+        plannedQuantity: 100.01,
+        unit: "sq.ft",
+        completedQuantity: 50,
+        progress: 50,
+        status: "IN_PROGRESS",
+        actualStartDate: new Date("2026-09-01"),
+        actualEndDate: null as Date | null,
+        completedAt: null as Date | null,
+        save: vi.fn().mockResolvedValue(true),
+      };
+
+      vi.spyOn(TaskModel, "findOne").mockReturnValue({
+        exec: vi.fn().mockResolvedValue(mockTask),
+      } as unknown as ReturnType<typeof TaskModel.findOne>);
+
+      vi.spyOn(ProgressRecordModel, "create").mockResolvedValue({} as any);
+      vi.spyOn(PhaseModel, "findById").mockReturnValue({
+        exec: vi.fn().mockResolvedValue(null),
+      } as unknown as ReturnType<typeof PhaseModel.findById>);
+      vi.spyOn(ProjectModel, "findById").mockReturnValue({
+        exec: vi.fn().mockResolvedValue(null),
+      } as unknown as ReturnType<typeof ProjectModel.findById>);
+      vi.spyOn(AuditLogModel, "create").mockResolvedValue({} as any);
+
+      const result = await progressService.logProgress(
+        "507f1f77bcf86cd799439011",
+        "507f1f77bcf86cd799439020",
+        { completedQuantity: 100.01 },
+        "507f1f77bcf86cd799439001"
+      );
+
+      expect(result.task.completedQuantity).toBe(100.01);
+      expect(result.task.progress).toBe(100);
+      expect(result.task.status).toBe("COMPLETED");
+      expect(result.task.completedAt).not.toBeNull();
     });
 
     it("should reject negative completed quantity with BadRequestError", async () => {

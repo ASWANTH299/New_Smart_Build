@@ -6,6 +6,7 @@ import { validateRequest } from "../../middleware/validate.js";
 import {
   createLocationSchema,
   receiveMaterialsSchema,
+  issueMaterialsSchema,
   transferMaterialsSchema,
   adjustStockSchema,
   returnMaterialsSchema,
@@ -49,6 +50,13 @@ router.post(
   requireRoles("ADMIN", "STORE_MANAGER", "PROJECT_MANAGER"),
   validateRequest(receiveMaterialsSchema),
   (req, res, next) => inventoryController.receiveMaterials(req, res, next)
+);
+
+router.post(
+  "/issue",
+  requireRoles("ADMIN", "STORE_MANAGER", "PROJECT_MANAGER"),
+  validateRequest(issueMaterialsSchema),
+  (req, res, next) => inventoryController.issueMaterials(req, res, next)
 );
 
 router.post(

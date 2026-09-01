@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Building2 } from "lucide-react";
+import { ArrowLeft, Building2, Check } from "lucide-react";
 import { PageHeader } from "../../components/ui/PageHeader.js";
 import { Card } from "../../components/ui/Card.js";
 import { Input } from "../../components/ui/Input.js";
@@ -21,6 +21,8 @@ export const CreateProjectPage: React.FC = () => {
   const [types, setTypes] = useState<ProjectType[]>([]);
   const [templates, setTemplates] = useState<ProjectTemplate[]>([]);
   const [managers, setManagers] = useState<User[]>([]);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [selectedTeamUserIds, setSelectedTeamUserIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const [code, setCode] = useState("");
@@ -38,8 +40,9 @@ export const CreateProjectPage: React.FC = () => {
       projectService.getProjectTypes(),
       projectService.getProjectTemplates(),
       userService.getUsers({ role: "PROJECT_MANAGER" }),
+      userService.getUsers({ status: "ACTIVE", limit: 100 }),
     ])
-      .then(([typesRes, templatesRes, managersRes]) => {
+      .then(([typesRes, templatesRes, managersRes, allUsersRes]) => {
         if (typesRes.success && typesRes.data) {
           setTypes(typesRes.data);
           if (typesRes.data.length > 0) setSelectedType(typesRes.data[0]._id);
@@ -55,11 +58,20 @@ export const CreateProjectPage: React.FC = () => {
             setSelectedManager(user.id);
           }
         }
+        if (allUsersRes.success && allUsersRes.data) {
+          setAllUsers(allUsersRes.data);
+        }
       })
       .catch(() => {
         showError("Initialization Error", "Failed to load project configuration options.");
       });
   }, [user, showError]);
+
+  const toggleTeamUser = (userId: string) => {
+    setSelectedTeamUserIds((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,10 +93,11 @@ export const CreateProjectPage: React.FC = () => {
         plannedStartDate: startDate,
         plannedEndDate: endDate,
         projectManagerId: managerId,
+        teamUserIds: selectedTeamUserIds,
       });
 
       if (res.success && res.data) {
-        showSuccess("Project Created", `Initialized ${res.data.name} (${res.data.code})`);
+        showSuccess("Project Created", `Initialized ${res.data.name} (${res.data.code}) with standard phases.`);
         navigate(`/projects/${res.data._id}`);
       }
     } catch (error) {
@@ -97,6 +110,8 @@ export const CreateProjectPage: React.FC = () => {
     }
   };
 
+  const nonManagerUsers = allUsers.filter((u) => u.id !== selectedManager);
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
@@ -107,7 +122,7 @@ export const CreateProjectPage: React.FC = () => {
 
       <PageHeader
         title="Initialize Capital Project"
-        description="Set up project identification, type blueprint, scheduled timeline, and operational leadership."
+        description="Set up project identification, type blueprint, scheduled timeline, and operational team roster."
       />
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -142,7 +157,7 @@ export const CreateProjectPage: React.FC = () => {
             <Select
               label="Roadmap Template"
               options={[
-                { value: "", label: "None / Custom Setup" },
+                { value: "", label: "Standard Construction Lifecycle (4 Default Phases)" },
                 ...templates.map((tmpl) => ({ value: tmpl._id, label: tmpl.name })),
               ]}
               value={selectedTemplate}
@@ -170,7 +185,7 @@ export const CreateProjectPage: React.FC = () => {
           </div>
         </Card>
 
-        <Card title="4. Timeline & Management">
+        <Card title="4. Timeline & Management Leadership">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Input
               label="Planned Start Date"
@@ -197,6 +212,58 @@ export const CreateProjectPage: React.FC = () => {
               onChange={(e) => setSelectedManager(e.target.value)}
             />
           </div>
+        </Card>
+
+        <Card
+          title={`5. Project Team Assignment (${selectedTeamUserIds.length} Selected)`}
+          action={
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              Site Engineers, Store Managers, Contractors, Client Reps
+            </span>
+          }
+        >
+          {nonManagerUsers.length === 0 ? (
+            <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+              No additional registered users found. You can invite team members after project creation.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-56 overflow-y-auto p-1">
+              {nonManagerUsers.map((u) => {
+                const isSelected = selectedTeamUserIds.includes(u.id);
+                return (
+                  <button
+                    key={u.id}
+                    type="button"
+                    onClick={() => toggleTeamUser(u.id)}
+                    className={`p-2.5 rounded-lg border text-left flex items-start justify-between gap-2 text-xs transition-all ${
+                      isSelected
+                        ? "border-brand-500 bg-brand-50/80 dark:bg-brand-950/60 text-brand-900 dark:text-brand-200 ring-1 ring-brand-500"
+                        : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-700"
+                    }`}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="font-semibold truncate">{u.name}</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate font-mono">
+                        {u.email}
+                      </div>
+                      <div className="text-[10px] text-brand-600 dark:text-brand-400 font-medium mt-0.5">
+                        {u.primaryRole.replace(/_/g, " ")}
+                      </div>
+                    </div>
+                    <div
+                      className={`w-4 h-4 rounded flex items-center justify-center shrink-0 mt-0.5 border ${
+                        isSelected
+                          ? "bg-brand-600 border-brand-600 text-white"
+                          : "border-slate-300 dark:border-slate-700 bg-transparent"
+                      }`}
+                    >
+                      {isSelected && <Check className="w-3 h-3" />}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </Card>
 
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">

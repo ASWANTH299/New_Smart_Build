@@ -4,6 +4,7 @@ import { Input } from "./ui/Input.js";
 import { Textarea } from "./ui/Textarea.js";
 import { Button } from "./ui/Button.js";
 import { ProgressIndicator } from "./ui/ProgressIndicator.js";
+import { StatusBadge } from "./ui/StatusBadge.js";
 import { Task, taskService } from "../services/taskService.js";
 import { useToast } from "../hooks/useToast.js";
 
@@ -37,10 +38,18 @@ export const ProgressUpdateModal: React.FC<ProgressUpdateModalProps> = ({
   if (!task) return null;
 
   const planned = task.plannedQuantity || 1;
+  const remainingWork = Math.max(0, Math.round((planned - completedQuantity) * 100) / 100);
   const previewPercentage = Math.min(
     100,
     Math.max(0, Math.round((completedQuantity / planned) * 100 * 100) / 100)
   );
+
+  const resultingStatus =
+    previewPercentage >= 100 || completedQuantity >= planned
+      ? "COMPLETED"
+      : previewPercentage > 0
+      ? "IN_PROGRESS"
+      : "TODO";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +75,7 @@ export const ProgressUpdateModal: React.FC<ProgressUpdateModalProps> = ({
 
       showSuccess(
         "Progress Recorded",
-        `${task.title} is now ${previewPercentage}% completed.`
+        `${task.title} is now ${previewPercentage}% completed (${resultingStatus}).`
       );
       onClose();
       if (onSuccess) onSuccess();
@@ -88,16 +97,16 @@ export const ProgressUpdateModal: React.FC<ProgressUpdateModalProps> = ({
       description={`Enter verified field quantities to update task and phase progression.`}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+        <div className="p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-lg space-y-2">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-500 font-medium">Planned Work Scope:</span>
-            <span className="font-bold text-slate-900">
+            <span className="text-slate-500 dark:text-slate-400 font-medium">Planned Work Scope:</span>
+            <span className="font-bold text-slate-900 dark:text-slate-100">
               {planned} {task.unit}
             </span>
           </div>
           <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-500 font-medium">Current Progress:</span>
-            <span className="font-bold text-brand-600">
+            <span className="text-slate-500 dark:text-slate-400 font-medium">Current Progress:</span>
+            <span className="font-bold text-brand-600 dark:text-brand-400">
               {task.completedQuantity} {task.unit} ({task.progress}%)
             </span>
           </div>
@@ -115,10 +124,23 @@ export const ProgressUpdateModal: React.FC<ProgressUpdateModalProps> = ({
           helperText={`Must be between 0 and ${planned} ${task.unit}`}
         />
 
+        <div className="p-3 bg-slate-50/50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 rounded-lg space-y-2 text-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-slate-600 dark:text-slate-400 font-medium">Remaining Work:</span>
+            <span className="font-bold text-slate-900 dark:text-slate-100 font-mono">
+              {remainingWork} {task.unit}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-slate-600 dark:text-slate-400 font-medium">Auto-Reconciled Status:</span>
+            <StatusBadge status={resultingStatus} size="sm" />
+          </div>
+        </div>
+
         <div className="space-y-1.5 pt-1">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
             <span>Resulting Progress:</span>
-            <span className="text-brand-600 font-bold">{previewPercentage}%</span>
+            <span className="text-brand-600 dark:text-brand-400 font-bold">{previewPercentage}%</span>
           </div>
           <ProgressIndicator progress={previewPercentage} size="md" />
         </div>

@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { ProjectModel, IProject, ProjectStatus, ProjectHealth } from "./project.model.js";
 import { ProjectMembershipModel } from "../auth/projectMembership.model.js";
 import { UserModel } from "../users/user.model.js";
+import { phaseService } from "../phases/phase.service.js";
 import { logAuditAction } from "../audit/auditLog.model.js";
 import {
   ConflictError,
@@ -85,6 +86,13 @@ export class ProjectService {
 
     await ProjectMembershipModel.insertMany(memberships);
 
+    // Auto-initialize standard construction phases for new projects
+    try {
+      await phaseService.initializeDefaultPhases(projectIdStr, creatorUserId);
+    } catch {
+      // Phase auto-initialization non-blocking
+    }
+
     await logAuditAction({
       actorUserId: creatorUserId,
       action: "PROJECT_CREATED",
@@ -148,7 +156,7 @@ export class ProjectService {
       ProjectModel.find(query)
         .populate("projectManagerId", "name email")
         .populate("typeId", "name code")
-        .sort({ updatedAt: -1 })
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .exec(),
@@ -167,8 +175,8 @@ export class ProjectService {
   async getProjectById(projectId: string): Promise<IProject> {
     const project = await ProjectModel.findById(projectId)
       .populate("projectManagerId", "name email primaryRole")
-      .populate("clientUserId", "name email")
-      .populate("typeId", "name code description")
+      .populate("clientUserId", "name email primaryRole")
+      .populate("typeId", "name code")
       .exec();
 
     if (!project) {
@@ -179,7 +187,7 @@ export class ProjectService {
 
   async updateProject(
     projectId: string,
-    updates: Partial<CreateProjectInput> & { health?: ProjectHealth; progress?: number },
+    updates: Partial<CreateProjectInput>,
     userId: string
   ): Promise<IProject> {
     const project = await ProjectModel.findById(projectId).exec();
@@ -189,13 +197,31 @@ export class ProjectService {
 
     if (updates.name) project.name = updates.name.trim();
     if (updates.location) project.location = updates.location.trim();
-    if (updates.description !== undefined) project.description = updates.description;
+    if (updates.description !== undefined) project.description = updates.description.trim();
+    if (updates.typeId) project.typeId = new mongoose.Types.ObjectId(updates.typeId);
+    if (updates.clientUserId !== undefined) {
+      project.clientUserId = updates.clientUserId
+        ? new mongoose.Types.ObjectId(updates.clientUserId)
+        : null;
+    }
     if (updates.plannedStartDate) project.plannedStartDate = new Date(updates.plannedStartDate);
     if (updates.plannedEndDate) project.plannedEndDate = new Date(updates.plannedEndDate);
-    if (updates.health) project.health = updates.health;
-    if (updates.progress !== undefined) project.progress = updates.progress;
+
     if (updates.projectManagerId) {
-      project.projectManagerId = new mongoose.Types.ObjectId(updates.projectManagerId);
+      const pmId = new mongoose.Types.ObjectId(updates.projectManagerId);
+      project.projectManagerId = pmId;
+
+      await ProjectMembershipModel.findOneAndUpdate(
+        { userId: pmId, projectId },
+        {
+          userId: pmId,
+          projectId,
+          assignmentStatus: "ACTIVE",
+          assignedAt: new Date(),
+          assignedBy: new mongoose.Types.ObjectId(userId),
+        },
+        { upsert: true }
+      );
     }
 
     await project.save();
@@ -215,8 +241,7 @@ export class ProjectService {
   async updateProjectStatus(
     projectId: string,
     newStatus: ProjectStatus,
-    userId: string,
-    reason?: string
+    userId: string
   ): Promise<IProject> {
     const project = await ProjectModel.findById(projectId).exec();
     if (!project) {
@@ -224,11 +249,13 @@ export class ProjectService {
     }
 
     const currentStatus = project.status;
-    const allowed = VALID_TRANSITIONS[currentStatus] || [];
+    const allowed = VALID_TRANSITIONS[currentStatus];
 
-    if (!allowed.includes(newStatus)) {
+    if (!allowed || !allowed.includes(newStatus)) {
       throw new BadRequestError(
-        `Invalid status transition from '${currentStatus}' to '${newStatus}'. Allowed: ${allowed.join(", ") || "none"}`
+        `Invalid status transition from '${currentStatus}' to '${newStatus}'. Allowed: [${(
+          allowed || []
+        ).join(", ")}]`
       );
     }
 
@@ -236,11 +263,9 @@ export class ProjectService {
     if (newStatus === "ACTIVE" && !project.actualStartDate) {
       project.actualStartDate = new Date();
     }
-    if (newStatus === "COMPLETED" && !project.actualEndDate) {
+    if (newStatus === "COMPLETED") {
       project.actualEndDate = new Date();
-    }
-    if (newStatus === "ARCHIVED") {
-      project.archivedAt = new Date();
+      project.progress = 100;
     }
 
     await project.save();
@@ -251,7 +276,7 @@ export class ProjectService {
       entityType: "PROJECT",
       entityId: projectId,
       projectId,
-      metadata: { from: currentStatus, to: newStatus, reason },
+      metadata: { from: currentStatus, to: newStatus },
     });
 
     return project;
@@ -263,6 +288,7 @@ export class ProjectService {
     daysRemaining: number;
   }> {
     const project = await this.getProjectById(projectId);
+
     const teamCount = await ProjectMembershipModel.countDocuments({
       projectId,
       assignmentStatus: "ACTIVE",
@@ -314,6 +340,90 @@ export class ProjectService {
         };
       })
       .filter((item): item is NonNullable<typeof item> => item !== null);
+  }
+
+  async addTeamMember(
+    projectId: string,
+    targetUserId: string,
+    assignedBy: string
+  ): Promise<{ message: string; user: { id: string; name: string; email: string; primaryRole: string } }> {
+    const project = await ProjectModel.findById(projectId).exec();
+    if (!project) {
+      throw new NotFoundError("Project not found.");
+    }
+
+    const user = await UserModel.findById(targetUserId).exec();
+    if (!user) {
+      throw new NotFoundError("User not found.");
+    }
+
+    await ProjectMembershipModel.findOneAndUpdate(
+      { userId: user._id, projectId },
+      {
+        userId: user._id,
+        projectId,
+        assignmentStatus: "ACTIVE",
+        assignedAt: new Date(),
+        removedAt: null,
+        assignedBy: mongoose.Types.ObjectId.isValid(assignedBy)
+          ? new mongoose.Types.ObjectId(assignedBy)
+          : null,
+      },
+      { upsert: true, new: true }
+    );
+
+    await logAuditAction({
+      actorUserId: assignedBy,
+      action: "PROJECT_MEMBER_ASSIGNED",
+      entityType: "PROJECT_MEMBERSHIP",
+      entityId: `${user._id.toString()}:${projectId}`,
+      projectId,
+      metadata: { userId: user._id.toString(), userName: user.name, role: user.primaryRole },
+    });
+
+    return {
+      message: `User ${user.name} added to project team successfully`,
+      user: {
+        id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        primaryRole: user.primaryRole,
+      },
+    };
+  }
+
+  async removeTeamMember(
+    projectId: string,
+    targetUserId: string,
+    removedBy: string
+  ): Promise<void> {
+    const project = await ProjectModel.findById(projectId).exec();
+    if (!project) {
+      throw new NotFoundError("Project not found.");
+    }
+
+    const membership = await ProjectMembershipModel.findOne({
+      userId: new mongoose.Types.ObjectId(targetUserId),
+      projectId,
+      assignmentStatus: "ACTIVE",
+    }).exec();
+
+    if (!membership) {
+      throw new NotFoundError("User is not an active team member on this project.");
+    }
+
+    membership.assignmentStatus = "REMOVED";
+    membership.removedAt = new Date();
+    await membership.save();
+
+    await logAuditAction({
+      actorUserId: removedBy,
+      action: "PROJECT_MEMBER_REMOVED",
+      entityType: "PROJECT_MEMBERSHIP",
+      entityId: `${targetUserId}:${projectId}`,
+      projectId,
+      metadata: { userId: targetUserId },
+    });
   }
 }
 

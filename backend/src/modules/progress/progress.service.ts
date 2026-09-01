@@ -143,7 +143,7 @@ export class ProgressService {
       source: input.source || "WEB",
     });
 
-    // 2. Update task progress & status
+    // 2. Update task progress & status auto-reconciliation
     task.completedQuantity = input.completedQuantity;
     task.progress = this.calculateTaskProgress(
       task.plannedQuantity,
@@ -151,15 +151,19 @@ export class ProgressService {
       task.status
     );
 
-    if (task.progress >= 100) {
+    if (task.progress >= 100 || task.completedQuantity >= task.plannedQuantity) {
       task.status = "COMPLETED";
+      task.completedQuantity = task.plannedQuantity;
+      task.progress = 100;
       task.completedAt = new Date();
       if (!task.actualEndDate) task.actualEndDate = new Date();
     } else if (task.progress > 0) {
-      if (task.status === "TODO" || task.status === "BLOCKED") {
-        task.status = "IN_PROGRESS";
-      }
+      task.status = "IN_PROGRESS";
+      task.completedAt = null;
       if (!task.actualStartDate) task.actualStartDate = new Date();
+    } else if (task.progress === 0 && task.status === "COMPLETED") {
+      task.status = "TODO";
+      task.completedAt = null;
     }
 
     await task.save();

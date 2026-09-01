@@ -65,6 +65,94 @@ export class PhaseService {
     return phase;
   }
 
+  async initializeDefaultPhases(projectId: string, userId: string): Promise<IPhase[]> {
+    const project = await ProjectModel.findById(projectId).exec();
+    if (!project) {
+      throw new NotFoundError("Project not found.");
+    }
+
+    const existingPhases = await PhaseModel.find({
+      projectId: new mongoose.Types.ObjectId(projectId),
+    })
+      .sort({ sequence: 1 })
+      .exec();
+
+    if (existingPhases.length > 0) {
+      return existingPhases;
+    }
+
+    const start = new Date(project.plannedStartDate).getTime();
+    const end = new Date(project.plannedEndDate).getTime();
+    const totalDuration = Math.max(end - start, 30 * 24 * 60 * 60 * 1000); // at least 30 days
+
+    const defaultPhaseBlueprints = [
+      {
+        name: "Substructure & Deep Foundation",
+        description: "Excavation, earthworks, pile capping, and foundation concrete pouring.",
+        sequence: 1,
+        startFraction: 0,
+        endFraction: 0.25,
+      },
+      {
+        name: "Superstructure Concrete Frame",
+        description: "Core structural columns, shear walls, and reinforced suspended slabs.",
+        sequence: 2,
+        startFraction: 0.25,
+        endFraction: 0.6,
+      },
+      {
+        name: "Finishing, Facade & MEP Works",
+        description: "Masonry, external cladding, MEP services, HVAC, and internal plastering.",
+        sequence: 3,
+        startFraction: 0.6,
+        endFraction: 0.88,
+      },
+      {
+        name: "Testing, Commissioning & Handover",
+        description: "Quality assurance inspections, snag-list clearance, and final authority signoffs.",
+        sequence: 4,
+        startFraction: 0.88,
+        endFraction: 1.0,
+      },
+    ];
+
+    const createdPhases: IPhase[] = [];
+    for (let i = 0; i < defaultPhaseBlueprints.length; i++) {
+      const bp = defaultPhaseBlueprints[i];
+      const pStart = new Date(start + totalDuration * bp.startFraction);
+      const pEnd = new Date(start + totalDuration * bp.endFraction);
+
+      const prevPhaseId = i > 0 ? createdPhases[i - 1]._id : undefined;
+
+      const phase = (await PhaseModel.create({
+        projectId: new mongoose.Types.ObjectId(projectId),
+        name: bp.name,
+        description: bp.description,
+        sequence: bp.sequence,
+        plannedStartDate: pStart,
+        plannedEndDate: pEnd,
+        status: i === 0 ? "IN_PROGRESS" : "NOT_STARTED",
+        progress: 0,
+        dependencies: prevPhaseId ? [prevPhaseId] : [],
+      })) as IPhase;
+
+      createdPhases.push(phase);
+    }
+
+    await progressService.recalculateProjectProgress(projectId);
+
+    await logAuditAction({
+      actorUserId: userId,
+      action: "PHASES_INITIALIZED",
+      entityType: "PROJECT",
+      entityId: projectId,
+      projectId,
+      metadata: { count: createdPhases.length },
+    });
+
+    return createdPhases;
+  }
+
   async getPhases(projectId: string): Promise<
     Array<
       IPhase & {

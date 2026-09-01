@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import materialService from "./materialService";
 import { apiClient } from "./api";
 
-describe("Frontend materialService Unit Tests (Phase 8)", () => {
+describe("Frontend materialService Unit Tests (Phase 8 & Fixes)", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
@@ -71,6 +71,54 @@ describe("Frontend materialService Unit Tests (Phase 8)", () => {
       unit: "Tons",
     });
     expect(result.data?.code).toBe("MAT-STL-001");
+  });
+
+  it("should execute stock inward receipt and stock issue", async () => {
+    const mockReceive = {
+      success: true,
+      data: {
+        transaction: { transactionNumber: "TXN-2026-00001", quantity: 100 } as any,
+        balance: { quantity: 100, availableQuantity: 100 } as any,
+      },
+    };
+
+    vi.spyOn(apiClient, "post").mockResolvedValueOnce(mockReceive);
+
+    const recResult = await materialService.receiveMaterials({
+      locationId: "loc-1",
+      materialId: "mat-1",
+      quantity: 100,
+    });
+
+    expect(apiClient.post).toHaveBeenCalledWith("/inventory/receive", {
+      locationId: "loc-1",
+      materialId: "mat-1",
+      quantity: 100,
+    });
+    expect(recResult.data?.transaction.transactionNumber).toBe("TXN-2026-00001");
+
+    const mockIssue = {
+      success: true,
+      data: {
+        transaction: { transactionNumber: "TXN-2026-00002", quantity: 20 } as any,
+        balance: { quantity: 80, availableQuantity: 80 } as any,
+      },
+    };
+
+    vi.spyOn(apiClient, "post").mockResolvedValueOnce(mockIssue);
+
+    const issueResult = await materialService.issueMaterials({
+      locationId: "loc-1",
+      materialId: "mat-1",
+      quantity: 20,
+    });
+
+    expect(apiClient.post).toHaveBeenCalledWith("/inventory/issue", {
+      locationId: "loc-1",
+      materialId: "mat-1",
+      quantity: 20,
+    });
+    expect(issueResult.data?.balance.availableQuantity).toBe(80);
   });
 
   it("should fetch project BOM versions and details", async () => {

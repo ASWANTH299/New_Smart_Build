@@ -55,6 +55,10 @@ export const phaseService = {
     );
   },
 
+  async initializeDefaultPhases(projectId: string): Promise<ApiResponse<Phase[]>> {
+    return await apiClient.post<Phase[]>(`/projects/${projectId}/phases/initialize-defaults`);
+  },
+
   async deletePhase(
     projectId: string,
     phaseId: string

@@ -53,6 +53,40 @@ describe("PhaseService Unit Tests (Phase 7)", () => {
     expect(AuditLogModel.create).toHaveBeenCalled();
   });
 
+  it("should initialize default construction phases when none exist", async () => {
+    vi.spyOn(ProjectModel, "findById").mockReturnValue({
+      exec: vi.fn().mockResolvedValue({
+        _id: "507f1f77bcf86cd799439011",
+        plannedStartDate: new Date("2026-01-01"),
+        plannedEndDate: new Date("2026-12-31"),
+      }),
+    } as unknown as ReturnType<typeof ProjectModel.findById>);
+
+    vi.spyOn(PhaseModel, "find").mockReturnValue({
+      sort: vi.fn().mockReturnThis(),
+      exec: vi.fn().mockResolvedValue([]),
+    } as unknown as ReturnType<typeof PhaseModel.find>);
+
+    vi.spyOn(PhaseModel, "create").mockImplementation(async (doc: any) => ({
+      _id: "phase-" + doc.sequence,
+      ...doc,
+    }) as any);
+
+    vi.spyOn(progressService, "recalculateProjectProgress").mockResolvedValue(0);
+    vi.spyOn(AuditLogModel, "create").mockResolvedValue({} as unknown as IAuditLog);
+
+    const phases = await phaseService.initializeDefaultPhases(
+      "507f1f77bcf86cd799439011",
+      "507f1f77bcf86cd799439001"
+    );
+
+    expect(phases.length).toBe(4);
+    expect(phases[0].name).toBe("Substructure & Deep Foundation");
+    expect(phases[1].name).toBe("Superstructure Concrete Frame");
+    expect(phases[2].name).toBe("Finishing, Facade & MEP Works");
+    expect(phases[3].name).toBe("Testing, Commissioning & Handover");
+  });
+
   it("should retrieve existing phase by valid projectId and phaseId", async () => {
     const mockPhase = {
       _id: "507f1f77bcf86cd799439015",
