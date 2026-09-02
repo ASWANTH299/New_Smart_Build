@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
+import { Plus, Trash2, ArrowLeft, CheckCircle2, XCircle, ArrowRight } from "lucide-react";
 import { materialService } from "../../services/materialService.js";
 import { MaterialRequest, Material } from "../../types/material.js";
 import { useAuth } from "../../hooks/useAuth.js";
-import Card from "../../components/ui/Card";
-import Button from "../../components/ui/Button";
-import Input from "../../components/ui/Input";
-import Select from "../../components/ui/Select";
-import StatusBadge from "../../components/ui/StatusBadge";
-import Modal from "../../components/ui/Modal.js";
+import Card from "../../components/ui/Card.js";
+import Button from "../../components/ui/Button.js";
+import Input from "../../components/ui/Input.js";
+import Select from "../../components/ui/Select.js";
+import StatusBadge from "../../components/ui/StatusBadge.js";
+import SlideOverDrawer from "../../components/ui/SlideOverDrawer.js";
 import LoadingState from "../../components/ui/LoadingState.js";
 import EmptyState from "../../components/ui/EmptyState.js";
 import ErrorState from "../../components/ui/ErrorState.js";
@@ -32,8 +33,8 @@ export const MaterialRequestsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Create Request Modal
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  // Create Request Drawer
+  const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [reason, setReason] = useState("");
   const [submitImmediately, setSubmitImmediately] = useState(true);
@@ -41,8 +42,8 @@ export const MaterialRequestsPage: React.FC = () => {
     { materialId: "", requestedQuantity: 1, unit: "", notes: "" },
   ]);
 
-  // Review Modal (PM)
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  // Review Drawer (PM)
+  const [isReviewDrawerOpen, setIsReviewDrawerOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<MaterialRequest | null>(null);
   const [reviewDecision, setReviewDecision] = useState<"APPROVE" | "REJECT">("APPROVE");
   const [rejectionReason, setRejectionReason] = useState("");
@@ -138,7 +139,7 @@ export const MaterialRequestsPage: React.FC = () => {
 
       if (res.success && res.data) {
         showSuccess("Request Created", `Material Request ${res.data.requestNumber} created successfully!`);
-        setIsCreateModalOpen(false);
+        setIsCreateDrawerOpen(false);
         setReason("");
         setItems([{ materialId: "", requestedQuantity: 1, unit: "", notes: "" }]);
         fetchRequests();
@@ -154,7 +155,7 @@ export const MaterialRequestsPage: React.FC = () => {
     setSelectedRequest(req);
     setReviewDecision("APPROVE");
     setRejectionReason("");
-    setIsReviewModalOpen(true);
+    setIsReviewDrawerOpen(true);
   };
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
@@ -174,7 +175,7 @@ export const MaterialRequestsPage: React.FC = () => {
 
       if (res.success) {
         showSuccess("Request Reviewed", `Request ${selectedRequest.requestNumber} ${reviewDecision.toLowerCase()}d.`);
-        setIsReviewModalOpen(false);
+        setIsReviewDrawerOpen(false);
         fetchRequests();
       }
     } catch (err: unknown) {
@@ -189,17 +190,17 @@ export const MaterialRequestsPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 mb-1 font-sans">
-            <Link to={`/projects/${projectId}`} className="hover:underline text-brand-600 dark:text-brand-400">
-              ← Project Workspace
+          <div className="flex items-center gap-2 text-xs text-zinc-500 mb-1 font-sans">
+            <Link to={`/projects/${projectId}`} className="hover:underline text-brand-600 dark:text-brand-400 font-medium inline-flex items-center gap-1">
+              <ArrowLeft className="w-3 h-3" /> Project Workspace
             </Link>
             <span>/</span>
             <span>Material Requests</span>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-            Material Requests
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight font-display">
+            Material Requests & Requisitions
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
             Site engineer requisition workflow: Request → PM Approval → Store Manager Stock Issue.
           </p>
         </div>
@@ -208,23 +209,24 @@ export const MaterialRequestsPage: React.FC = () => {
           <Button
             id="create-request-btn"
             variant="primary"
-            onClick={() => setIsCreateModalOpen(true)}
+            leftIcon={<Plus className="w-4 h-4" />}
+            onClick={() => setIsCreateDrawerOpen(true)}
           >
             + Create Material Request
           </Button>
         )}
       </div>
 
-      {/* Status Filter */}
+      {/* Status Filter Tabs */}
       <Card className="p-4">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 mr-2">
-            Status:
+          <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mr-2 font-display">
+            Filter:
           </span>
           {[
             { value: "", label: "All Requests" },
-            { value: "SUBMITTED", label: "Submitted (Pending PM Review)" },
-            { value: "APPROVED", label: "Approved (Ready to Issue)" },
+            { value: "SUBMITTED", label: "Submitted" },
+            { value: "APPROVED", label: "Approved" },
             { value: "PARTIALLY_ISSUED", label: "Partially Issued" },
             { value: "ISSUED", label: "Fully Issued" },
             { value: "DRAFT", label: "Drafts" },
@@ -233,10 +235,10 @@ export const MaterialRequestsPage: React.FC = () => {
             <button
               key={tab.value}
               onClick={() => setStatusFilter(tab.value)}
-              className={`px-3 py-1.5 rounded text-xs font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
                 statusFilter === tab.value
-                  ? "bg-brand-600 text-white shadow-sm"
-                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200"
+                  ? "bg-brand-600 text-white shadow-xs"
+                  : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700"
               }`}
             >
               {tab.label}
@@ -253,96 +255,96 @@ export const MaterialRequestsPage: React.FC = () => {
       ) : requests.length === 0 ? (
         <EmptyState
           title="No Material Requests Found"
-          description="Site engineers can submit material requests against project tasks or general construction activities."
+          description="No material requests match the selected status filter."
           action={
             canRequest ? (
-              <Button variant="primary" onClick={() => setIsCreateModalOpen(true)}>
-                Create First Request
+              <Button variant="primary" onClick={() => setIsCreateDrawerOpen(true)}>
+                Create First Material Request
               </Button>
             ) : undefined
           }
         />
       ) : (
-        <Card className="overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
+        <Card className="overflow-hidden border border-zinc-200/90 dark:border-zinc-800 shadow-card">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
-              <thead className="bg-slate-50 dark:bg-slate-800/80 text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+            <table className="w-full text-left text-sm text-zinc-600 dark:text-zinc-300">
+              <thead className="bg-zinc-50/80 dark:bg-zinc-850/80 text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider border-b border-zinc-200/80 dark:border-zinc-800 font-display">
                 <tr>
                   <th className="py-3.5 px-4">Request #</th>
-                  <th className="py-3.5 px-4">Reason / Purpose</th>
-                  <th className="py-3.5 px-4">Requested By</th>
+                  <th className="py-3.5 px-4">Reason / Scope</th>
                   <th className="py-3.5 px-4 text-center">Items</th>
-                  <th className="py-3.5 px-4">Status</th>
+                  <th className="py-3.5 px-4">Requested By</th>
                   <th className="py-3.5 px-4">Date</th>
+                  <th className="py-3.5 px-4">Status</th>
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900/60 font-mono text-xs">
-                {requests.map((req) => {
-                  const requester =
-                    typeof req.requestedBy === "object" && req.requestedBy !== null
-                      ? `${req.requestedBy.firstName} ${req.requestedBy.lastName}`
-                      : "Site Engineer";
-
-                  return (
-                    <tr key={req._id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
-                      <td className="py-3.5 px-4 font-semibold text-brand-600 dark:text-brand-400">
-                        <Link to={`/projects/${projectId}/material-requests/${req._id}`} className="hover:underline">
-                          {req.requestNumber}
-                        </Link>
-                      </td>
-                      <td className="py-3.5 px-4 font-sans font-medium text-slate-900 dark:text-white max-w-xs truncate">
-                        {req.reason}
-                      </td>
-                      <td className="py-3.5 px-4 font-sans text-slate-600 dark:text-slate-300">
-                        {requester}
-                      </td>
-                      <td className="py-3.5 px-4 text-center text-slate-900 dark:text-white font-semibold">
-                        {req.items?.length || 0}
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <StatusBadge status={req.status.toLowerCase()} />
-                      </td>
-                      <td className="py-3.5 px-4 text-slate-500 font-sans">
-                        {req.createdAt ? new Date(req.createdAt).toLocaleDateString() : "-"}
-                      </td>
-                      <td className="py-3.5 px-4 text-right font-sans space-x-2">
+              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/80 bg-white dark:bg-zinc-900 font-mono text-xs">
+                {requests.map((req) => (
+                  <tr key={req._id} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40 transition-colors">
+                    <td className="py-3.5 px-4 font-semibold text-brand-600 dark:text-brand-400">
+                      <Link to={`/projects/${projectId}/material-requests/${req._id}`} className="hover:underline">
+                        {req.requestNumber}
+                      </Link>
+                    </td>
+                    <td className="py-3.5 px-4 font-sans font-medium text-zinc-900 dark:text-zinc-100">
+                      {req.reason}
+                    </td>
+                    <td className="py-3.5 px-4 text-center font-semibold">
+                      {req.items?.length || 0}
+                    </td>
+                    <td className="py-3.5 px-4 font-sans text-zinc-600 dark:text-zinc-300">
+                      {typeof req.requestedBy === "object" && req.requestedBy
+                        ? "name" in req.requestedBy
+                          ? (req.requestedBy as any).name
+                          : `${(req.requestedBy as any).firstName || ""} ${(req.requestedBy as any).lastName || ""}`.trim() || "User"
+                        : "Site Engineer"}
+                    </td>
+                    <td className="py-3.5 px-4 text-zinc-500 font-sans">
+                      {req.createdAt ? new Date(req.createdAt).toLocaleDateString() : "-"}
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <StatusBadge status={req.status.toLowerCase()} />
+                    </td>
+                    <td className="py-3.5 px-4 text-right font-sans">
+                      <div className="flex items-center justify-end gap-2">
                         {isPMOrAdmin && req.status === "SUBMITTED" && (
-                          <Button
-                            variant="secondary"
-                            size="sm"
+                          <button
                             onClick={() => handleOpenReview(req)}
+                            className="px-2.5 py-1 bg-brand-50 text-brand-700 dark:bg-brand-950/80 dark:text-brand-300 hover:bg-brand-100 rounded-lg text-xs font-semibold"
                           >
                             Review
-                          </Button>
+                          </button>
                         )}
                         <Link
                           to={`/projects/${projectId}/material-requests/${req._id}`}
-                          className="inline-flex items-center text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 ml-2"
+                          className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 inline-flex items-center gap-0.5"
                         >
-                          Details →
+                          Details <ArrowRight className="w-3 h-3" />
                         </Link>
-                      </td>
-                    </tr>
-                  );
-                })}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         </Card>
       )}
 
-      {/* Create Request Modal */}
-      <Modal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
+      {/* Create Request SlideOverDrawer */}
+      <SlideOverDrawer
+        isOpen={isCreateDrawerOpen}
+        onClose={() => setIsCreateDrawerOpen(false)}
         title="Create Material Request"
+        subtitle="Submit a material requisition from site for Project Manager approval"
+        size="lg"
       >
-        <form onSubmit={handleCreateSubmit} className="space-y-4">
+        <form onSubmit={handleCreateSubmit} className="space-y-6">
           <Input
             id="request-reason-input"
-            label="Purpose / Work Description *"
-            placeholder="e.g. Concrete footing pour for Grid 4 foundation"
+            label="Requisition Purpose / Reason *"
+            placeholder="e.g. Concrete pour material requirement for Level 2 slab"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             required
@@ -350,83 +352,95 @@ export const MaterialRequestsPage: React.FC = () => {
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                Requested Materials List
-              </span>
-              <Button variant="outline" size="sm" type="button" onClick={handleAddItemRow}>
-                + Add Item Row
+              <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 font-display">
+                Material Items ({items.length})
+              </label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                leftIcon={<Plus className="w-3.5 h-3.5" />}
+                onClick={handleAddItemRow}
+              >
+                Add Another Item
               </Button>
             </div>
 
-            {items.map((item, idx) => (
-              <div key={idx} className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded border border-slate-200 dark:border-slate-700 space-y-2">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <div className="sm:col-span-2">
-                    <Select
-                      id={`req-mat-${idx}`}
-                      value={item.materialId}
-                      onChange={(e) => handleItemChange(idx, "materialId", e.target.value)}
-                      options={[
-                        { value: "", label: "-- Select Material --" },
-                        ...materials.map((m) => ({
-                          value: m._id,
-                          label: `${m.code} - ${m.name} (${m.unit})`,
-                        })),
-                      ]}
-                      required
-                    />
+            <div className="space-y-3">
+              {items.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-850/60 space-y-3"
+                >
+                  <div className="flex items-center justify-between text-xs font-bold text-zinc-500 font-display">
+                    <span>Item #{idx + 1}</span>
+                    {items.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveItemRow(idx)}
+                        className="text-red-600 hover:text-red-700 dark:text-red-400"
+                        title="Remove item"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
-                  <div>
+
+                  <Select
+                    label="Select Material *"
+                    value={item.materialId}
+                    onChange={(e) => handleItemChange(idx, "materialId", e.target.value)}
+                    options={[
+                      { value: "", label: "-- Select Material from Master Catalog --" },
+                      ...materials.map((m) => ({
+                        value: m._id,
+                        label: `${m.code} - ${m.name} (${m.unit})`,
+                      })),
+                    ]}
+                    required
+                  />
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Input
-                      id={`req-qty-${idx}`}
+                      label="Quantity *"
                       type="number"
                       min="0.01"
                       step="any"
-                      placeholder="Qty"
                       value={item.requestedQuantity}
                       onChange={(e) => handleItemChange(idx, "requestedQuantity", Number(e.target.value))}
                       required
                     />
+                    <Input
+                      label="Unit"
+                      value={item.unit}
+                      onChange={(e) => handleItemChange(idx, "unit", e.target.value)}
+                      placeholder="e.g. Bags, Tons, m³"
+                    />
                   </div>
-                </div>
 
-                <div className="flex items-center justify-between gap-2">
                   <Input
-                    id={`req-note-${idx}`}
-                    placeholder="Item notes / specs (optional)"
+                    label="Item Notes / Placement Ref"
+                    placeholder="e.g. Grid A-C column reinforcement"
                     value={item.notes}
                     onChange={(e) => handleItemChange(idx, "notes", e.target.value)}
-                    className="text-xs"
                   />
-                  {items.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveItemRow(idx)}
-                      className="text-xs text-red-600 hover:text-red-700 font-semibold px-2 py-1"
-                    >
-                      Delete
-                    </button>
-                  )}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 pt-2">
+          <label className="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 cursor-pointer select-none">
             <input
               type="checkbox"
-              id="submit-immediately-chk"
               checked={submitImmediately}
               onChange={(e) => setSubmitImmediately(e.target.checked)}
-              className="rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+              className="rounded border-zinc-300 text-brand-600 focus:ring-brand-500"
             />
-            <label htmlFor="submit-immediately-chk" className="text-xs text-slate-700 dark:text-slate-300">
-              Submit directly for PM review (otherwise saved as Draft)
-            </label>
-          </div>
+            <span>Submit immediately for PM Review (uncheck to save as Draft)</span>
+          </label>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
-            <Button variant="outline" type="button" onClick={() => setIsCreateModalOpen(false)}>
+          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <Button variant="outline" type="button" onClick={() => setIsCreateDrawerOpen(false)}>
               Cancel
             </Button>
             <Button variant="primary" type="submit" isLoading={creating}>
@@ -434,68 +448,67 @@ export const MaterialRequestsPage: React.FC = () => {
             </Button>
           </div>
         </form>
-      </Modal>
+      </SlideOverDrawer>
 
-      {/* Review Request Modal (PM) */}
-      <Modal
-        isOpen={isReviewModalOpen}
-        onClose={() => setIsReviewModalOpen(false)}
-        title={`Review Material Request: ${selectedRequest?.requestNumber}`}
+      {/* Review Request SlideOverDrawer */}
+      <SlideOverDrawer
+        isOpen={isReviewDrawerOpen}
+        onClose={() => setIsReviewDrawerOpen(false)}
+        title={selectedRequest ? `Review Request: ${selectedRequest.requestNumber}` : "Review Material Request"}
+        subtitle="Approve or Reject the site engineer requisition"
       >
         <form onSubmit={handleReviewSubmit} className="space-y-4">
-          <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1 bg-slate-50 dark:bg-slate-800/40 p-3 rounded border border-slate-200 dark:border-slate-700">
-            <div><span className="font-semibold">Reason:</span> {selectedRequest?.reason}</div>
-            <div><span className="font-semibold">Items Count:</span> {selectedRequest?.items?.length || 0} material line(s)</div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          <div className="space-y-2">
+            <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 font-display">
               Review Decision *
             </label>
             <div className="flex items-center gap-4">
-              <label className="inline-flex items-center gap-2 text-sm text-slate-900 dark:text-white cursor-pointer">
+              <label className="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 cursor-pointer">
                 <input
                   type="radio"
-                  name="review-decision"
+                  name="reviewDecision"
                   value="APPROVE"
                   checked={reviewDecision === "APPROVE"}
                   onChange={() => setReviewDecision("APPROVE")}
-                  className="text-emerald-600 focus:ring-emerald-500"
+                  className="text-brand-600 focus:ring-brand-500"
                 />
-                <span className="font-medium text-emerald-700 dark:text-emerald-400">Approve Request</span>
+                <span className="flex items-center gap-1 text-emerald-600 font-bold">
+                  <CheckCircle2 className="w-4 h-4" /> Approve Requisition
+                </span>
               </label>
 
-              <label className="inline-flex items-center gap-2 text-sm text-slate-900 dark:text-white cursor-pointer">
+              <label className="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 cursor-pointer">
                 <input
                   type="radio"
-                  name="review-decision"
+                  name="reviewDecision"
                   value="REJECT"
                   checked={reviewDecision === "REJECT"}
                   onChange={() => setReviewDecision("REJECT")}
-                  className="text-red-600 focus:ring-red-500"
+                  className="text-brand-600 focus:ring-brand-500"
                 />
-                <span className="font-medium text-red-700 dark:text-red-400">Reject Request</span>
+                <span className="flex items-center gap-1 text-red-600 font-bold">
+                  <XCircle className="w-4 h-4" /> Reject Requisition
+                </span>
               </label>
             </div>
           </div>
 
           {reviewDecision === "REJECT" && (
             <Input
-              id="rejection-reason-input"
               label="Rejection Reason *"
-              placeholder="State reason for rejection..."
+              placeholder="e.g. Quantity exceeds budgeted BOM allocation for current task"
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               required
             />
           )}
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
-            <Button variant="outline" type="button" onClick={() => setIsReviewModalOpen(false)}>
+          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <Button variant="outline" type="button" onClick={() => setIsReviewDrawerOpen(false)}>
               Cancel
             </Button>
             <Button
-              variant={reviewDecision === "APPROVE" ? "secondary" : "danger"}
+              variant={reviewDecision === "APPROVE" ? "primary" : "danger"}
               type="submit"
               isLoading={reviewing}
             >
@@ -503,7 +516,7 @@ export const MaterialRequestsPage: React.FC = () => {
             </Button>
           </div>
         </form>
-      </Modal>
+      </SlideOverDrawer>
     </div>
   );
 };

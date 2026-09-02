@@ -1,5 +1,5 @@
 import React from "react";
-import { LoadingState } from "./LoadingState.js";
+import { SkeletonTable } from "./Skeleton.js";
 import { EmptyState } from "./EmptyState.js";
 import { cn } from "../../utils/cn.js";
 
@@ -39,11 +39,7 @@ export function DataTable<T>({
   className,
 }: DataTableProps<T>) {
   if (isLoading) {
-    return (
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-8 shadow-card">
-        <LoadingState message="Loading records..." />
-      </div>
-    );
+    return <SkeletonTable cols={columns.length || 4} rows={5} className={className} />;
   }
 
   if (data.length === 0) {
@@ -57,17 +53,22 @@ export function DataTable<T>({
   }
 
   return (
-    <div className={cn("w-full overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-card", className)}>
+    <div
+      className={cn(
+        "w-full overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-card transition-colors",
+        className
+      )}
+    >
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs sm:text-sm">
-          <thead className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          <thead className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-850/80 text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-display">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
                   scope="col"
                   className={cn(
-                    "px-4 py-3",
+                    "px-4 py-3.5",
                     col.align === "center" && "text-center",
                     col.align === "right" && "text-right",
                     col.className
@@ -78,7 +79,7 @@ export function DataTable<T>({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+          <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/80 bg-white dark:bg-zinc-900">
             {data.map((row) => {
               const key = keyExtractor(row);
               return (
@@ -86,8 +87,10 @@ export function DataTable<T>({
                   key={key}
                   onClick={() => onRowClick && onRowClick(row)}
                   className={cn(
-                    "transition-colors duration-150",
-                    onRowClick ? "cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-800/60" : "hover:bg-slate-50/40 dark:hover:bg-slate-800/30"
+                    "transition-colors duration-150 group",
+                    onRowClick
+                      ? "cursor-pointer hover:bg-zinc-50/90 dark:hover:bg-zinc-800/60 active:bg-zinc-100 dark:active:bg-zinc-800"
+                      : "hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30"
                   )}
                 >
                   {columns.map((col) => {
@@ -96,7 +99,7 @@ export function DataTable<T>({
                       <td
                         key={`${key}-${col.key}`}
                         className={cn(
-                          "px-4 py-3 text-slate-800 dark:text-slate-200",
+                          "px-4 py-3.5 text-zinc-800 dark:text-zinc-200 font-sans",
                           col.align === "center" && "text-center",
                           col.align === "right" && "text-right",
                           col.className

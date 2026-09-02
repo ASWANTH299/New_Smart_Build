@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  ArrowRightLeft,
+  SlidersHorizontal,
+  AlertTriangle,
+} from "lucide-react";
 import { materialService } from "../../services/materialService.js";
 import {
   InventoryBalance,
@@ -9,12 +15,12 @@ import {
   StockAlert,
 } from "../../types/material.js";
 import { useAuth } from "../../hooks/useAuth.js";
-import Card from "../../components/ui/Card";
-import Button from "../../components/ui/Button";
-import Input from "../../components/ui/Input";
-import Select from "../../components/ui/Select";
-import StatusBadge from "../../components/ui/StatusBadge";
-import Modal from "../../components/ui/Modal.js";
+import Card from "../../components/ui/Card.js";
+import Button from "../../components/ui/Button.js";
+import Input from "../../components/ui/Input.js";
+import Select from "../../components/ui/Select.js";
+import StatusBadge from "../../components/ui/StatusBadge.js";
+import SlideOverDrawer from "../../components/ui/SlideOverDrawer.js";
 import LoadingState from "../../components/ui/LoadingState.js";
 import EmptyState from "../../components/ui/EmptyState.js";
 import ErrorState from "../../components/ui/ErrorState.js";
@@ -36,14 +42,14 @@ export const InventoryPage: React.FC = () => {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [lowStockOnly, setLowStockOnly] = useState(false);
 
-  // Modals
-  const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
-  const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
-  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
-  const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
+  // Drawers
+  const [isReceiveDrawerOpen, setIsReceiveDrawerOpen] = useState(false);
+  const [isIssueDrawerOpen, setIsIssueDrawerOpen] = useState(false);
+  const [isTransferDrawerOpen, setIsTransferDrawerOpen] = useState(false);
+  const [isAdjustDrawerOpen, setIsAdjustDrawerOpen] = useState(false);
   const [processing, setProcessing] = useState(false);
 
-  // Modal forms
+  // Drawer forms
   const [receiveData, setReceiveData] = useState({
     locationId: "",
     materialId: "",
@@ -133,7 +139,7 @@ export const InventoryPage: React.FC = () => {
 
       if (res.success) {
         showSuccess("Receipt Processed", "Materials received into store successfully.");
-        setIsReceiveModalOpen(false);
+        setIsReceiveDrawerOpen(false);
         setReceiveData({ locationId: "", materialId: "", quantity: 1, unitCost: 0, reason: "" });
         fetchInventoryData();
       }
@@ -162,7 +168,7 @@ export const InventoryPage: React.FC = () => {
 
       if (res.success) {
         showSuccess("Stock Issued", "Materials issued from store successfully.");
-        setIsIssueModalOpen(false);
+        setIsIssueDrawerOpen(false);
         setIssueData({ locationId: "", materialId: "", quantity: 1, reason: "" });
         fetchInventoryData();
       }
@@ -194,7 +200,7 @@ export const InventoryPage: React.FC = () => {
 
       if (res.success) {
         showSuccess("Transfer Completed", "Stock transferred between locations successfully.");
-        setIsTransferModalOpen(false);
+        setIsTransferDrawerOpen(false);
         setTransferData({ fromLocationId: "", toLocationId: "", materialId: "", quantity: 1, reason: "" });
         fetchInventoryData();
       }
@@ -222,7 +228,7 @@ export const InventoryPage: React.FC = () => {
 
       if (res.success) {
         showSuccess("Adjustment Applied", "Stock balance adjusted successfully.");
-        setIsAdjustModalOpen(false);
+        setIsAdjustDrawerOpen(false);
         setAdjustData({
           locationId: "",
           materialId: "",
@@ -244,41 +250,45 @@ export const InventoryPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight font-display">
             Inventory & Warehouse Management
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
             Real-time multi-location stock levels, reorder threshold alerts, and audit transaction log.
           </p>
         </div>
 
         {canManage && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Button
               id="receive-materials-btn"
               variant="primary"
-              onClick={() => setIsReceiveModalOpen(true)}
+              leftIcon={<ArrowDownLeft className="w-4 h-4" />}
+              onClick={() => setIsReceiveDrawerOpen(true)}
             >
               + Receive Stock
             </Button>
             <Button
               id="issue-materials-btn"
               variant="outline"
-              onClick={() => setIsIssueModalOpen(true)}
+              leftIcon={<ArrowUpRight className="w-4 h-4" />}
+              onClick={() => setIsIssueDrawerOpen(true)}
             >
               - Issue Stock
             </Button>
             <Button
               id="transfer-materials-btn"
               variant="outline"
-              onClick={() => setIsTransferModalOpen(true)}
+              leftIcon={<ArrowRightLeft className="w-4 h-4" />}
+              onClick={() => setIsTransferDrawerOpen(true)}
             >
               ⇄ Transfer
             </Button>
             <Button
               id="adjust-stock-btn"
               variant="outline"
-              onClick={() => setIsAdjustModalOpen(true)}
+              leftIcon={<SlidersHorizontal className="w-4 h-4" />}
+              onClick={() => setIsAdjustDrawerOpen(true)}
             >
               ± Adjust Stock
             </Button>
@@ -288,211 +298,221 @@ export const InventoryPage: React.FC = () => {
 
       {/* Stock Alerts Warning Banner */}
       {alerts.length > 0 && (
-        <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg p-4 space-y-2">
-          <div className="flex items-center gap-2 font-semibold text-amber-800 dark:text-amber-300 text-sm">
-            <span>⚠️</span>
+        <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 space-y-2">
+          <div className="flex items-center gap-2 font-semibold text-amber-800 dark:text-amber-300 text-xs font-display">
+            <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
             <span>Active Stock Threshold Alerts ({alerts.length})</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
-            {alerts.slice(0, 4).map((alert, idx) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            {alerts.map((alt) => (
               <div
-                key={idx}
-                className="flex items-center justify-between bg-white dark:bg-slate-900/60 p-2.5 rounded border border-amber-200/60 dark:border-amber-800/60"
+                key={alt.balanceId}
+                className="bg-white/80 dark:bg-zinc-900/80 p-2.5 rounded-xl border border-amber-200/60 dark:border-amber-900/60 text-xs flex items-center justify-between gap-2"
               >
-                <span className="text-slate-800 dark:text-slate-200">{alert.message}</span>
-                <StatusBadge
-                  status={alert.type.toLowerCase()}
-                  size="sm"
-                  label={alert.type === "CRITICAL_LOW_STOCK" ? "Low Stock" : "Reorder"}
-                />
+                <div className="min-w-0">
+                  <span className="font-bold text-zinc-900 dark:text-zinc-100 block truncate">
+                    {alt.material.name}
+                  </span>
+                  <span className="text-[11px] text-zinc-500 font-mono">
+                    {alt.location.name}: {alt.availableQuantity} avail (Min: {alt.threshold})
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 shrink-0 font-mono">
+                  LOW
+                </span>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Filters */}
+      {/* Filter and Location Selector Bar */}
       <Card className="p-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="w-full sm:w-72">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
             <Select
-              id="inventory-location-filter"
+              id="location-filter-select"
               value={selectedLocation}
               onChange={(e) => setSelectedLocation(e.target.value)}
               options={[
                 { value: "", label: "All Storage Locations" },
                 ...locations.map((loc) => ({
                   value: loc._id,
-                  label: `${loc.name} (${loc.type === "CENTRAL_WAREHOUSE" ? "Central" : "Site"})`,
+                  label: `${loc.name} (${loc.type === "CENTRAL_WAREHOUSE" ? "Warehouse" : "Store"})`,
                 })),
               ]}
+              className="w-full sm:w-64"
             />
+
+            <label className="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 cursor-pointer select-none shrink-0 font-display">
+              <input
+                id="low-stock-checkbox"
+                type="checkbox"
+                checked={lowStockOnly}
+                onChange={(e) => setLowStockOnly(e.target.checked)}
+                className="rounded border-zinc-300 text-brand-600 focus:ring-brand-500"
+              />
+              <span>Low Stock Alerts Only</span>
+            </label>
           </div>
 
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="low-stock-filter-chk"
-              checked={lowStockOnly}
-              onChange={(e) => setLowStockOnly(e.target.checked)}
-              className="rounded border-slate-300 text-brand-600 focus:ring-brand-500"
-            />
-            <label htmlFor="low-stock-filter-chk" className="text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
-              Show Low-Stock & Reorder Items Only
-            </label>
+          <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">
+            Tracking {balances.length} active inventory balance records
           </div>
         </div>
       </Card>
 
-      {/* Balances Ledger Table */}
+      {/* Main Content View */}
       {loading ? (
-        <LoadingState message="Loading inventory balances..." />
+        <LoadingState message="Loading inventory ledger..." />
       ) : error ? (
         <ErrorState message={error} onRetry={fetchInventoryData} />
       ) : balances.length === 0 ? (
         <EmptyState
-          title="No inventory records found"
-          description="Receive materials into central warehouse or site stores to populate inventory balances."
+          title="No Inventory Balances Recorded"
+          description="There is no stock recorded for the selected location. Perform a Stock Inward receipt to initialize inventory."
           action={
             canManage ? (
-              <Button variant="primary" onClick={() => setIsReceiveModalOpen(true)}>
+              <Button variant="primary" onClick={() => setIsReceiveDrawerOpen(true)}>
                 Receive First Stock
               </Button>
             ) : undefined
           }
         />
       ) : (
-        <Card className="overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
-              <thead className="bg-slate-50 dark:bg-slate-800/80 text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-                <tr>
-                  <th className="py-3.5 px-4">Material</th>
-                  <th className="py-3.5 px-4">Storage Location</th>
-                  <th className="py-3.5 px-4 text-right">Total Quantity</th>
-                  <th className="py-3.5 px-4 text-right">Reserved</th>
-                  <th className="py-3.5 px-4 text-right">Available</th>
-                  <th className="py-3.5 px-4 text-right">Avg. Unit Cost</th>
-                  <th className="py-3.5 px-4">Stock Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900/60 font-mono text-xs">
-                {balances.map((b) => (
-                  <tr key={b._id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
-                    <td className="py-3.5 px-4 font-sans font-medium text-slate-900 dark:text-white">
-                      <Link to={`/materials/${b.materialId?._id}`} className="hover:underline text-brand-600 dark:text-brand-400">
-                        {b.materialId?.code}
-                      </Link>{" "}
-                      - {b.materialId?.name}
-                    </td>
-                    <td className="py-3.5 px-4 font-sans text-slate-600 dark:text-slate-300">
-                      {b.locationId?.name}
-                    </td>
-                    <td className="py-3.5 px-4 text-right font-semibold text-slate-900 dark:text-white">
-                      {b.quantity} {b.materialId?.unit}
-                    </td>
-                    <td className="py-3.5 px-4 text-right text-slate-500">
-                      {b.reservedQuantity} {b.materialId?.unit}
-                    </td>
-                    <td className="py-3.5 px-4 text-right font-bold text-emerald-600 dark:text-emerald-400">
-                      {b.availableQuantity} {b.materialId?.unit}
-                    </td>
-                    <td className="py-3.5 px-4 text-right text-slate-700 dark:text-slate-300">
-                      ${b.averageUnitCost ? b.averageUnitCost.toFixed(2) : "0.00"}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      {b.isLowStock ? (
-                        <StatusBadge status="critical_low_stock" label="Low Stock" size="sm" />
-                      ) : b.isReorderNeeded ? (
-                        <StatusBadge status="reorder_level_reached" label="Reorder" size="sm" />
-                      ) : (
-                        <StatusBadge status="healthy" label="Sufficient" size="sm" />
-                      )}
-                    </td>
+        <div className="space-y-6">
+          {/* Multi-Location Balances Table */}
+          <Card className="overflow-hidden border border-zinc-200/90 dark:border-zinc-800 shadow-card">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-zinc-600 dark:text-zinc-300">
+                <thead className="bg-zinc-50/80 dark:bg-zinc-850/80 text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider border-b border-zinc-200/80 dark:border-zinc-800 font-display">
+                  <tr>
+                    <th className="py-3.5 px-4">Material Spec</th>
+                    <th className="py-3.5 px-4">Storage Location</th>
+                    <th className="py-3.5 px-4 text-right">Total In-Stock</th>
+                    <th className="py-3.5 px-4 text-right">Reserved</th>
+                    <th className="py-3.5 px-4 text-right">Available Qty</th>
+                    <th className="py-3.5 px-4 text-right">Avg. Unit Cost</th>
+                    <th className="py-3.5 px-4">Stock Health</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+                </thead>
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/80 bg-white dark:bg-zinc-900 font-mono text-xs">
+                  {balances.map((b) => {
+                    const mat = typeof b.materialId === "object" ? b.materialId : null;
+                    const loc = typeof b.locationId === "object" ? b.locationId : null;
+                    const isCritical = mat && b.availableQuantity <= (mat.minimumStock || 0);
+                    const isReorder = mat && b.availableQuantity <= (mat.reorderLevel || 0);
+
+                    return (
+                      <tr key={b._id} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40 transition-colors">
+                        <td className="py-3.5 px-4 font-sans font-medium text-zinc-900 dark:text-zinc-100">
+                          {mat ? `${mat.code} - ${mat.name}` : "Material Item"}
+                        </td>
+                        <td className="py-3.5 px-4 font-sans text-zinc-600 dark:text-zinc-300">
+                          {loc ? loc.name : "Warehouse Location"}
+                        </td>
+                        <td className="py-3.5 px-4 text-right font-semibold text-zinc-900 dark:text-zinc-100">
+                          {b.quantity} {mat?.unit || "units"}
+                        </td>
+                        <td className="py-3.5 px-4 text-right text-zinc-500">
+                          {b.reservedQuantity} {mat?.unit || "units"}
+                        </td>
+                        <td className="py-3.5 px-4 text-right font-semibold text-emerald-600 dark:text-emerald-400">
+                          {b.availableQuantity} {mat?.unit || "units"}
+                        </td>
+                        <td className="py-3.5 px-4 text-right text-zinc-700 dark:text-zinc-300">
+                          ${b.averageUnitCost ? b.averageUnitCost.toFixed(2) : "0.00"}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          {isCritical ? (
+                            <StatusBadge status="rejected" size="sm" label="Low Stock" />
+                          ) : isReorder ? (
+                            <StatusBadge status="warning" size="sm" label="Reorder" />
+                          ) : (
+                            <StatusBadge status="approved" size="sm" label="In Stock" />
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* Audit Transaction Ledger */}
+          <Card
+            title="Recent Stock Movement Ledger"
+            subtitle="Immutable chronological history of inward receipts, issues, transfers, and cycle count adjustments"
+          >
+            {transactions.length === 0 ? (
+              <p className="text-xs text-zinc-500 italic py-4 text-center">
+                No inventory transactions logged yet.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs font-mono">
+                  <thead className="bg-zinc-50/80 dark:bg-zinc-850/80 text-[10px] font-bold text-zinc-500 uppercase tracking-wider border-b border-zinc-200/80 dark:border-zinc-800 font-display">
+                    <tr>
+                      <th className="py-2.5 px-3">TXN #</th>
+                      <th className="py-2.5 px-3">Type</th>
+                      <th className="py-2.5 px-3">Material</th>
+                      <th className="py-2.5 px-3">Location</th>
+                      <th className="py-2.5 px-3 text-right">Quantity</th>
+                      <th className="py-2.5 px-3 text-right">Total Cost</th>
+                      <th className="py-2.5 px-3">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
+                    {transactions.map((t) => (
+                      <tr key={t._id} className="hover:bg-zinc-50/60 dark:hover:bg-zinc-800/40">
+                        <td className="py-2.5 px-3 font-semibold text-brand-600 dark:text-brand-400">
+                          {t.transactionNumber}
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <StatusBadge status={t.transactionType.toLowerCase()} size="sm" />
+                        </td>
+                        <td className="py-2.5 px-3 font-sans text-zinc-900 dark:text-zinc-100">
+                          {typeof t.materialId === "object" && t.materialId !== null ? (t.materialId as any).name : "Material"}
+                        </td>
+                        <td className="py-2.5 px-3 font-sans text-zinc-500">
+                          {typeof t.locationId === "object" && t.locationId !== null ? (t.locationId as any).name : "Store"}
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-semibold text-zinc-900 dark:text-zinc-100">
+                          {t.quantity}
+                        </td>
+                        <td className="py-2.5 px-3 text-right text-zinc-700 dark:text-zinc-300">
+                          ${t.totalCost?.toFixed(2) || "0.00"}
+                        </td>
+                        <td className="py-2.5 px-3 text-zinc-500 font-sans">
+                          {new Date(t.timestamp).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+        </div>
       )}
 
-      {/* Recent Inventory Transactions Log */}
-      <Card className="p-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-            Recent Inventory Transactions Ledger
-          </h2>
-          <span className="text-xs text-slate-500 font-sans">
-            Immutable 7-Type Audit History
-          </span>
-        </div>
-
-        {transactions.length === 0 ? (
-          <div className="text-sm text-slate-500 py-6 text-center">
-            No transactions recorded yet.
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
-              <thead className="bg-slate-50 dark:bg-slate-800/80 text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-                <tr>
-                  <th className="py-3 px-4">TXN Number</th>
-                  <th className="py-3 px-4">Type</th>
-                  <th className="py-3 px-4">Material</th>
-                  <th className="py-3 px-4 text-right">Quantity</th>
-                  <th className="py-3 px-4 text-right">Total Cost</th>
-                  <th className="py-3 px-4">Date / Time</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900/60 font-mono text-xs">
-                {transactions.map((t) => {
-                  const mat = typeof t.materialId === "object" ? t.materialId : null;
-                  return (
-                    <tr key={t._id}>
-                      <td className="py-3 px-4 text-brand-600 dark:text-brand-400">{t.transactionNumber}</td>
-                      <td className="py-3 px-4">
-                        <StatusBadge status={t.transactionType.toLowerCase()} size="sm" />
-                      </td>
-                      <td className="py-3 px-4 font-sans font-medium text-slate-900 dark:text-white">
-                        {mat ? `${mat.code} - ${mat.name}` : "Material Item"}
-                      </td>
-                      <td className="py-3 px-4 text-right font-semibold text-slate-900 dark:text-white">
-                        {t.quantity}
-                      </td>
-                      <td className="py-3 px-4 text-right font-semibold text-slate-900 dark:text-white">
-                        ${t.totalCost?.toFixed(2) || "0.00"}
-                      </td>
-                      <td className="py-3 px-4 text-slate-500 font-sans">
-                        {new Date(t.timestamp).toLocaleString()}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
-
-      {/* Receive Modal */}
-      <Modal
-        isOpen={isReceiveModalOpen}
-        onClose={() => setIsReceiveModalOpen(false)}
-        title="Receive Materials into Inventory"
+      {/* Receive Stock SlideOverDrawer */}
+      <SlideOverDrawer
+        isOpen={isReceiveDrawerOpen}
+        onClose={() => setIsReceiveDrawerOpen(false)}
+        title="Stock Inward (Receive Goods)"
+        subtitle="Receive incoming material deliveries or purchase shipments into a storage location"
       >
         <form onSubmit={handleReceiveSubmit} className="space-y-4">
           <Select
             id="receive-location-select"
-            label="Destination Location *"
+            label="Storage Location *"
             value={receiveData.locationId}
             onChange={(e) => setReceiveData({ ...receiveData, locationId: e.target.value })}
             options={[
-              { value: "", label: "-- Select Location --" },
-              ...locations.map((loc) => ({
-                value: loc._id,
-                label: `${loc.name} (${loc.type === "CENTRAL_WAREHOUSE" ? "Central Warehouse" : "Site Store"})`,
-              })),
+              { value: "", label: "-- Select Storage Location --" },
+              ...locations.map((loc) => ({ value: loc._id, label: loc.name })),
             ]}
             required
           />
@@ -501,14 +521,7 @@ export const InventoryPage: React.FC = () => {
             id="receive-material-select"
             label="Material *"
             value={receiveData.materialId}
-            onChange={(e) => {
-              const mat = materials.find((m) => m._id === e.target.value);
-              setReceiveData({
-                ...receiveData,
-                materialId: e.target.value,
-                unitCost: mat?.unitPrice || receiveData.unitCost,
-              });
-            }}
+            onChange={(e) => setReceiveData({ ...receiveData, materialId: e.target.value })}
             options={[
               { value: "", label: "-- Select Material --" },
               ...materials.map((m) => ({
@@ -522,7 +535,7 @@ export const InventoryPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               id="receive-quantity"
-              label="Received Quantity *"
+              label="Quantity Received *"
               type="number"
               min="0.01"
               step="any"
@@ -543,49 +556,116 @@ export const InventoryPage: React.FC = () => {
 
           <Input
             id="receive-reason"
-            label="Notes / PO Reference"
-            placeholder="e.g. PO-2026-088 Supplier Direct Delivery"
+            label="Receipt Reference / GRN"
+            placeholder="e.g. PO-2026-0004 delivery batch"
             value={receiveData.reason}
             onChange={(e) => setReceiveData({ ...receiveData, reason: e.target.value })}
           />
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
-            <Button variant="outline" type="button" onClick={() => setIsReceiveModalOpen(false)}>
+          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <Button variant="outline" type="button" onClick={() => setIsReceiveDrawerOpen(false)}>
               Cancel
             </Button>
             <Button variant="primary" type="submit" isLoading={processing}>
-              Confirm Receipt
+              Process Inward Receipt
             </Button>
           </div>
         </form>
-      </Modal>
+      </SlideOverDrawer>
 
-      {/* Transfer Modal */}
-      <Modal
-        isOpen={isTransferModalOpen}
-        onClose={() => setIsTransferModalOpen(false)}
+      {/* Issue Stock SlideOverDrawer */}
+      <SlideOverDrawer
+        isOpen={isIssueDrawerOpen}
+        onClose={() => setIsIssueDrawerOpen(false)}
+        title="Issue / Requisition Materials"
+        subtitle="Issue construction materials from storage location for site execution or requisition"
+      >
+        <form onSubmit={handleIssueSubmit} className="space-y-4">
+          <Select
+            id="issue-location-select"
+            label="Storage Location *"
+            value={issueData.locationId}
+            onChange={(e) => setIssueData({ ...issueData, locationId: e.target.value })}
+            options={[
+              { value: "", label: "-- Select Location --" },
+              ...locations.map((loc) => ({ value: loc._id, label: loc.name })),
+            ]}
+            required
+          />
+
+          <Select
+            id="issue-material-select"
+            label="Material *"
+            value={issueData.materialId}
+            onChange={(e) => setIssueData({ ...issueData, materialId: e.target.value })}
+            options={[
+              { value: "", label: "-- Select Material --" },
+              ...materials.map((m) => ({
+                value: m._id,
+                label: `${m.code} - ${m.name} (${m.unit})`,
+              })),
+            ]}
+            required
+          />
+
+          <Input
+            id="issue-quantity"
+            label="Quantity to Issue *"
+            type="number"
+            min="0.01"
+            step="any"
+            value={issueData.quantity}
+            onChange={(e) => setIssueData({ ...issueData, quantity: Number(e.target.value) })}
+            required
+          />
+
+          <Input
+            id="issue-reason"
+            label="Issuance Reason / Work Reference *"
+            placeholder="e.g. Dispatched to Site Engineer for slab reinforcement"
+            value={issueData.reason}
+            onChange={(e) => setIssueData({ ...issueData, reason: e.target.value })}
+            required
+          />
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <Button variant="outline" type="button" onClick={() => setIsIssueDrawerOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit" isLoading={processing}>
+              Confirm Stock Issuance
+            </Button>
+          </div>
+        </form>
+      </SlideOverDrawer>
+
+      {/* Transfer SlideOverDrawer */}
+      <SlideOverDrawer
+        isOpen={isTransferDrawerOpen}
+        onClose={() => setIsTransferDrawerOpen(false)}
         title="Transfer Stock Between Locations"
+        subtitle="Inter-store dispatch between Central Warehouse and Project Site Stores"
       >
         <form onSubmit={handleTransferSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Select
-              id="transfer-from-loc"
+              id="transfer-from-select"
               label="Source Location *"
               value={transferData.fromLocationId}
               onChange={(e) => setTransferData({ ...transferData, fromLocationId: e.target.value })}
               options={[
-                { value: "", label: "-- Source Location --" },
+                { value: "", label: "-- Source Store --" },
                 ...locations.map((loc) => ({ value: loc._id, label: loc.name })),
               ]}
               required
             />
             <Select
-              id="transfer-to-loc"
+              id="transfer-to-select"
               label="Destination Location *"
               value={transferData.toLocationId}
               onChange={(e) => setTransferData({ ...transferData, toLocationId: e.target.value })}
               options={[
-                { value: "", label: "-- Destination Location --" },
+                { value: "", label: "-- Destination Store --" },
                 ...locations.map((loc) => ({ value: loc._id, label: loc.name })),
               ]}
               required
@@ -626,8 +706,8 @@ export const InventoryPage: React.FC = () => {
             onChange={(e) => setTransferData({ ...transferData, reason: e.target.value })}
           />
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
-            <Button variant="outline" type="button" onClick={() => setIsTransferModalOpen(false)}>
+          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <Button variant="outline" type="button" onClick={() => setIsTransferDrawerOpen(false)}>
               Cancel
             </Button>
             <Button variant="primary" type="submit" isLoading={processing}>
@@ -635,13 +715,14 @@ export const InventoryPage: React.FC = () => {
             </Button>
           </div>
         </form>
-      </Modal>
+      </SlideOverDrawer>
 
-      {/* Adjust Modal */}
-      <Modal
-        isOpen={isAdjustModalOpen}
-        onClose={() => setIsAdjustModalOpen(false)}
+      {/* Adjust SlideOverDrawer */}
+      <SlideOverDrawer
+        isOpen={isAdjustDrawerOpen}
+        onClose={() => setIsAdjustDrawerOpen(false)}
         title="Adjust Inventory Balance"
+        subtitle="Physical inventory cycle count variance correction with mandatory audit reason"
       >
         <form onSubmit={handleAdjustSubmit} className="space-y-4">
           <Select
@@ -708,8 +789,8 @@ export const InventoryPage: React.FC = () => {
             required
           />
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
-            <Button variant="outline" type="button" onClick={() => setIsAdjustModalOpen(false)}>
+          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <Button variant="outline" type="button" onClick={() => setIsAdjustDrawerOpen(false)}>
               Cancel
             </Button>
             <Button variant="primary" type="submit" isLoading={processing}>
@@ -717,73 +798,7 @@ export const InventoryPage: React.FC = () => {
             </Button>
           </div>
         </form>
-      </Modal>
-
-      {/* Issue Stock Modal */}
-      <Modal
-        isOpen={isIssueModalOpen}
-        onClose={() => setIsIssueModalOpen(false)}
-        title="Issue / Requisition Materials"
-        description="Issue construction materials from storage location for site execution or requisition."
-      >
-        <form onSubmit={handleIssueSubmit} className="space-y-4">
-          <Select
-            id="issue-location-select"
-            label="Storage Location *"
-            value={issueData.locationId}
-            onChange={(e) => setIssueData({ ...issueData, locationId: e.target.value })}
-            options={[
-              { value: "", label: "-- Select Location --" },
-              ...locations.map((loc) => ({ value: loc._id, label: loc.name })),
-            ]}
-            required
-          />
-
-          <Select
-            id="issue-material-select"
-            label="Material *"
-            value={issueData.materialId}
-            onChange={(e) => setIssueData({ ...issueData, materialId: e.target.value })}
-            options={[
-              { value: "", label: "-- Select Material --" },
-              ...materials.map((m) => ({
-                value: m._id,
-                label: `${m.code} - ${m.name} (${m.unit})`,
-              })),
-            ]}
-            required
-          />
-
-          <Input
-            id="issue-quantity"
-            label="Quantity to Issue *"
-            type="number"
-            min="0.01"
-            step="any"
-            value={issueData.quantity}
-            onChange={(e) => setIssueData({ ...issueData, quantity: Number(e.target.value) })}
-            required
-          />
-
-          <Input
-            id="issue-reason"
-            label="Issuance Reason / Work Reference *"
-            placeholder="e.g. Dispatched to Site Engineer for slab reinforcement"
-            value={issueData.reason}
-            onChange={(e) => setIssueData({ ...issueData, reason: e.target.value })}
-            required
-          />
-
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
-            <Button variant="outline" type="button" onClick={() => setIsIssueModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary" type="submit" isLoading={processing}>
-              Confirm Stock Issuance
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      </SlideOverDrawer>
     </div>
   );
 };

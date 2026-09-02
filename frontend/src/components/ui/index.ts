@@ -9,6 +9,8 @@ export * from "./Card.js";
 export * from "./Metric.js";
 export * from "./Tabs.js";
 export * from "./Modal.js";
+export * from "./SlideOverDrawer.js";
+export * from "./Skeleton.js";
 export * from "./ConfirmationDialog.js";
 export * from "./LoadingState.js";
 export * from "./EmptyState.js";

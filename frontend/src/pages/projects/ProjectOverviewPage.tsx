@@ -16,6 +16,8 @@ import {
   Sparkles,
   Users,
   Shield,
+  Activity,
+  Calendar,
 } from "lucide-react";
 import { PageHeader } from "../../components/ui/PageHeader.js";
 import { Card } from "../../components/ui/Card.js";
@@ -24,6 +26,7 @@ import { StatusBadge } from "../../components/ui/StatusBadge.js";
 import { ProgressIndicator } from "../../components/ui/ProgressIndicator.js";
 import { Button } from "../../components/ui/Button.js";
 import { Modal } from "../../components/ui/Modal.js";
+import { SlideOverDrawer } from "../../components/ui/SlideOverDrawer.js";
 import { Select } from "../../components/ui/Select.js";
 import { LoadingState } from "../../components/ui/LoadingState.js";
 import { ErrorState } from "../../components/ui/ErrorState.js";
@@ -60,8 +63,8 @@ export const ProjectOverviewPage: React.FC = () => {
   const [nextStatus, setNextStatus] = useState<ProjectContextType["status"]>("ACTIVE");
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
-  // Add Team Member Modal State
-  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+  // Team Management Slide-Over State
+  const [isTeamDrawerOpen, setIsTeamDrawerOpen] = useState(false);
   const [selectedUserToAdd, setSelectedUserToAdd] = useState("");
   const [isAddingMember, setIsAddingMember] = useState(false);
   const [removingUserId, setRemovingUserId] = useState<string | null>(null);
@@ -105,8 +108,8 @@ export const ProjectOverviewPage: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  const handleOpenAddMemberModal = async () => {
-    setIsAddMemberModalOpen(true);
+  const handleOpenTeamDrawer = async () => {
+    setIsTeamDrawerOpen(true);
     try {
       const res = await userService.getUsers({ status: "ACTIVE", limit: 100 });
       if (res.success && res.data) {
@@ -133,7 +136,6 @@ export const ProjectOverviewPage: React.FC = () => {
       const res = await projectService.addTeamMember(projectId, selectedUserToAdd);
       if (res.success && res.data) {
         showSuccess("Member Assigned", res.data.message);
-        setIsAddMemberModalOpen(false);
         loadData();
       }
     } catch (error) {
@@ -218,7 +220,7 @@ export const ProjectOverviewPage: React.FC = () => {
     }
   };
 
-  if (isLoading) return <LoadingState message="Loading project workspace..." />;
+  if (isLoading) return <LoadingState message="Loading project command center..." />;
   if (!data) return <ErrorState title="Project Not Found" message="Could not find the requested project." />;
 
   const { project, daysRemaining } = data;
@@ -227,12 +229,17 @@ export const ProjectOverviewPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-xs text-slate-500">
-        <Link to="/projects" className="hover:text-slate-900 inline-flex items-center gap-1">
+      {/* Back Link */}
+      <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+        <Link
+          to="/projects"
+          className="hover:text-zinc-900 dark:hover:text-zinc-100 inline-flex items-center gap-1.5 font-medium transition-colors"
+        >
           <ArrowLeft className="w-3.5 h-3.5" /> Back to Projects Directory
         </Link>
       </div>
 
+      {/* Hero Command Center Header */}
       <PageHeader
         title={`${project.name} (${project.code})`}
         description={project.location}
@@ -247,7 +254,11 @@ export const ProjectOverviewPage: React.FC = () => {
             <Button
               variant={isCurrentActive ? "secondary" : "outline"}
               onClick={handleSetCurrentContext}
-              leftIcon={isCurrentActive ? <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> : undefined}
+              leftIcon={
+                isCurrentActive ? (
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                ) : undefined
+              }
             >
               {isCurrentActive ? "Active Workspace" : "Set as Active Project"}
             </Button>
@@ -269,10 +280,10 @@ export const ProjectOverviewPage: React.FC = () => {
         }
       />
 
-      {/* Quick Access Navigation Bar for Project Modules */}
-      <div className="flex items-center gap-3 p-2.5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-card overflow-x-auto transition-colors duration-150">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 font-display px-2 shrink-0">
-          Project Modules:
+      {/* Quick Access Module Pill Bar */}
+      <div className="flex items-center gap-2 p-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 shadow-card overflow-x-auto">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-display px-2 shrink-0">
+          Modules:
         </span>
         <Link to={`/projects/${projectId}/phases`} className="shrink-0">
           <Button variant="outline" size="sm" leftIcon={<Layers className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
@@ -281,7 +292,7 @@ export const ProjectOverviewPage: React.FC = () => {
         </Link>
         <Link to={`/projects/${projectId}/tasks`} className="shrink-0">
           <Button variant="outline" size="sm" leftIcon={<CheckSquare className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Tasks & Work Tracking
+            Tasks & Progress
           </Button>
         </Link>
         <Link to={`/projects/${projectId}/milestones`} className="shrink-0">
@@ -291,17 +302,12 @@ export const ProjectOverviewPage: React.FC = () => {
         </Link>
         <Link to={`/projects/${projectId}/bom`} className="shrink-0">
           <Button variant="outline" size="sm" leftIcon={<Package className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Bill of Materials (BOM)
+            BOM Spec
           </Button>
         </Link>
         <Link to={`/projects/${projectId}/material-requests`} className="shrink-0">
           <Button variant="outline" size="sm" leftIcon={<RotateCcw className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Material Requests
-          </Button>
-        </Link>
-        <Link to={`/projects/${projectId}/procurement-requests`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<Layers className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Procurement Requests
+            Requisitions
           </Button>
         </Link>
         <Link to={`/projects/${projectId}/purchase-orders`} className="shrink-0">
@@ -309,14 +315,24 @@ export const ProjectOverviewPage: React.FC = () => {
             Purchase Orders
           </Button>
         </Link>
+        <Link to={`/projects/${projectId}/workforce`} className="shrink-0">
+          <Button variant="outline" size="sm" leftIcon={<Users className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
+            Workforce
+          </Button>
+        </Link>
+        <Link to={`/projects/${projectId}/attendance`} className="shrink-0">
+          <Button variant="outline" size="sm" leftIcon={<Clock className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
+            Attendance
+          </Button>
+        </Link>
         <Link to={`/projects/${projectId}/receiving`} className="shrink-0">
           <Button variant="outline" size="sm" leftIcon={<CheckCircle2 className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Receiving & GRN
+            Receiving GRN
           </Button>
         </Link>
       </div>
 
-      {/* Overview Metrics Cards */}
+      {/* Overview Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Metric
           label="Lifecycle Status"
@@ -327,43 +343,47 @@ export const ProjectOverviewPage: React.FC = () => {
         <Metric
           label="Schedule Health"
           value={project.health}
-          subtext={project.health === "HEALTHY" ? "Schedule on target" : "Requires attention"}
+          variant={project.health === "HEALTHY" ? "emerald" : "amber"}
+          subtext={project.health === "HEALTHY" ? "On-track with zero blockers" : "Requires attention"}
           icon={<HeartPulse className="w-5 h-5" />}
         />
         <Metric
           label="Days Remaining"
           value={`${daysRemaining} Days`}
           subtext={`Target: ${new Date(project.plannedEndDate).toLocaleDateString()}`}
-          icon={<Flag className="w-5 h-5" />}
+          icon={<Calendar className="w-5 h-5" />}
         />
         <Metric
-          label="Assigned Team"
+          label="Site Workforce"
           value={`${team.length}`}
-          subtext="Active members on site"
+          subtext="Assigned operations team"
           icon={<Users className="w-5 h-5" />}
         />
       </div>
 
-      {/* Progress & Specifications */}
+      {/* Core Grid: Progress Rollup, Roadmap, Team */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
+          {/* Construction Progress */}
           <Card title="Construction Progress Rollup">
             <div className="space-y-4">
-              <div className="flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
-                <span className="font-semibold">Overall Project Completion</span>
-                <span className="font-bold text-brand-600 dark:text-brand-400">{project.progress || 0}%</span>
+              <div className="flex items-center justify-between text-xs text-zinc-700 dark:text-zinc-300">
+                <span className="font-semibold">Overall Site Completion</span>
+                <span className="font-bold text-brand-600 dark:text-brand-400 text-sm tabular-nums">
+                  {project.progress || 0}%
+                </span>
               </div>
               <ProgressIndicator progress={project.progress || 0} size="lg" />
 
               {project.description && (
-                <div className="text-xs text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <div className="text-xs text-zinc-600 dark:text-zinc-400 pt-3 border-t border-zinc-100 dark:border-zinc-800">
                   <p>{project.description}</p>
                 </div>
               )}
             </div>
           </Card>
 
-          {/* Construction Phases Progress Breakdown */}
+          {/* Construction Phases Roadmap */}
           <Card
             title={`Construction Phases Roadmap (${phases.length})`}
             action={
@@ -377,15 +397,20 @@ export const ProjectOverviewPage: React.FC = () => {
                     <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Auto-Initialize
                   </button>
                 )}
-                <Link to={`/projects/${projectId}/phases`} className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+                <Link
+                  to={`/projects/${projectId}/phases`}
+                  className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline"
+                >
                   View All
                 </Link>
               </div>
             }
           >
             {phases.length === 0 ? (
-              <div className="py-4 text-center space-y-3">
-                <p className="text-xs text-slate-500 dark:text-slate-400 italic">No phases defined for this project.</p>
+              <div className="py-6 text-center space-y-3">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 italic">
+                  No phases defined for this project.
+                </p>
                 {canManage && (
                   <Button
                     variant="outline"
@@ -404,17 +429,19 @@ export const ProjectOverviewPage: React.FC = () => {
                   <Link
                     key={p._id}
                     to={`/projects/${projectId}/phases/${p._id}`}
-                    className="block p-2.5 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    className="block p-3 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-850/60 hover:bg-zinc-100/80 dark:hover:bg-zinc-800 transition-all group"
                   >
-                    <div className="flex items-center justify-between text-xs mb-1.5">
+                    <div className="flex items-center justify-between text-xs mb-2">
                       <div className="flex items-center gap-2">
                         <span className="w-5 h-5 rounded-full bg-brand-100 dark:bg-brand-950/80 text-brand-800 dark:text-brand-300 font-mono text-[10px] font-bold flex items-center justify-center">
                           {p.sequence}
                         </span>
-                        <span className="font-bold text-slate-900 dark:text-slate-100">{p.name}</span>
+                        <span className="font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                          {p.name}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-slate-700 dark:text-slate-300">{p.progress}%</span>
+                      <div className="flex items-center gap-2 font-mono">
+                        <span className="font-bold text-zinc-700 dark:text-zinc-300">{p.progress}%</span>
                         <StatusBadge status={p.status} size="sm" />
                       </div>
                     </div>
@@ -425,27 +452,36 @@ export const ProjectOverviewPage: React.FC = () => {
             )}
           </Card>
 
-          {/* Upcoming Key Milestones */}
+          {/* Upcoming Milestone Gates */}
           <Card
             title={`Upcoming Milestone Gates (${milestones.length})`}
             action={
-              <Link to={`/projects/${projectId}/milestones`} className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+              <Link
+                to={`/projects/${projectId}/milestones`}
+                className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline"
+              >
                 View All
               </Link>
             }
           >
             {milestones.length === 0 ? (
-              <p className="text-xs text-slate-500 dark:text-slate-400 italic">No milestones defined.</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 italic py-4 text-center">
+                No milestone gates scheduled.
+              </p>
             ) : (
-              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+              <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
                 {milestones.slice(0, 4).map((m) => (
-                  <div key={m._id} className="py-2.5 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <Flag className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
+                  <div key={m._id} className="py-3 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                        <Flag className="w-4 h-4" />
+                      </div>
                       <div>
-                        <span className="font-semibold text-slate-900 dark:text-slate-100 block">{m.name}</span>
-                        <span className="text-[11px] text-slate-400 dark:text-slate-500">
-                          Due {new Date(m.plannedDate).toLocaleDateString()}
+                        <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">
+                          {m.name}
+                        </span>
+                        <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-mono">
+                          Target: {new Date(m.plannedDate).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
@@ -457,36 +493,38 @@ export const ProjectOverviewPage: React.FC = () => {
           </Card>
         </div>
 
-        {/* Project Meta Details & Health Engine Output */}
+        {/* Right Column: Health Engine & Team Workforce */}
         <div className="space-y-6">
-          {/* Health Assessment Details */}
+          {/* Health Intelligence */}
           <Card title="Project Health Intelligence">
-            <div className="space-y-3 text-xs">
+            <div className="space-y-3.5 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-slate-500 dark:text-slate-400 font-medium">Health Rating:</span>
+                <span className="text-zinc-500 dark:text-zinc-400 font-medium">Health Rating:</span>
                 <span
-                  className={`font-bold px-2 py-0.5 rounded flex items-center gap-1 text-[11px] ${
+                  className={`font-bold px-2.5 py-1 rounded-md flex items-center gap-1.5 text-[11px] ${
                     project.health === "HEALTHY"
-                      ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300"
+                      ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800"
                       : project.health === "AT_RISK"
-                      ? "bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300"
-                      : "bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300"
+                      ? "bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800"
+                      : "bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 border border-red-200/60 dark:border-red-800"
                   }`}
                 >
-                  <HeartPulse className="w-3.5 h-3.5" />
+                  <Activity className="w-3.5 h-3.5" />
                   {project.health}
                 </span>
               </div>
 
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1.5">
-                <span className="text-slate-500 dark:text-slate-400 font-semibold block">Contributing Factors:</span>
+              <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 space-y-2">
+                <span className="text-zinc-500 dark:text-zinc-400 font-semibold block uppercase tracking-wider text-[10px]">
+                  Contributing Factors:
+                </span>
                 {!project.healthFactors || project.healthFactors.length === 0 ? (
-                  <p className="text-slate-500 dark:text-slate-400 italic">No active risk factors detected.</p>
+                  <p className="text-zinc-500 dark:text-zinc-400 italic">No active risk factors detected.</p>
                 ) : (
-                  <ul className="space-y-1 text-slate-700 dark:text-slate-300">
+                  <ul className="space-y-1.5 text-zinc-700 dark:text-zinc-300">
                     {project.healthFactors.map((factor, idx) => (
-                      <li key={idx} className="flex items-start gap-1.5">
-                        <AlertTriangle className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
+                      <li key={idx} className="flex items-start gap-2 bg-amber-50/60 dark:bg-amber-950/30 p-2 rounded-lg border border-amber-200/50 dark:border-amber-900/50">
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                         <span className="text-[11px] leading-tight">{factor}</span>
                       </li>
                     ))}
@@ -496,159 +534,198 @@ export const ProjectOverviewPage: React.FC = () => {
             </div>
           </Card>
 
-          <Card title="Project Details">
+          {/* Project Details */}
+          <Card title="Project Specification">
             <div className="space-y-3.5 text-xs">
               <div>
-                <span className="text-slate-500 dark:text-slate-400 block">Project Manager</span>
-                <span className="font-semibold text-slate-900 dark:text-slate-100">
-                  {project.projectManagerId?.name || "Unassigned"}
+                <span className="text-zinc-500 dark:text-zinc-400 block text-[11px]">Project Manager</span>
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                  {project.projectManagerId?.name ||
+                    (project.projectManagerId
+                      ? `${(project.projectManagerId as any).firstName || ""} ${(project.projectManagerId as any).lastName || ""}`.trim()
+                      : "Unassigned")}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 dark:text-slate-400 block">Construction Type</span>
-                <span className="font-semibold text-slate-900 dark:text-slate-100">
+                <span className="text-zinc-500 dark:text-zinc-400 block text-[11px]">Construction Type</span>
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                   {project.typeId?.name || "Standard Project"}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 dark:text-slate-400 block">Site Location</span>
-                <div className="flex items-center gap-1 font-semibold text-slate-900 dark:text-slate-100 mt-0.5">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span className="text-zinc-500 dark:text-zinc-400 block text-[11px]">Site Location</span>
+                <div className="flex items-center gap-1.5 font-semibold text-zinc-900 dark:text-zinc-100 mt-0.5">
+                  <MapPin className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
                   <span>{project.location}</span>
                 </div>
               </div>
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2">
+              <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800 grid grid-cols-2 gap-2 font-mono">
                 <div>
-                  <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Start Date</span>
-                  <span className="font-semibold text-slate-900 dark:text-slate-100 text-xs">
+                  <span className="text-zinc-500 dark:text-zinc-400 block text-[10px] font-sans">Start Date</span>
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100 text-xs">
                     {new Date(project.plannedStartDate).toLocaleDateString()}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Target Handover</span>
-                  <span className="font-semibold text-slate-900 dark:text-slate-100 text-xs">
+                  <span className="text-zinc-500 dark:text-zinc-400 block text-[10px] font-sans">Handover</span>
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100 text-xs">
                     {new Date(project.plannedEndDate).toLocaleDateString()}
                   </span>
                 </div>
               </div>
             </div>
           </Card>
+
+          {/* Team Workforce Card */}
+          <Card
+            title={`Assigned Workforce (${team.length})`}
+            action={
+              canManage ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  leftIcon={<UserPlus className="w-3.5 h-3.5" />}
+                  onClick={handleOpenTeamDrawer}
+                >
+                  Manage
+                </Button>
+              ) : undefined
+            }
+          >
+            {team.length === 0 ? (
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 italic py-2">
+                No workforce members assigned.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {team.slice(0, 4).map((member) => (
+                  <div
+                    key={member.membershipId}
+                    className="p-2.5 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-850/60 flex items-center justify-between text-xs"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <span className="font-bold text-zinc-900 dark:text-zinc-100 block truncate">
+                        {member.user.name}
+                      </span>
+                      <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono block truncate">
+                        {member.user.email}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold text-brand-600 dark:text-brand-400 uppercase font-mono px-2 py-0.5 rounded bg-brand-50 dark:bg-brand-950/80">
+                      {member.user.primaryRole.replace(/_/g, " ")}
+                    </span>
+                  </div>
+                ))}
+                {team.length > 4 && (
+                  <button
+                    type="button"
+                    onClick={handleOpenTeamDrawer}
+                    className="w-full text-center text-xs font-semibold text-brand-600 dark:text-brand-400 pt-1 hover:underline"
+                  >
+                    +{team.length - 4} more team members
+                  </button>
+                )}
+              </div>
+            )}
+          </Card>
         </div>
       </div>
 
-      {/* Dedicated Project Team & Members Section */}
-      <Card
-        title={`Project Team & Operational Workforce (${team.length})`}
-        action={
-          canManage ? (
-            <Button
-              variant="outline"
-              size="sm"
-              leftIcon={<UserPlus className="w-3.5 h-3.5" />}
-              onClick={handleOpenAddMemberModal}
-            >
-              Add Member to Project
-            </Button>
-          ) : undefined
-        }
+      {/* Team Management SlideOverDrawer */}
+      <SlideOverDrawer
+        isOpen={isTeamDrawerOpen}
+        onClose={() => setIsTeamDrawerOpen(false)}
+        title="Project Team & Operational Workforce"
+        subtitle={`Manage registered team members assigned to ${project.name}`}
+        size="lg"
       >
-        {team.length === 0 ? (
-          <div className="py-6 text-center space-y-2">
-            <p className="text-xs text-slate-500 dark:text-slate-400 italic">
-              No team members are currently assigned to this project.
-            </p>
-            {canManage && (
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={handleOpenAddMemberModal}
-                leftIcon={<UserPlus className="w-4 h-4" />}
-              >
-                Assign First Member
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {team.map((member) => (
-              <div
-                key={member.membershipId}
-                className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-between gap-3 text-xs"
-              >
-                <div className="min-w-0 flex-1 space-y-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-slate-900 dark:text-slate-100 truncate">
-                      {member.user.name}
-                    </span>
+        <div className="space-y-6">
+          {/* Add Member Form */}
+          {canManage && (
+            <div className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-850 space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300 font-display">
+                Assign New User to Project
+              </h4>
+              <form onSubmit={handleAddMember} className="space-y-3">
+                {availableUsersToAdd.length === 0 ? (
+                  <p className="text-xs text-zinc-500 italic">
+                    All active platform users are already assigned to this team roster.
+                  </p>
+                ) : (
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="flex-1">
+                      <Select
+                        options={availableUsersToAdd.map((u) => ({
+                          value: u.id,
+                          label: `${u.name} (${u.email}) — ${u.primaryRole.replace(/_/g, " ")}`,
+                        }))}
+                        value={selectedUserToAdd}
+                        onChange={(e) => setSelectedUserToAdd(e.target.value)}
+                      />
+                    </div>
+                    <Button
+                      variant="primary"
+                      type="submit"
+                      isLoading={isAddingMember}
+                      leftIcon={<UserPlus className="w-4 h-4" />}
+                    >
+                      Assign Member
+                    </Button>
                   </div>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 block truncate font-mono">
-                    {member.user.email}
-                  </span>
-                  <div className="flex items-center gap-1 text-[10px] font-semibold text-brand-700 dark:text-brand-300">
-                    <Shield className="w-3 h-3" />
-                    <span>{member.user.primaryRole.replace(/_/g, " ")}</span>
-                  </div>
-                </div>
-
-                {canManage && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 shrink-0 p-1.5 h-auto"
-                    title={`Remove ${member.user.name} from project`}
-                    isLoading={removingUserId === member.user.id}
-                    onClick={() => handleRemoveMember(member.user.id, member.user.name)}
-                  >
-                    <UserX className="w-4 h-4" />
-                  </Button>
                 )}
-              </div>
-            ))}
-          </div>
-        )}
-      </Card>
-
-      {/* Add Team Member Modal */}
-      <Modal
-        isOpen={isAddMemberModalOpen}
-        onClose={() => setIsAddMemberModalOpen(false)}
-        title="Assign User to Project Team"
-        description="Select an active platform user (Site Engineer, Store Manager, Contractor, Client, etc.) to assign."
-      >
-        <form onSubmit={handleAddMember} className="space-y-4">
-          {availableUsersToAdd.length === 0 ? (
-            <p className="text-xs text-slate-500 italic py-2">
-              All active registered platform users are already assigned to this project team.
-            </p>
-          ) : (
-            <Select
-              label="Select Platform User"
-              options={availableUsersToAdd.map((u) => ({
-                value: u.id,
-                label: `${u.name} (${u.email}) — ${u.primaryRole.replace(/_/g, " ")}`,
-              }))}
-              value={selectedUserToAdd}
-              onChange={(e) => setSelectedUserToAdd(e.target.value)}
-            />
+              </form>
+            </div>
           )}
 
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" type="button" onClick={() => setIsAddMemberModalOpen(false)}>
-              Cancel
-            </Button>
-            {availableUsersToAdd.length > 0 && (
-              <Button
-                variant="primary"
-                type="submit"
-                isLoading={isAddingMember}
-                leftIcon={<UserPlus className="w-4 h-4" />}
-              >
-                Add Member to Project
-              </Button>
+          {/* Current Roster List */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-display">
+              Active Project Roster ({team.length})
+            </h4>
+
+            {team.length === 0 ? (
+              <p className="text-xs text-zinc-500 italic py-4 text-center">
+                No users assigned to this project team yet.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {team.map((member) => (
+                  <div
+                    key={member.membershipId}
+                    className="p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between gap-3 text-xs shadow-xs"
+                  >
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <span className="font-bold text-zinc-900 dark:text-zinc-100 block">
+                        {member.user.name}
+                      </span>
+                      <span className="text-[11px] text-zinc-500 dark:text-zinc-400 block font-mono">
+                        {member.user.email}
+                      </span>
+                      <div className="flex items-center gap-1.5 text-[10px] font-semibold text-brand-600 dark:text-brand-400 pt-0.5">
+                        <Shield className="w-3 h-3" />
+                        <span>{member.user.primaryRole.replace(/_/g, " ")}</span>
+                      </div>
+                    </div>
+
+                    {canManage && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/60 p-2 h-auto"
+                        title={`Remove ${member.user.name}`}
+                        isLoading={removingUserId === member.user.id}
+                        onClick={() => handleRemoveMember(member.user.id, member.user.name)}
+                      >
+                        <UserX className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
             )}
           </div>
-        </form>
-      </Modal>
+        </div>
+      </SlideOverDrawer>
 
       {/* Status Lifecycle Modal */}
       <Modal

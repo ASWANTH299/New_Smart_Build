@@ -1,2 +1,4 @@
-// Shared UI components (AppShell, Button, Input, Modal, etc.) - Initialized in Phase 3
-export {};
+export * from "./ui/index.js";
+export * from "./ProjectSwitcher.js";
+export * from "./ThemeToggle.js";
+export * from "./PermissionGate.js";

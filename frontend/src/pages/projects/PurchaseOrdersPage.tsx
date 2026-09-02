@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, Link, useSearchParams } from "react-router-dom";
+import { Plus, Trash2, ArrowLeft, ArrowRight } from "lucide-react";
 import { procurementService } from "../../services/procurementService.js";
 import { materialService } from "../../services/materialService.js";
 import {
@@ -13,8 +14,9 @@ import { useToast } from "../../hooks/useToast.js";
 import Card from "../../components/ui/Card.js";
 import Button from "../../components/ui/Button.js";
 import Input from "../../components/ui/Input.js";
+import Select from "../../components/ui/Select.js";
 import StatusBadge from "../../components/ui/StatusBadge.js";
-import Modal from "../../components/ui/Modal.js";
+import SlideOverDrawer from "../../components/ui/SlideOverDrawer.js";
 import LoadingState from "../../components/ui/LoadingState.js";
 import EmptyState from "../../components/ui/EmptyState.js";
 import ErrorState from "../../components/ui/ErrorState.js";
@@ -41,8 +43,8 @@ export const PurchaseOrdersPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Create PO Modal
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  // Create PO Drawer
+  const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [selectedPRId, setSelectedPRId] = useState(prIdFromUrl || "");
   const [selectedVendorId, setSelectedVendorId] = useState("");
@@ -84,7 +86,6 @@ export const PurchaseOrdersPage: React.FC = () => {
       if (prRes.success && prRes.data) {
         setApprovedRequests(prRes.data);
 
-        // If opened from URL with prId
         if (prIdFromUrl) {
           const targetPR = prRes.data.find((p) => p._id === prIdFromUrl);
           if (targetPR) {
@@ -97,7 +98,7 @@ export const PurchaseOrdersPage: React.FC = () => {
                 unitPrice: i.estimatedUnitPrice || 0,
               }))
             );
-            setIsCreateModalOpen(true);
+            setIsCreateDrawerOpen(true);
           }
         }
       }
@@ -158,6 +159,10 @@ export const PurchaseOrdersPage: React.FC = () => {
   const calculateSubtotal = () =>
     items.reduce((sum, i) => sum + (Number(i.quantity) || 0) * (Number(i.unitPrice) || 0), 0);
 
+  const subtotal = calculateSubtotal();
+  const taxAmount = Number(tax) || 0;
+  const totalAmount = subtotal + taxAmount;
+
   const handleCreatePOSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!projectId || !selectedVendorId) {
@@ -191,7 +196,7 @@ export const PurchaseOrdersPage: React.FC = () => {
 
       if (res.success && res.data) {
         showSuccess("Purchase Order Created", `PO ${res.data.poNumber} created successfully.`);
-        setIsCreateModalOpen(false);
+        setIsCreateDrawerOpen(false);
         fetchOrders();
       }
     } catch (err: unknown) {
@@ -206,17 +211,17 @@ export const PurchaseOrdersPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 mb-1 font-sans">
-            <Link to={`/projects/${projectId}`} className="hover:underline text-brand-600 dark:text-brand-400">
-              ← Project Workspace
+          <div className="flex items-center gap-2 text-xs text-zinc-500 mb-1 font-sans">
+            <Link to={`/projects/${projectId}`} className="hover:underline text-brand-600 dark:text-brand-400 font-medium inline-flex items-center gap-1">
+              <ArrowLeft className="w-3 h-3" /> Project Workspace
             </Link>
             <span>/</span>
             <span>Purchase Orders</span>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight font-display">
             Purchase Orders (PO)
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
             Vendor orders, contract line items, delivery tracking, and receiving fulfillment.
           </p>
         </div>
@@ -225,84 +230,79 @@ export const PurchaseOrdersPage: React.FC = () => {
           <Button
             id="create-po-btn"
             variant="primary"
-            onClick={() => setIsCreateModalOpen(true)}
+            leftIcon={<Plus className="w-4 h-4" />}
+            onClick={() => setIsCreateDrawerOpen(true)}
           >
-            + Create Purchase Order
+            + Issue Purchase Order
           </Button>
         )}
       </div>
 
-      {/* Purchase Orders Table */}
+      {/* Orders Table */}
       {loading ? (
         <LoadingState message="Loading purchase orders..." />
       ) : error ? (
         <ErrorState message={error} onRetry={fetchOrders} />
       ) : purchaseOrders.length === 0 ? (
         <EmptyState
-          title="No purchase orders found"
-          description="Create purchase orders for approved procurement requests to issue orders to suppliers."
+          title="No Purchase Orders Found"
+          description="Create vendor purchase orders to procure materials approved from engineering requisitions."
           action={
             canManage ? (
-              <Button variant="primary" onClick={() => setIsCreateModalOpen(true)}>
-                Create First Purchase Order
+              <Button variant="primary" onClick={() => setIsCreateDrawerOpen(true)}>
+                Issue First Purchase Order
               </Button>
             ) : undefined
           }
         />
       ) : (
-        <Card className="overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
+        <Card className="overflow-hidden border border-zinc-200/90 dark:border-zinc-800 shadow-card">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
-              <thead className="bg-slate-50 dark:bg-slate-800/80 text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+            <table className="w-full text-left text-sm text-zinc-600 dark:text-zinc-300">
+              <thead className="bg-zinc-50/80 dark:bg-zinc-850/80 text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider border-b border-zinc-200/80 dark:border-zinc-800 font-display">
                 <tr>
-                  <th className="py-3.5 px-4">PO Number</th>
-                  <th className="py-3.5 px-4">Vendor</th>
+                  <th className="py-3.5 px-4">PO #</th>
+                  <th className="py-3.5 px-4">Vendor / Supplier</th>
                   <th className="py-3.5 px-4 text-center">Items</th>
                   <th className="py-3.5 px-4 text-right">Total Amount</th>
                   <th className="py-3.5 px-4">Expected Delivery</th>
-                  <th className="py-3.5 px-4">Approval</th>
-                  <th className="py-3.5 px-4">Fulfillment</th>
+                  <th className="py-3.5 px-4">Status</th>
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900/60 font-mono text-xs">
+              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/80 bg-white dark:bg-zinc-900 font-mono text-xs">
                 {purchaseOrders.map((po) => {
                   const vendorName =
-                    typeof po.vendorId === "object" && po.vendorId !== null
-                      ? po.vendorId.name
-                      : "Vendor";
+                    typeof po.vendorId === "object" && po.vendorId ? po.vendorId.name : "Supplier";
 
                   return (
-                    <tr key={po._id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
-                      <td className="py-3.5 px-4 font-bold text-brand-600 dark:text-brand-400">
+                    <tr key={po._id} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40 transition-colors">
+                      <td className="py-3.5 px-4 font-semibold text-brand-600 dark:text-brand-400">
                         <Link to={`/projects/${projectId}/purchase-orders/${po._id}`} className="hover:underline">
                           {po.poNumber}
                         </Link>
                       </td>
-                      <td className="py-3.5 px-4 font-sans font-medium text-slate-900 dark:text-white">
+                      <td className="py-3.5 px-4 font-sans font-medium text-zinc-900 dark:text-zinc-100">
                         {vendorName}
                       </td>
-                      <td className="py-3.5 px-4 text-center font-bold text-slate-900 dark:text-white">
+                      <td className="py-3.5 px-4 text-center font-semibold">
                         {po.items?.length || 0}
                       </td>
-                      <td className="py-3.5 px-4 text-right font-bold text-slate-900 dark:text-white">
+                      <td className="py-3.5 px-4 text-right font-bold text-zinc-900 dark:text-zinc-100">
                         ${po.total?.toFixed(2) || "0.00"}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-500 font-sans">
-                        {po.expectedDeliveryDate ? new Date(po.expectedDeliveryDate).toLocaleDateString() : "—"}
+                      <td className="py-3.5 px-4 text-zinc-500 font-sans">
+                        {po.expectedDeliveryDate ? new Date(po.expectedDeliveryDate).toLocaleDateString() : "TBD"}
                       </td>
                       <td className="py-3.5 px-4">
-                        <StatusBadge status={po.approvalStatus.toLowerCase()} size="sm" />
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <StatusBadge status={po.status.toLowerCase()} size="sm" />
+                        <StatusBadge status={po.status.toLowerCase()} />
                       </td>
                       <td className="py-3.5 px-4 text-right font-sans">
                         <Link
                           to={`/projects/${projectId}/purchase-orders/${po._id}`}
-                          className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 hover:underline"
+                          className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 inline-flex items-center gap-0.5"
                         >
-                          View Details →
+                          Details <ArrowRight className="w-3 h-3" />
                         </Link>
                       </td>
                     </tr>
@@ -314,224 +314,204 @@ export const PurchaseOrdersPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Create PO Modal */}
-      {isCreateModalOpen && (
-        <Modal
-          isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-          title="Create Purchase Order (PO)"
-        >
-          <form onSubmit={handleCreatePOSubmit} className="space-y-4">
-            {/* Optional PR Selection */}
-            {approvedRequests.length > 0 && (
-              <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                  Source from Approved Procurement Request (Optional)
-                </label>
-                <select
-                  value={selectedPRId}
-                  onChange={(e) => handlePRSelection(e.target.value)}
-                  className="w-full text-xs rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 p-2"
-                >
-                  <option value="">-- Direct Purchase Order --</option>
-                  {approvedRequests.map((pr) => (
-                    <option key={pr._id} value={pr._id}>
-                      {pr.requestNumber} - {pr.reason} ({pr.items.length} items)
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+      {/* Create Purchase Order SlideOverDrawer */}
+      <SlideOverDrawer
+        isOpen={isCreateDrawerOpen}
+        onClose={() => setIsCreateDrawerOpen(false)}
+        title="Issue Purchase Order (PO)"
+        subtitle="Generate a binding vendor contract with line items and delivery schedule"
+        size="lg"
+      >
+        <form onSubmit={handleCreatePOSubmit} className="space-y-6">
+          {/* PR Association */}
+          {approvedRequests.length > 0 && (
+            <Select
+              id="po-pr-select"
+              label="Populate from Approved Procurement Request (Optional)"
+              value={selectedPRId}
+              onChange={(e) => handlePRSelection(e.target.value)}
+              options={[
+                { value: "", label: "-- Manual Order (No Linked PR) --" },
+                ...approvedRequests.map((pr) => ({
+                  value: pr._id,
+                  label: `${pr.requestNumber} - ${pr.reason} (${pr.items.length} items)`,
+                })),
+              ]}
+            />
+          )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                  Select Supplier / Vendor *
-                </label>
-                <select
-                  value={selectedVendorId}
-                  onChange={(e) => setSelectedVendorId(e.target.value)}
-                  className="w-full text-xs rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 p-2"
-                  required
-                >
-                  <option value="">-- Choose Vendor --</option>
-                  {vendors.map((v) => (
-                    <option key={v._id} value={v._id}>
-                      {v.code} - {v.name} ({v.address.city})
-                    </option>
-                  ))}
-                </select>
-              </div>
+          {/* Vendor and Delivery Schedule */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Select
+              id="po-vendor-select"
+              label="Vendor / Supplier *"
+              value={selectedVendorId}
+              onChange={(e) => setSelectedVendorId(e.target.value)}
+              options={[
+                { value: "", label: "-- Select Approved Vendor --" },
+                ...vendors.map((v) => ({
+                  value: v._id,
+                  label: `${v.name} (${v.code})`,
+                })),
+              ]}
+              required
+            />
 
-              <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                  Expected Delivery Date
-                </label>
-                <Input
-                  type="date"
-                  value={expectedDeliveryDate}
-                  onChange={(e) => setExpectedDeliveryDate(e.target.value)}
-                />
-              </div>
-            </div>
+            <Input
+              id="po-delivery-date"
+              label="Expected Delivery Date"
+              type="date"
+              value={expectedDeliveryDate}
+              onChange={(e) => setExpectedDeliveryDate(e.target.value)}
+            />
+          </div>
 
-            {/* Line Items */}
-            <div className="border-t border-slate-200 dark:border-slate-700 pt-3">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                  Order Items & Pricing
-                </span>
-                <Button type="button" size="sm" variant="outline" onClick={handleAddItemRow}>
-                  + Add Line Item
-                </Button>
-              </div>
-
-              <div className="space-y-3 max-h-56 overflow-y-auto pr-1">
-                {items.map((row, idx) => (
-                  <div
-                    key={idx}
-                    className="flex flex-col sm:flex-row items-center gap-2 p-2 bg-slate-50 dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-800"
-                  >
-                    <div className="flex-1 w-full">
-                      <select
-                        value={row.materialId}
-                        onChange={(e) => handleItemChange(idx, "materialId", e.target.value)}
-                        className="w-full text-xs rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 p-2"
-                        required
-                      >
-                        <option value="">-- Select Material --</option>
-                        {materials.map((m) => (
-                          <option key={m._id} value={m._id}>
-                            {m.code} - {m.name} ({m.unit})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="w-24">
-                      <Input
-                        type="number"
-                        min="0.1"
-                        step="any"
-                        placeholder="Qty"
-                        value={row.quantity}
-                        onChange={(e) => handleItemChange(idx, "quantity", Number(e.target.value))}
-                        required
-                      />
-                    </div>
-
-                    <div className="w-28">
-                      <Input
-                        type="number"
-                        min="0"
-                        step="any"
-                        placeholder="Unit Price"
-                        value={row.unitPrice}
-                        onChange={(e) => handleItemChange(idx, "unitPrice", Number(e.target.value))}
-                        required
-                      />
-                    </div>
-
-                    <div className="w-24 text-right font-mono text-xs font-bold text-slate-900 dark:text-white">
-                      ${((Number(row.quantity) || 0) * (Number(row.unitPrice) || 0)).toFixed(2)}
-                    </div>
-
-                    {items.length > 1 && (
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="danger"
-                        onClick={() => handleRemoveItemRow(idx)}
-                      >
-                        ✕
-                      </Button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Financial Summary */}
-            <div className="flex justify-end pt-2 border-t border-slate-200 dark:border-slate-700 font-mono text-xs space-y-1">
-              <div className="w-56 space-y-1">
-                <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                  <span>Subtotal:</span>
-                  <span>${calculateSubtotal().toFixed(2)}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Tax Amount:</span>
-                  <div className="w-24">
-                    <Input
-                      type="number"
-                      min="0"
-                      step="any"
-                      value={tax}
-                      onChange={(e) => setTax(Number(e.target.value))}
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-between font-bold text-slate-900 dark:text-white text-sm pt-1 border-t border-slate-200 dark:border-slate-700">
-                  <span>Total Cost:</span>
-                  <span className="text-brand-600 dark:text-brand-400">
-                    ${(calculateSubtotal() + (Number(tax) || 0)).toFixed(2)}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Additional Notes and Terms */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-200 dark:border-slate-700">
-              <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                  Purchase Order Notes / Instructions
-                </label>
-                <Input
-                  placeholder="e.g. Delivery between 8 AM and 4 PM at Site Gate 2"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                  Payment & Contract Terms
-                </label>
-                <Input
-                  placeholder="e.g. Net 30 days upon inspection approval"
-                  value={terms}
-                  onChange={(e) => setTerms(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 pt-2">
-              <input
-                type="checkbox"
-                id="submit-po-approval-chk"
-                checked={submitForApproval}
-                onChange={(e) => setSubmitForApproval(e.target.checked)}
-                className="rounded border-slate-300 text-brand-600 focus:ring-brand-500"
-              />
-              <label htmlFor="submit-po-approval-chk" className="text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
-                Submit directly for Project Manager approval
+          {/* Line Items List */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 font-display">
+                Contract Line Items ({items.length})
               </label>
-            </div>
-
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setIsCreateModalOpen(false)}
-                disabled={creating}
+                size="sm"
+                leftIcon={<Plus className="w-3.5 h-3.5" />}
+                onClick={handleAddItemRow}
               >
-                Cancel
-              </Button>
-              <Button type="submit" variant="primary" disabled={creating}>
-                {creating ? "Creating PO..." : "Issue Purchase Order"}
+                Add Line Item
               </Button>
             </div>
-          </form>
-        </Modal>
-      )}
+
+            <div className="space-y-3">
+              {items.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-850/60 space-y-3"
+                >
+                  <div className="flex items-center justify-between text-xs font-bold text-zinc-500 font-display">
+                    <span>Item #{idx + 1}</span>
+                    {items.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveItemRow(idx)}
+                        className="text-red-600 hover:text-red-700 dark:text-red-400"
+                        title="Remove item"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  <Select
+                    label="Material Spec *"
+                    value={item.materialId}
+                    onChange={(e) => handleItemChange(idx, "materialId", e.target.value)}
+                    options={[
+                      { value: "", label: "-- Choose Material --" },
+                      ...materials.map((m) => ({
+                        value: m._id,
+                        label: `${m.code} - ${m.name} (${m.unit})`,
+                      })),
+                    ]}
+                    required
+                  />
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <Input
+                      label="Quantity *"
+                      type="number"
+                      min="0.01"
+                      step="any"
+                      value={item.quantity}
+                      onChange={(e) => handleItemChange(idx, "quantity", Number(e.target.value))}
+                      required
+                    />
+                    <Input
+                      label="Unit"
+                      value={item.unit}
+                      onChange={(e) => handleItemChange(idx, "unit", e.target.value)}
+                      placeholder="e.g. Bags, Tons"
+                    />
+                    <Input
+                      label="Unit Price ($) *"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={item.unitPrice}
+                      onChange={(e) => handleItemChange(idx, "unitPrice", Number(e.target.value))}
+                      required
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Pricing Summary */}
+          <div className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-850 space-y-2 font-mono text-xs">
+            <div className="flex justify-between text-zinc-600 dark:text-zinc-400 font-sans">
+              <span>Subtotal:</span>
+              <span className="font-bold text-zinc-900 dark:text-zinc-100 font-mono">
+                ${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              </span>
+            </div>
+            <div className="flex items-center justify-between font-sans">
+              <span className="text-zinc-600 dark:text-zinc-400">Taxes / Shipping ($):</span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={tax}
+                onChange={(e) => setTax(Number(e.target.value) || 0)}
+                className="w-28 text-right px-2 py-1 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded text-xs font-mono"
+              />
+            </div>
+            <div className="flex justify-between border-t border-zinc-200 dark:border-zinc-700 pt-2 text-sm font-bold text-zinc-900 dark:text-zinc-100 font-sans">
+              <span>Total PO Amount:</span>
+              <span className="font-mono text-brand-600 dark:text-brand-400">
+                ${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              id="po-notes"
+              label="Order Notes"
+              placeholder="e.g. Delivery dock instructions"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
+            <Input
+              id="po-terms"
+              label="Payment & Delivery Terms"
+              placeholder="e.g. Net 30 days upon inspection"
+              value={terms}
+              onChange={(e) => setTerms(e.target.value)}
+            />
+          </div>
+
+          <label className="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={submitForApproval}
+              onChange={(e) => setSubmitForApproval(e.target.checked)}
+              className="rounded border-zinc-300 text-brand-600 focus:ring-brand-500"
+            />
+            <span>Submit immediately for approval (uncheck to save as Draft)</span>
+          </label>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <Button variant="outline" type="button" onClick={() => setIsCreateDrawerOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit" isLoading={creating}>
+              Create Purchase Order
+            </Button>
+          </div>
+        </form>
+      </SlideOverDrawer>
     </div>
   );
 };

@@ -38,6 +38,10 @@ import {
   PurchaseOrdersPage,
   PurchaseOrderDetailPage,
   ReceivingPage,
+  WorkerListPage,
+  WorkerDetailPage,
+  ProjectWorkforcePage,
+  AttendancePage,
   ProfilePage,
   NotFoundPage,
   PermissionDeniedPage,
@@ -126,6 +130,14 @@ export const AppRoutes: React.FC = () => {
         <Route path="/vendors" element={<VendorsPage />} />
         <Route path="/vendors/:vendorId" element={<VendorDetailPage />} />
 
+        {/* Master Workforce Catalog (Phase 10) */}
+        <Route path="/workforce" element={<WorkerListPage />} />
+        <Route path="/workforce/:workerId" element={<WorkerDetailPage />} />
+
+        {/* Project Workforce & Attendance (Phase 10) */}
+        <Route path="/projects/:projectId/workforce" element={<ProjectWorkforcePage />} />
+        <Route path="/projects/:projectId/attendance" element={<AttendancePage />} />
+
         {/* Project Procurement & Purchasing (Phase 9) */}
         <Route path="/projects/:projectId/procurement-requests" element={<ProcurementRequestsPage />} />
         <Route path="/projects/:projectId/purchase-orders" element={<PurchaseOrdersPage />} />
@@ -179,26 +191,31 @@ export const AppRoutes: React.FC = () => {
         <Route
           path="/operations"
           element={
-            <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-card">
-              <h2 className="text-lg font-bold text-slate-900">Site Operations Module</h2>
-              <p className="text-xs text-slate-500 mt-1">Foundation shell ready for subsequent phases.</p>
+            <div className="p-6">
+              <h2 className="text-xl font-bold">Site Operations</h2>
+              <p className="text-sm text-zinc-500 mt-2">
+                Operations overview — Navigate directly to Projects or Workforce & Attendance sheets.
+              </p>
             </div>
           }
         />
-
         <Route
           path="/quality-safety"
           element={
-            <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-card">
-              <h2 className="text-lg font-bold text-slate-900">Quality & Safety Module</h2>
-              <p className="text-xs text-slate-500 mt-1">Foundation shell ready for subsequent phases.</p>
+            <div className="p-6">
+              <h2 className="text-xl font-bold">Quality & Safety</h2>
+              <p className="text-sm text-zinc-500 mt-2">
+                Quality Inspections and Safety Incident reporting modules (Phases 14 & 15).
+              </p>
             </div>
           }
         />
-
-        <Route path="/permission-denied" element={<PermissionDeniedPage />} />
-        <Route path="*" element={<NotFoundPage />} />
       </Route>
+
+      {/* Fallback Error Routes */}
+      <Route path="/403" element={<PermissionDeniedPage />} />
+      <Route path="/404" element={<NotFoundPage />} />
+      <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>
   );
 };

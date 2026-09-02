@@ -6,39 +6,44 @@
   :root {
     --brand-primary: #026fc7;
     --brand-dark: #082849;
-    --surface-bg: #f1f5f9;
+    --surface-bg: #f8fafc;
     --surface-card: #ffffff;
-    --surface-border: #cbd5e1;
-    --text-main: #0f172a;
+    --surface-border: #e2e8f0;
+    --text-main: #09090b;
     --text-muted: #64748b;
   }
 
   .dark {
     --brand-primary: #36a7f7;
     --brand-dark: #0c3f6e;
-    --surface-bg: #070d19;
-    --surface-card: #0f172a;
-    --surface-border: #1e293b;
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
+    --surface-bg: #09090b;
+    --surface-card: #18181b;
+    --surface-border: #27272a;
+    --text-main: #fafafa;
+    --text-muted: #a1a1aa;
   }
 
   html {
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #0f172a;
-    background-color: #f1f5f9;
+    font-family: Inter, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #09090b;
+    background-color: #f8fafc;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   html.dark {
-    color: #f8fafc;
-    background-color: #070d19;
+    color: #fafafa;
+    background-color: #09090b;
   }
 
-  /* Accessible focus ring */
+  /* Tabular monospaced numbers for tables, metrics, quantities */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Accessible crisp focus ring */
   *:focus-visible {
-    outline: 2px solid #026fc7;
+    outline: 2px solid #0284c7;
     outline-offset: 2px;
   }
 
@@ -48,93 +53,76 @@
   }
 }
 
-/* Clearly visible architectural engineering dot grid texture */
+/* Subtle architectural engineering dot grid texture */
 .app-canvas-bg {
-  background-color: #f1f5f9;
-  background-image: radial-gradient(rgba(100, 116, 139, 0.28) 1.25px, transparent 1.25px);
-  background-size: 20px 20px;
+  background-color: #f8fafc;
+  background-image: radial-gradient(rgba(100, 116, 139, 0.22) 1.25px, transparent 1.25px);
+  background-size: 24px 24px;
 }
 
 .dark .app-canvas-bg {
-  background-color: #070d19;
-  background-image: radial-gradient(rgba(148, 163, 184, 0.22) 1.25px, transparent 1.25px);
-  background-size: 20px 20px;
+  background-color: #09090b;
+  background-image: radial-gradient(rgba(161, 161, 170, 0.16) 1.25px, transparent 1.25px);
+  background-size: 24px 24px;
 }
 
 /* Auth page architectural grid overlay */
 .auth-grid-bg {
-  background-color: #0c3f6e;
+  background-color: #09090b;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
-/* Smooth page and card entrance animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Shimmer pulse effect for realistic skeleton placeholders */
+.shimmer-mask {
+  position: relative;
+  overflow: hidden;
 }
 
-.animate-fade-in {
-  animation: fadeIn 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.shimmer-mask::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.25) 20%,
+    rgba(255, 255, 255, 0.5) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 2s infinite;
+  content: "";
 }
 
-/* Subtle 2.5D Construction & Structural Motion */
-@keyframes structuralRise {
-  0% {
-    transform: translateY(120%);
-    opacity: 0;
-  }
-  15% {
-    opacity: 0.6;
-  }
-  85% {
-    opacity: 0.6;
-  }
-  100% {
-    transform: translateY(-120%);
-    opacity: 0;
-  }
+.dark .shimmer-mask::after {
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.04) 20%,
+    rgba(255, 255, 255, 0.08) 60%,
+    rgba(255, 255, 255, 0)
+  );
 }
 
-.animate-structural-rise-slow {
-  animation: structuralRise 28s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+/* Mobile Touch Target and Safe Area Insets */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
 }
 
-.animate-structural-rise-med {
-  animation: structuralRise 20s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
 }
 
-.animate-structural-rise-fast {
-  animation: structuralRise 14s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Faint architectural drafting lines background */
-.blueprint-lines {
-  background-image: 
-    linear-gradient(to right, rgba(148, 163, 184, 0.12) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
-  background-size: 100px 100px;
-}
-
-.dark .blueprint-lines {
-  background-image: 
-    linear-gradient(to right, rgba(51, 65, 85, 0.18) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(51, 65, 85, 0.18) 1px, transparent 1px);
-  background-size: 100px 100px;
-}
-
-/* Custom subtle scrollbar for construction data tables and sidebars */
+/* Custom subtle scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -147,7 +135,7 @@
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #27272a;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -155,7 +143,7 @@
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #3f3f46;
 }
 
 /* Respect reduced motion preference */

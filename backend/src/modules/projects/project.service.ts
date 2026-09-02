@@ -267,6 +267,9 @@ export class ProjectService {
       project.actualEndDate = new Date();
       project.progress = 100;
     }
+    if (newStatus === "ARCHIVED") {
+      project.archivedAt = new Date();
+    }
 
     await project.save();
 

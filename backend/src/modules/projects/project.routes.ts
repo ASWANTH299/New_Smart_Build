@@ -11,6 +11,8 @@ import {
   purchaseOrderRouter,
   receivingRouter,
 } from "../procurement/procurement.routes.js";
+import { projectWorkforceRouter } from "../workforce/workforce.routes.js";
+import { attendanceRouter } from "../attendance/attendance.routes.js";
 import { authenticate } from "../../middleware/authenticate.js";
 import { requireRoles } from "../../middleware/authorize.js";
 import { requireProjectAccess } from "../../middleware/projectAccess.js";
@@ -46,6 +48,8 @@ router.use("/:projectId/material-requests", materialRequestRoutes);
 router.use("/:projectId/procurement-requests", procurementRequestRouter);
 router.use("/:projectId/purchase-orders", purchaseOrderRouter);
 router.use("/:projectId/receiving", receivingRouter);
+router.use("/:projectId/workforce", projectWorkforceRouter);
+router.use("/:projectId/attendance", attendanceRouter);
 
 // Project-scoped direct routes (with membership check)
 router.get("/:projectId", requireProjectAccess("projectId"), (req, res, next) =>
