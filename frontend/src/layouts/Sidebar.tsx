@@ -10,6 +10,7 @@ import {
   Truck,
   Settings,
   Users,
+  Wrench,
   X,
 } from "lucide-react";
 import { usePermissions } from "../hooks/useAuth.js";
@@ -58,6 +59,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       name: "Workforce & Labor",
       href: "/workforce",
       icon: <Users className="w-4 h-4 shrink-0" />,
+      roles: ["ADMIN", "PROJECT_MANAGER", "SITE_ENGINEER"],
+    },
+    {
+      name: "Equipment & Assets",
+      href: "/equipment",
+      icon: <Wrench className="w-4 h-4 shrink-0" />,
       roles: ["ADMIN", "PROJECT_MANAGER", "SITE_ENGINEER"],
     },
     {

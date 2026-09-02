@@ -18,6 +18,7 @@ import {
   Shield,
   Activity,
   Calendar,
+  Truck,
 } from "lucide-react";
 import { PageHeader } from "../../components/ui/PageHeader.js";
 import { Card } from "../../components/ui/Card.js";
@@ -323,6 +324,11 @@ export const ProjectOverviewPage: React.FC = () => {
         <Link to={`/projects/${projectId}/attendance`} className="shrink-0">
           <Button variant="outline" size="sm" leftIcon={<Clock className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
             Attendance
+          </Button>
+        </Link>
+        <Link to={`/projects/${projectId}/equipment`} className="shrink-0">
+          <Button variant="outline" size="sm" leftIcon={<Truck className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
+            Equipment
           </Button>
         </Link>
         <Link to={`/projects/${projectId}/receiving`} className="shrink-0">

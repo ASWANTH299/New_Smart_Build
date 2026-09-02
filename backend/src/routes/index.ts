@@ -9,6 +9,7 @@ import materialRoutes from "../modules/materials/material.routes.js";
 import inventoryRoutes from "../modules/inventory/inventory.routes.js";
 import vendorRoutes from "../modules/vendors/vendor.routes.js";
 import workforceRoutes from "../modules/workforce/workforce.routes.js";
+import equipmentRoutes from "../modules/equipment/equipment.routes.js";
 
 const router = Router();
 
@@ -36,6 +37,9 @@ router.use("/vendors", vendorRoutes);
 
 // Mount workforce management routes at /api/v1/workforce
 router.use("/workforce", workforceRoutes);
+
+// Mount equipment & machinery catalog routes at /api/v1/equipment
+router.use("/equipment", equipmentRoutes);
 
 // Mount project operations routes at /api/v1/projects
 router.use("/projects", projectRoutes);
