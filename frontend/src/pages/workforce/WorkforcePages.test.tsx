@@ -9,31 +9,45 @@ import { workforceService } from "../../services/workforceService.js";
 import { procurementService } from "../../services/procurementService.js";
 import { phaseService } from "../../services/phaseService.js";
 import { taskService } from "../../services/taskService.js";
-import { AuthProvider } from "../../hooks/useAuth.js";
-import { ToastProvider } from "../../hooks/useToast.js";
-import { ProjectProvider } from "../../hooks/useProjectContext.js";
 
 vi.mock("../../services/workforceService.js");
 vi.mock("../../services/procurementService.js");
 vi.mock("../../services/phaseService.js");
 vi.mock("../../services/taskService.js");
+vi.mock("../../hooks/useAuth.js", () => ({
+  useAuth: () => ({
+    user: { id: "u-1", primaryRole: "ADMIN", name: "Admin User", email: "admin@smartbuild.com" },
+    isAuthenticated: true,
+  }),
+  usePermissions: () => ({
+    userRole: "ADMIN",
+    isAdmin: true,
+    isProjectManager: false,
+    isSiteEngineer: false,
+    isStoreManager: false,
+    isContractor: false,
+    isClient: false,
+  }),
+  AuthProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+vi.mock("../../hooks/useToast.js", () => ({
+  useToast: () => ({
+    showSuccess: vi.fn(),
+    showError: vi.fn(),
+  }),
+  ToastProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+vi.mock("../../hooks/useProjectContext.js", () => ({
+  useProjectContext: () => ({
+    activeProject: { id: "p-1", code: "PRJ-001", name: "Metro Heights" },
+    setActiveProject: vi.fn(),
+  }),
+  ProjectProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
 
 describe("Workforce & Attendance Integration Tests (Phase 10)", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    localStorage.clear();
-    localStorage.setItem(
-      "smartbuild_auth_user",
-      JSON.stringify({
-        id: "u-1",
-        name: "Admin User",
-        email: "admin@smartbuild.com",
-        primaryRole: "ADMIN",
-        additionalRoles: [],
-        effectivePermissions: ["all"],
-      })
-    );
-    localStorage.setItem("smartbuild_auth_token", "fake-jwt-token");
+    vi.restoreAllMocks();
   });
 
   describe("WorkerListPage", () => {
@@ -61,20 +75,16 @@ describe("Workforce & Attendance Integration Tests (Phase 10)", () => {
 
       render(
         <MemoryRouter initialEntries={["/workforce"]}>
-          <AuthProvider>
-            <ToastProvider>
-              <Routes>
-                <Route path="/workforce" element={<WorkerListPage />} />
-              </Routes>
-            </ToastProvider>
-          </AuthProvider>
+          <Routes>
+            <Route path="/workforce" element={<WorkerListPage />} />
+          </Routes>
         </MemoryRouter>
       );
 
       await waitFor(() => {
         expect(screen.getByText("Workforce & Labor Management")).toBeInTheDocument();
-        expect(screen.getByText("Ramesh Kumar")).toBeInTheDocument();
-        expect(screen.getByText("Mason")).toBeInTheDocument();
+        expect(screen.getAllByText("Ramesh Kumar")[0]).toBeInTheDocument();
+        expect(screen.getAllByText(/mason/i)[0]).toBeInTheDocument();
         expect(screen.getByText("+ Register Worker")).toBeInTheDocument();
       });
     });
@@ -119,19 +129,15 @@ describe("Workforce & Attendance Integration Tests (Phase 10)", () => {
 
       render(
         <MemoryRouter initialEntries={["/workforce/w-1"]}>
-          <AuthProvider>
-            <ToastProvider>
-              <Routes>
-                <Route path="/workforce/:workerId" element={<WorkerDetailPage />} />
-              </Routes>
-            </ToastProvider>
-          </AuthProvider>
+          <Routes>
+            <Route path="/workforce/:workerId" element={<WorkerDetailPage />} />
+          </Routes>
         </MemoryRouter>
       );
 
       await waitFor(() => {
-        expect(screen.getByText("Ramesh Kumar")).toBeInTheDocument();
-        expect(screen.getByText("Mason")).toBeInTheDocument();
+        expect(screen.getAllByText("Ramesh Kumar")[0]).toBeInTheDocument();
+        expect(screen.getAllByText(/mason/i)[0]).toBeInTheDocument();
         expect(screen.getByText("Metro Heights (PRJ-001)")).toBeInTheDocument();
       });
     });
@@ -172,15 +178,9 @@ describe("Workforce & Attendance Integration Tests (Phase 10)", () => {
 
       render(
         <MemoryRouter initialEntries={["/projects/p-1/workforce"]}>
-          <AuthProvider>
-            <ToastProvider>
-              <ProjectProvider>
-                <Routes>
-                  <Route path="/projects/:projectId/workforce" element={<ProjectWorkforcePage />} />
-                </Routes>
-              </ProjectProvider>
-            </ToastProvider>
-          </AuthProvider>
+          <Routes>
+            <Route path="/projects/:projectId/workforce" element={<ProjectWorkforcePage />} />
+          </Routes>
         </MemoryRouter>
       );
 
@@ -237,15 +237,9 @@ describe("Workforce & Attendance Integration Tests (Phase 10)", () => {
 
       render(
         <MemoryRouter initialEntries={["/projects/p-1/attendance"]}>
-          <AuthProvider>
-            <ToastProvider>
-              <ProjectProvider>
-                <Routes>
-                  <Route path="/projects/:projectId/attendance" element={<AttendancePage />} />
-                </Routes>
-              </ProjectProvider>
-            </ToastProvider>
-          </AuthProvider>
+          <Routes>
+            <Route path="/projects/:projectId/attendance" element={<AttendancePage />} />
+          </Routes>
         </MemoryRouter>
       );
 

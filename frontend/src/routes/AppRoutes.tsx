@@ -45,6 +45,9 @@ import {
   EquipmentListPage,
   EquipmentDetailPage,
   ProjectEquipmentPage,
+  ProjectBudgetPage,
+  ExpensesPage,
+  BudgetChangeRequestsPage,
   ProfilePage,
   NotFoundPage,
   PermissionDeniedPage,
@@ -147,6 +150,11 @@ export const AppRoutes: React.FC = () => {
 
         {/* Project Equipment Deployments (Phase 11) */}
         <Route path="/projects/:projectId/equipment" element={<ProjectEquipmentPage />} />
+
+        {/* Project Budget & Financial Management (Phase 12) */}
+        <Route path="/projects/:projectId/budget" element={<ProjectBudgetPage />} />
+        <Route path="/projects/:projectId/expenses" element={<ExpensesPage />} />
+        <Route path="/projects/:projectId/budget-change-requests" element={<BudgetChangeRequestsPage />} />
 
         {/* Project Procurement & Purchasing (Phase 9) */}
         <Route path="/projects/:projectId/procurement-requests" element={<ProcurementRequestsPage />} />

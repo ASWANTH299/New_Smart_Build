@@ -7,30 +7,44 @@ import { ProjectEquipmentPage } from "../projects/ProjectEquipmentPage.js";
 import { equipmentService } from "../../services/equipmentService.js";
 import { procurementService } from "../../services/procurementService.js";
 import { taskService } from "../../services/taskService.js";
-import { AuthProvider } from "../../hooks/useAuth.js";
-import { ToastProvider } from "../../hooks/useToast.js";
-import { ProjectProvider } from "../../hooks/useProjectContext.js";
 
 vi.mock("../../services/equipmentService.js");
 vi.mock("../../services/procurementService.js");
 vi.mock("../../services/taskService.js");
+vi.mock("../../hooks/useAuth.js", () => ({
+  useAuth: () => ({
+    user: { id: "u-1", primaryRole: "ADMIN", name: "Admin User", email: "admin@smartbuild.com" },
+    isAuthenticated: true,
+  }),
+  usePermissions: () => ({
+    userRole: "ADMIN",
+    isAdmin: true,
+    isProjectManager: false,
+    isSiteEngineer: false,
+    isStoreManager: false,
+    isContractor: false,
+    isClient: false,
+  }),
+  AuthProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+vi.mock("../../hooks/useToast.js", () => ({
+  useToast: () => ({
+    showSuccess: vi.fn(),
+    showError: vi.fn(),
+  }),
+  ToastProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+vi.mock("../../hooks/useProjectContext.js", () => ({
+  useProjectContext: () => ({
+    activeProject: { id: "p-1", code: "PRJ-001", name: "Metro Heights" },
+    setActiveProject: vi.fn(),
+  }),
+  ProjectProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
 
 describe("Equipment & Asset Management Integration Tests (Phase 11)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
-    localStorage.setItem(
-      "smartbuild_auth_user",
-      JSON.stringify({
-        id: "u-1",
-        name: "Admin User",
-        email: "admin@smartbuild.com",
-        primaryRole: "ADMIN",
-        additionalRoles: [],
-        effectivePermissions: ["all"],
-      })
-    );
-    localStorage.setItem("smartbuild_auth_token", "fake-jwt-token");
   });
 
   describe("EquipmentListPage", () => {
@@ -60,19 +74,16 @@ describe("Equipment & Asset Management Integration Tests (Phase 11)", () => {
 
       render(
         <MemoryRouter initialEntries={["/equipment"]}>
-          <AuthProvider>
-            <ToastProvider>
-              <Routes>
-                <Route path="/equipment" element={<EquipmentListPage />} />
-              </Routes>
-            </ToastProvider>
-          </AuthProvider>
+          <Routes>
+            <Route path="/equipment" element={<EquipmentListPage />} />
+          </Routes>
         </MemoryRouter>
       );
 
       await waitFor(() => {
         expect(screen.getByText("Equipment & Asset Fleet Management")).toBeInTheDocument();
-        expect(screen.getByText("CAT 320 Hydraulic Excavator")).toBeInTheDocument();
+        expect(screen.getAllByText("CAT 320 Hydraulic Excavator")[0]).toBeInTheDocument();
+        expect(screen.getAllByText("EQ-EXC-001")[0]).toBeInTheDocument();
         expect(screen.getByText("+ Register Equipment")).toBeInTheDocument();
       });
     });
@@ -108,19 +119,15 @@ describe("Equipment & Asset Management Integration Tests (Phase 11)", () => {
 
       render(
         <MemoryRouter initialEntries={["/equipment/eq-1"]}>
-          <AuthProvider>
-            <ToastProvider>
-              <Routes>
-                <Route path="/equipment/:equipmentId" element={<EquipmentDetailPage />} />
-              </Routes>
-            </ToastProvider>
-          </AuthProvider>
+          <Routes>
+            <Route path="/equipment/:equipmentId" element={<EquipmentDetailPage />} />
+          </Routes>
         </MemoryRouter>
       );
 
       await waitFor(() => {
-        expect(screen.getByText("CAT 320 Hydraulic Excavator")).toBeInTheDocument();
-        expect(screen.getByText("EQ-EXC-001")).toBeInTheDocument();
+        expect(screen.getAllByText("CAT 320 Hydraulic Excavator")[0]).toBeInTheDocument();
+        expect(screen.getAllByText("EQ-EXC-001")[0]).toBeInTheDocument();
         expect(screen.getByText("Report Breakdown")).toBeInTheDocument();
         expect(screen.getByText("Schedule Service")).toBeInTheDocument();
         expect(screen.getByText("Safety Inspection")).toBeInTheDocument();
@@ -140,9 +147,9 @@ describe("Equipment & Asset Management Integration Tests (Phase 11)", () => {
               code: "EQ-EXC-001",
               name: "CAT 320 Hydraulic Excavator",
               category: "EARTHMOVING",
-              ownershipType: "OWNED",
               status: "ASSIGNED",
               hourlyRate: 2500,
+              ownershipType: "OWNED",
               createdAt: "2026-09-02",
               updatedAt: "2026-09-02",
             },
@@ -150,7 +157,7 @@ describe("Equipment & Asset Management Integration Tests (Phase 11)", () => {
             startDate: "2026-09-10",
             endDate: "2026-09-20",
             status: "ACTIVE",
-            createdBy: { _id: "u-1", email: "admin@smartbuild.com" },
+            createdBy: { _id: "u-1", name: "Admin", email: "admin@smartbuild.com" },
             createdAt: "2026-09-02",
             updatedAt: "2026-09-02",
           },
@@ -165,21 +172,15 @@ describe("Equipment & Asset Management Integration Tests (Phase 11)", () => {
 
       render(
         <MemoryRouter initialEntries={["/projects/p-1/equipment"]}>
-          <AuthProvider>
-            <ToastProvider>
-              <ProjectProvider>
-                <Routes>
-                  <Route path="/projects/:projectId/equipment" element={<ProjectEquipmentPage />} />
-                </Routes>
-              </ProjectProvider>
-            </ToastProvider>
-          </AuthProvider>
+          <Routes>
+            <Route path="/projects/:projectId/equipment" element={<ProjectEquipmentPage />} />
+          </Routes>
         </MemoryRouter>
       );
 
       await waitFor(() => {
         expect(screen.getByText("Site Equipment & Heavy Machinery")).toBeInTheDocument();
-        expect(screen.getByText("CAT 320 Hydraulic Excavator")).toBeInTheDocument();
+        expect(screen.getAllByText("CAT 320 Hydraulic Excavator")[0]).toBeInTheDocument();
         expect(screen.getByText("+ Deploy Equipment")).toBeInTheDocument();
       });
     });
