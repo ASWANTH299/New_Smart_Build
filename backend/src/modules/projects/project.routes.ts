@@ -19,6 +19,9 @@ import {
   expenseRouter,
   budgetChangeRequestRouter,
 } from "../budget/budget.routes.js";
+import { dailyReportRouter } from "../daily-reports/dailyReport.routes.js";
+import { issueRouter } from "../issues/issue.routes.js";
+import { reportRouter } from "../reports/report.routes.js";
 import { authenticate } from "../../middleware/authenticate.js";
 import { requireRoles } from "../../middleware/authorize.js";
 import { requireProjectAccess } from "../../middleware/projectAccess.js";
@@ -60,6 +63,9 @@ router.use("/:projectId/equipment", projectEquipmentRouter);
 router.use("/:projectId/budget", budgetRouter);
 router.use("/:projectId/expenses", expenseRouter);
 router.use("/:projectId/budget-change-requests", budgetChangeRequestRouter);
+router.use("/:projectId/daily-reports", dailyReportRouter);
+router.use("/:projectId/issues", issueRouter);
+router.use("/:projectId/reports", reportRouter);
 
 // Project-scoped direct routes (with membership check)
 router.get("/:projectId", requireProjectAccess("projectId"), (req, res, next) =>

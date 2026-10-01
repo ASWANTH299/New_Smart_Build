@@ -10,6 +10,9 @@ import inventoryRoutes from "../modules/inventory/inventory.routes.js";
 import vendorRoutes from "../modules/vendors/vendor.routes.js";
 import workforceRoutes from "../modules/workforce/workforce.routes.js";
 import equipmentRoutes from "../modules/equipment/equipment.routes.js";
+import clientRoutes from "../modules/client/client.routes.js";
+import { authenticate } from "../middleware/authenticate.js";
+import { requireRoles } from "../middleware/authorize.js";
 
 const router = Router();
 
@@ -44,4 +47,8 @@ router.use("/equipment", equipmentRoutes);
 // Mount project operations routes at /api/v1/projects
 router.use("/projects", projectRoutes);
 
+// Mount client portal routes at /api/v1/client
+router.use("/client", authenticate, requireRoles("CLIENT", "ADMIN"), clientRoutes);
+
 export default router;
+

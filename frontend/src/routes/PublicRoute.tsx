@@ -11,11 +11,14 @@ export const PublicRoute: React.FC<PublicRouteProps> = ({
   children,
   restrictedWhenAuthenticated = true,
 }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const location = useLocation();
 
   if (isAuthenticated && restrictedWhenAuthenticated) {
-    const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/dashboard";
+    const defaultTarget =
+      user?.primaryRole === "CLIENT" ? "/client-portal" : "/dashboard";
+    const from =
+      (location.state as { from?: { pathname: string } })?.from?.pathname || defaultTarget;
     return <Navigate to={from} replace />;
   }
 

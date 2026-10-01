@@ -48,9 +48,13 @@ import {
   ProjectBudgetPage,
   ExpensesPage,
   BudgetChangeRequestsPage,
+  DailyReportsPage,
+  IssuesPage,
+  ProjectReportsPage,
   ProfilePage,
   NotFoundPage,
   PermissionDeniedPage,
+  ClientDashboardPage,
 } from "../pages/index.js";
 
 export const AppRoutes: React.FC = () => {
@@ -81,7 +85,7 @@ export const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       >
-        <Route index element={<DashboardPage />} />
+        <Route index element={<ClientDashboardPage />} />
       </Route>
 
       {/* 3. Protected Workspace Internal Routes */}
@@ -155,6 +159,13 @@ export const AppRoutes: React.FC = () => {
         <Route path="/projects/:projectId/budget" element={<ProjectBudgetPage />} />
         <Route path="/projects/:projectId/expenses" element={<ExpensesPage />} />
         <Route path="/projects/:projectId/budget-change-requests" element={<BudgetChangeRequestsPage />} />
+
+        {/* Daily Site Operations & Issue Tracking (Phase 13) */}
+        <Route path="/projects/:projectId/daily-reports" element={<DailyReportsPage />} />
+        <Route path="/projects/:projectId/issues" element={<IssuesPage />} />
+
+        {/* Reports & Analytics (Phase 18) */}
+        <Route path="/projects/:projectId/reports" element={<ProjectReportsPage />} />
 
         {/* Project Procurement & Purchasing (Phase 9) */}
         <Route path="/projects/:projectId/procurement-requests" element={<ProcurementRequestsPage />} />
