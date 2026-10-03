@@ -31,8 +31,8 @@ export const AppLayout: React.FC = () => {
       <div className="flex flex-1 flex-col overflow-hidden min-w-0 z-10 relative">
         <Header onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 animate-fade-in relative pb-20 md:pb-8">
-          <div className="mx-auto max-w-7xl space-y-6 relative z-10">
+        <main className="flex-1 min-w-0 bg-[#f8fafc] dark:bg-[#090d16] p-5 sm:p-6 lg:p-7 max-w-7xl mx-auto w-full overflow-y-auto animate-fade-in relative pb-20 md:pb-8">
+          <div className="space-y-6 relative z-10 w-full">
             <Outlet />
           </div>
         </main>

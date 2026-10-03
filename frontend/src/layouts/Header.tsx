@@ -4,6 +4,7 @@ import { Menu, LogOut, User as UserIcon, Settings, Shield, ChevronDown } from "l
 import { useAuth } from "../hooks/useAuth.js";
 import { ProjectSwitcher } from "../components/ProjectSwitcher.js";
 import { ThemeToggle } from "../components/ThemeToggle.js";
+import { useLocation } from "react-router-dom";
 
 export interface HeaderProps {
   onToggleSidebar: () => void;
@@ -13,6 +14,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const { user, logout } = useAuth();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -26,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-zinc-200/90 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md px-4 sm:px-6 transition-colors duration-150 shadow-xs">
+    <header className="sticky top-0 z-30 flex h-14 w-full items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm px-4 sm:px-6 transition-colors duration-150 shadow-xs">
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -37,9 +39,14 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           <Menu className="w-5 h-5" />
         </button>
 
-        {/* Project Context Switcher */}
+        {/* Project Context Switcher & Breadcrumb */}
         <div className="hidden sm:flex items-center pl-2 border-l border-zinc-200/90 dark:border-zinc-800">
           <ProjectSwitcher />
+          <div className="hidden md:flex items-center gap-2 text-xs font-medium text-zinc-500 dark:text-zinc-400 ml-4 border-l border-zinc-200/80 dark:border-zinc-800/80 pl-4">
+            <span>Smart Build</span>
+            <span className="text-zinc-300 dark:text-zinc-600">/</span>
+            <span className="text-zinc-900 dark:text-zinc-100 capitalize">{location.pathname.split('/')[1] || 'Dashboard'}</span>
+          </div>
         </div>
       </div>
 
@@ -57,15 +64,15 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               aria-expanded={isUserMenuOpen}
               aria-haspopup="true"
             >
-              <div className="hidden md:flex flex-col items-end text-right">
-                <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 font-display leading-tight">
+              <div className="hidden md:flex items-center gap-2">
+                <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
                   {user.name}
                 </span>
-                <span className="text-[10px] text-brand-700 dark:text-brand-300 font-bold uppercase tracking-wider font-mono">
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
                   {user.primaryRole.replace(/_/g, " ")}
                 </span>
               </div>
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-600 to-brand-700 text-white flex items-center justify-center font-bold text-xs shadow-xs font-display">
+              <div className="w-7 h-7 rounded bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 flex items-center justify-center font-bold text-xs shadow-xs">
                 {user.name ? user.name.charAt(0).toUpperCase() : "U"}
               </div>
               <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
