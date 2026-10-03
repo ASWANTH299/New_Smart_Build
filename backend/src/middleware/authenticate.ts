@@ -12,6 +12,10 @@ declare global {
   }
 }
 
+export interface AuthenticatedRequest extends Request {
+  user?: IUser;
+}
+
 export const authenticate = async (
   req: Request,
   _res: Response,

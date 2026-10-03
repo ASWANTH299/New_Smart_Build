@@ -4,8 +4,8 @@ import { issueService } from "./issue.service.js";
 export class IssueController {
   async createIssue(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId } = req.params;
-      const userId = (req.user?._id || req.user?.id)?.toString() || "";
+      const projectId = String(req.params.projectId);
+      const userId = (req.user as any)?._id?.toString() || (req.user as any)?.id?.toString() || "";
       const issue = await issueService.createIssue(
         projectId,
         req.body,
@@ -23,7 +23,7 @@ export class IssueController {
 
   async getIssuesByProject(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const { status, priority, category, assignedTo, search, page, limit } = req.query;
 
       const result = await issueService.getIssuesByProject(projectId, {
@@ -52,7 +52,8 @@ export class IssueController {
 
   async getIssueById(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId, issueId } = req.params;
+      const projectId = String(req.params.projectId);
+      const issueId = String(req.params.issueId);
       const issue = await issueService.getIssueById(projectId, issueId);
       res.status(200).json({
         success: true,
@@ -65,8 +66,9 @@ export class IssueController {
 
   async updateIssue(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId, issueId } = req.params;
-      const userId = (req.user?._id || req.user?.id)?.toString() || "";
+      const projectId = String(req.params.projectId);
+      const issueId = String(req.params.issueId);
+      const userId = (req.user as any)?._id?.toString() || (req.user as any)?.id?.toString() || "";
       const issue = await issueService.updateIssue(
         projectId,
         issueId,
@@ -85,9 +87,10 @@ export class IssueController {
 
   async resolveIssue(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId, issueId } = req.params;
+      const projectId = String(req.params.projectId);
+      const issueId = String(req.params.issueId);
       const { resolutionNotes } = req.body;
-      const userId = (req.user?._id || req.user?.id)?.toString() || "";
+      const userId = (req.user as any)?._id?.toString() || (req.user as any)?.id?.toString() || "";
       const issue = await issueService.resolveIssue(
         projectId,
         issueId,
@@ -106,8 +109,9 @@ export class IssueController {
 
   async closeIssue(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId, issueId } = req.params;
-      const userId = (req.user?._id || req.user?.id)?.toString() || "";
+      const projectId = String(req.params.projectId);
+      const issueId = String(req.params.issueId);
+      const userId = (req.user as any)?._id?.toString() || (req.user as any)?.id?.toString() || "";
       const issue = await issueService.closeIssue(
         projectId,
         issueId,

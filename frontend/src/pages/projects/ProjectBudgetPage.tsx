@@ -9,13 +9,9 @@ import {
   FileText,
   PieChart,
   ArrowLeft,
-  Calendar,
   Layers,
   CheckCircle2,
-  Clock,
   ArrowUpRight,
-  Filter,
-  RefreshCw,
 } from "lucide-react";
 import { budgetService } from "../../services/budgetService.js";
 import {
@@ -23,7 +19,6 @@ import {
   BudgetCategoryType,
   LogExpenseInput,
   UpdateBudgetPlanInput,
-  Expense,
 } from "../../types/budget.js";
 import { useAuth } from "../../hooks/useAuth.js";
 import { useToast } from "../../hooks/useToast.js";

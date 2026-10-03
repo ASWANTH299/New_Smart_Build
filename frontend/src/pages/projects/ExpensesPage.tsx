@@ -5,12 +5,9 @@ import {
   Plus,
   ArrowLeft,
   Search,
-  Filter,
   Trash2,
   PieChart,
   FileText,
-  Calendar,
-  ExternalLink,
 } from "lucide-react";
 import { budgetService } from "../../services/budgetService.js";
 import { Expense, BudgetCategoryType, LogExpenseInput } from "../../types/budget.js";
@@ -41,8 +38,7 @@ export const ExpensesPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [totalExpensesCount, setTotalExpensesCount] = useState<number>(0);
-  const [totalDisbursedAmount, setTotalDisbursedAmount] = useState<number>(0);
+  // KPIs
 
   // Log Expense Drawer
   const [isLogDrawerOpen, setIsLogDrawerOpen] = useState(false);
@@ -79,8 +75,6 @@ export const ExpensesPage: React.FC = () => {
         setExpenses(res.data);
         if (res.pagination) {
           setTotalPages(res.pagination.totalPages);
-          setTotalExpensesCount(res.pagination.total);
-          setTotalDisbursedAmount(res.pagination.totalAmount || 0);
         }
       }
     } catch (err: unknown) {
@@ -344,7 +338,7 @@ export const ExpensesPage: React.FC = () => {
           {totalPages > 1 && (
             <div className="p-4 border-t border-zinc-200/80 dark:border-zinc-800">
               <Pagination
-                currentPage={page}
+                page={page}
                 totalPages={totalPages}
                 onPageChange={(p) => setPage(p)}
               />

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const recordAttendanceSchema = z.object({
+export const recordAttendanceSchema = {
   params: z.object({
     projectId: z.string().min(1, "Project ID is required"),
   }),
@@ -14,9 +14,9 @@ export const recordAttendanceSchema = z.object({
     overtimeHours: z.number().min(0).max(24).optional(),
     notes: z.string().optional(),
   }),
-});
+};
 
-export const bulkRecordAttendanceSchema = z.object({
+export const bulkRecordAttendanceSchema = {
   params: z.object({
     projectId: z.string().min(1, "Project ID is required"),
   }),
@@ -36,9 +36,9 @@ export const bulkRecordAttendanceSchema = z.object({
       )
       .min(1, "At least one attendance record is required"),
   }),
-});
+};
 
-export const updateAttendanceSchema = z.object({
+export const updateAttendanceSchema = {
   params: z.object({
     projectId: z.string().min(1, "Project ID is required"),
     attendanceId: z.string().min(1, "Attendance ID is required"),
@@ -51,4 +51,4 @@ export const updateAttendanceSchema = z.object({
     overtimeHours: z.number().min(0).max(24).optional(),
     notes: z.string().optional(),
   }),
-});
+};

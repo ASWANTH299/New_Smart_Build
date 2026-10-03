@@ -4,21 +4,13 @@ import {
   FileText,
   Plus,
   ArrowLeft,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
   PieChart,
   DollarSign,
-  TrendingUp,
-  Clock,
-  ArrowUpRight,
 } from "lucide-react";
 import { budgetService } from "../../services/budgetService.js";
 import {
   BudgetChangeRequest,
   CreateBudgetChangeRequestInput,
-  BudgetCategoryType,
-  BudgetSummaryResponse,
 } from "../../types/budget.js";
 import { useAuth } from "../../hooks/useAuth.js";
 import { useToast } from "../../hooks/useToast.js";
@@ -39,7 +31,7 @@ export const BudgetChangeRequestsPage: React.FC = () => {
   const { showSuccess, showError } = useToast();
 
   const [requests, setRequests] = useState<BudgetChangeRequest[]>([]);
-  const [summary, setSummary] = useState<BudgetSummaryResponse | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -83,7 +75,6 @@ export const BudgetChangeRequestsPage: React.FC = () => {
         setRequests(reqRes.data);
       }
       if (sumRes.success && sumRes.data) {
-        setSummary(sumRes.data);
         const cats = sumRes.data.budget.categories;
         setRequestData((prev) => ({
           ...prev,

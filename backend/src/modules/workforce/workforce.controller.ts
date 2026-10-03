@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { workforceService } from "./workforce.service.js";
-import { AuthenticatedRequest } from "../../middleware/authenticate.js";
-
 export class WorkforceController {
-  async createWorker(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async createWorker(req: Request, res: Response, next: NextFunction) {
     try {
       const worker = await workforceService.createWorker(req.body);
       res.status(201).json({
@@ -45,7 +43,7 @@ export class WorkforceController {
 
   async getWorkerById(req: Request, res: Response, next: NextFunction) {
     try {
-      const { workerId } = req.params;
+      const workerId = String(req.params.workerId);
       const result = await workforceService.getWorkerById(workerId);
       res.status(200).json({
         success: true,
@@ -56,9 +54,9 @@ export class WorkforceController {
     }
   }
 
-  async updateWorker(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async updateWorker(req: Request, res: Response, next: NextFunction) {
     try {
-      const { workerId } = req.params;
+      const workerId = String(req.params.workerId);
       const worker = await workforceService.updateWorker(workerId, req.body);
       res.status(200).json({
         success: true,
@@ -70,9 +68,9 @@ export class WorkforceController {
     }
   }
 
-  async deleteWorker(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async deleteWorker(req: Request, res: Response, next: NextFunction) {
     try {
-      const { workerId } = req.params;
+      const workerId = String(req.params.workerId);
       await workforceService.deleteWorker(workerId);
       res.status(200).json({
         success: true,
@@ -83,13 +81,13 @@ export class WorkforceController {
     }
   }
 
-  async assignWorker(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async assignWorker(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const assignment = await workforceService.assignWorker(
         projectId,
         req.body,
-        req.user!.id
+        (req.user as any)?._id?.toString() || (req.user as any)?.id?.toString() || ""
       );
       res.status(201).json({
         success: true,
@@ -103,7 +101,7 @@ export class WorkforceController {
 
   async getProjectWorkforce(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const { status, trade, phaseId, taskId } = req.query;
       const assignments = await workforceService.getProjectWorkforce(projectId, {
         status: status as any,
@@ -121,9 +119,10 @@ export class WorkforceController {
     }
   }
 
-  async updateAssignment(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async updateAssignment(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId, assignmentId } = req.params;
+      const projectId = String(req.params.projectId);
+      const assignmentId = String(req.params.assignmentId);
       const assignment = await workforceService.updateAssignment(
         projectId,
         assignmentId,
@@ -139,9 +138,10 @@ export class WorkforceController {
     }
   }
 
-  async deleteAssignment(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async deleteAssignment(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId, assignmentId } = req.params;
+      const projectId = String(req.params.projectId);
+      const assignmentId = String(req.params.assignmentId);
       await workforceService.deleteAssignment(projectId, assignmentId);
       res.status(200).json({
         success: true,

@@ -7,8 +7,8 @@ export class BudgetController {
    */
   async getBudgetSummary(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { projectId } = req.params;
-      const summary = await budgetService.getBudgetSummary(projectId, req.user?._id?.toString());
+      const projectId = String(req.params.projectId);
+      const summary = await budgetService.getBudgetSummary(projectId, (req.user as any)?._id?.toString());
       res.status(200).json({
         success: true,
         data: summary,
@@ -23,13 +23,13 @@ export class BudgetController {
    */
   async updateBudgetPlan(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const { categories, notes } = req.body;
       const budget = await budgetService.updateBudgetPlan(
         projectId,
         categories,
         notes,
-        req.user?._id?.toString()
+        (req.user as any)?._id?.toString()
       );
       res.status(200).json({
         success: true,
@@ -46,11 +46,11 @@ export class BudgetController {
    */
   async recordExpense(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const expense = await budgetService.recordExpense(
         projectId,
         req.body,
-        req.user!._id.toString()
+        (req.user as any)?._id?.toString() || ""
       );
       res.status(201).json({
         success: true,
@@ -67,7 +67,7 @@ export class BudgetController {
    */
   async getExpenses(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const { category, status, startDate, endDate, search, page, limit } = req.query;
 
       const result = await budgetService.getExpenses(projectId, {
@@ -100,7 +100,8 @@ export class BudgetController {
    */
   async getExpenseById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { projectId, expenseId } = req.params;
+      const projectId = String(req.params.projectId);
+      const expenseId = String(req.params.expenseId);
       const expense = await budgetService.getExpenseById(projectId, expenseId);
       res.status(200).json({
         success: true,
@@ -116,12 +117,13 @@ export class BudgetController {
    */
   async updateExpense(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { projectId, expenseId } = req.params;
+      const projectId = String(req.params.projectId);
+      const expenseId = String(req.params.expenseId);
       const expense = await budgetService.updateExpense(
         projectId,
         expenseId,
         req.body,
-        req.user!._id.toString()
+        (req.user as any)?._id?.toString() || ""
       );
       res.status(200).json({
         success: true,
@@ -138,8 +140,9 @@ export class BudgetController {
    */
   async deleteExpense(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { projectId, expenseId } = req.params;
-      await budgetService.deleteExpense(projectId, expenseId, req.user!._id.toString());
+      const projectId = String(req.params.projectId);
+      const expenseId = String(req.params.expenseId);
+      await budgetService.deleteExpense(projectId, expenseId, (req.user as any)?._id?.toString() || "");
       res.status(200).json({
         success: true,
         message: "Expense deleted and budget reconciled successfully",
@@ -154,11 +157,11 @@ export class BudgetController {
    */
   async createBudgetChangeRequest(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const changeRequest = await budgetService.createBudgetChangeRequest(
         projectId,
         req.body,
-        req.user!._id.toString()
+        (req.user as any)?._id?.toString() || ""
       );
       res.status(201).json({
         success: true,
@@ -175,7 +178,7 @@ export class BudgetController {
    */
   async getBudgetChangeRequests(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const { status } = req.query;
       const requests = await budgetService.getBudgetChangeRequests(projectId, status as any);
       res.status(200).json({
@@ -192,14 +195,15 @@ export class BudgetController {
    */
   async reviewBudgetChangeRequest(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { projectId, requestId } = req.params;
+      const projectId = String(req.params.projectId);
+      const requestId = String(req.params.requestId);
       const { decision, reviewNotes } = req.body;
       const result = await budgetService.reviewBudgetChangeRequest(
         projectId,
         requestId,
         decision,
         reviewNotes,
-        req.user!._id.toString()
+        (req.user as any)?._id?.toString() || ""
       );
       res.status(200).json({
         success: true,

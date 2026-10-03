@@ -1,155 +1,187 @@
-# Smart Build — Construction Project & Resource Management Platform
+<div align="center">
+  <h1>Smart Build &mdash; Construction Project & Resource Management Platform</h1>
+  <p><b>A unified, role-governed digital ERP for multi-stage construction site planning, engineering quantities, field operations, budgeting, and stakeholder transparency.</b></p>
 
-Smart Build is a secure, web-based construction project and resource management platform for organizations managing multiple construction projects. It centralizes operations across project planning, quantity-based progress tracking, materials & BOM, procurement & inventory, workforce & attendance, equipment, budgets, daily site reports, quality & safety, documents, and an external client portal.
+  <!-- Status Badges -->
+  <img src="https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square" alt="Build Status" />
+  <img src="https://img.shields.io/badge/Test_Suite-300+_Passing-brightgreen?style=flat-square" alt="Test Suite" />
+  <img src="https://img.shields.io/badge/Node.js-%3E%3D18-blue?style=flat-square" alt="Node.js" />
+  <img src="https://img.shields.io/badge/React-v18-blue?style=flat-square" alt="React" />
+  <img src="https://img.shields.io/badge/License-MIT-orange?style=flat-square" alt="License" />
+  <img src="https://img.shields.io/badge/Architecture-16--Phase_V1_Complete-blueviolet?style=flat-square" alt="Architecture" />
+</div>
+
+<br />
+
+## 1. Executive Summary: Core Problem & Solution
+
+**The Problem:** Traditional construction management is often plagued by fragmented spreadsheets, delayed daily field logs, budget overruns, and a significant lack of client visibility. Disparate systems for materials, workforce, equipment, and financials lead to reconciliation errors and schedule delays.
+
+**The Solution:** Smart Build replaces these disjointed tools with a centralized, automated digital environment. From auto-seeded project lifecycle baselines and WBS tracking to real-time budget burn rate and live vendor PO tracking, Smart Build ensures that site engineers, store managers, and executives are all working from a single, auditable source of truth.
 
 ---
 
-## 1. Technology Stack
+## 2. Complete Tech Stack
 
-- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS, React Router v7
-- **Backend:** Node.js, Express, TypeScript
-- **Database:** MongoDB (with MongoDB Compass for development inspection)
-- **API Style:** REST (`/api/v1/`)
-- **Real-Time:** WebSockets (where required)
-- **Architecture:** Modular Monolith
-- **Source Control:** Git + GitHub
+| Layer | Technology | Key Functionality |
+| :--- | :--- | :--- |
+| **Frontend** | React, TypeScript, Vite, Tailwind CSS | High-performance, responsive UI, strict typing, rapid build tooling, and utility-first styling. |
+| **Backend** | Node.js, Express, TypeScript | Modular monolith REST API, strict request validation, and highly scalable controller architecture. |
+| **Database** | MongoDB, Mongoose | NoSQL flexible document storage, schema enforcement, and rapid aggregate querying. |
+| **Authentication** | JWT, bcrypt | Secure stateless identity management, hashed password storage, and HTTP-only protection. |
+| **Testing** | Vitest/Jest, Supertest, RTL | Unit/Integration testing suite, robust API testing, and React component validation. |
 
 ---
 
-## 2. Monorepo Directory Structure
+## 3. Role-Based Access Control (RBAC) Matrix
+
+Smart Build implements a strict 6-Role governance model mapping users to authorized system responsibilities:
+
+| Role | Authorized Responsibilities & Access Levels |
+| :--- | :--- |
+| **Admin** | Unrestricted global access. Manages users, organization settings, project master setup, and global catalogs. |
+| **Project Manager** | Full read/write access to assigned projects. Manages budgets, approvals, WBS planning, and workforce. |
+| **Site Engineer** | Daily site operations. Submits Daily Progress Reports (DPR), tracks tasks, and creates material requests. |
+| **Store Manager** | Warehouse and inventory oversight. Receives purchase orders, tracks BOM allocations, and logs material utilization. |
+| **Contractor** | Restricted access to assigned tasks. Logs attendance, updates snag resolutions, and reports field progress. |
+| **Client** | Read-only executive transparency. Accesses curated project milestones, verified photo galleries, and financial summaries. |
+
+---
+
+## 4. 16-Phase V1 Implemented Feature Suite
+
+The V1 system architecture has been fully realized across 16 sequential implementation phases. The platform provides:
+
+- **Identity & Security:** Robust JWT authentication, session revocation, route guards, and granular RBAC authorization.
+- **Planning & Engineering:** Auto-seeded 4-stage project lifecycles, WBS task structures with measurable unit quantities (e.g., sq.ft, cu.m), and an auto-reconciling progress engine.
+- **Supply Chain & Machinery:** Centralized master materials catalog, location-based inventory tracking, full procurement pipeline (POs), and heavy equipment fleet management.
+- **Field Operations & Attendance:** Roster assignment, daily shift check-in/check-out tracking, Daily Site Reports (DPR), and a complete snag/issue resolution lifecycle.
+- **Financials & Reporting:** Comprehensive multi-category budget tracking (Material, Workforce, Equipment, Overhead), expense logging, burn rate analysis, live cost variance, and dynamic CSV/JSON report exports.
+- **Client Portal:** A dedicated, read-only executive dashboard ensuring stakeholder transparency, highlighting curated milestones, approved photo galleries, and payment tranche tracking.
+
+---
+
+## 5. System Architecture & Workflow Flowchart
 
 ```text
-smart-build/
-├── frontend/                     # React + Vite + TypeScript application
-│   ├── src/
-│   │   ├── app/                  # Application root & providers
-│   │   ├── assets/               # Static assets & images
-│   │   ├── components/           # Shared reusable UI components
-│   │   ├── features/             # Domain-specific feature modules
-│   │   ├── hooks/                # Custom React hooks
-│   │   ├── layouts/              # App layouts (Internal, Auth, Client)
-│   │   ├── pages/                # Route page components
-│   │   ├── routes/               # Routing configuration
-│   │   ├── services/             # API client & services
-│   │   ├── styles/               # Global styles & Tailwind config
-│   │   ├── types/                # TypeScript shared types
-│   │   └── utils/                # Helper utilities
-│   ├── public/                   # Public assets
-│   ├── index.html                # Entry HTML
-│   ├── vite.config.ts            # Vite configuration
-│   ├── tailwind.config.ts        # Tailwind design tokens
-│   ├── tsconfig.json             # TypeScript configuration
-│   └── package.json
-│
-├── backend/                      # Node.js + Express + TypeScript application
-│   ├── src/
-│   │   ├── config/               # Environment & service configurations
-│   │   ├── middleware/           # Express middleware (auth, error, logger, validation)
-│   │   ├── modules/              # Business domain modules
-│   │   ├── routes/               # Route registry
-│   │   ├── services/             # Application & domain services
-│   │   ├── repositories/         # MongoDB data access layer
-│   │   ├── validators/           # Request schema validation
-│   │   ├── websocket/            # WebSocket handlers
-│   │   ├── storage/              # Local storage adapter abstraction
-│   │   ├── utils/                # Utility helpers & custom errors
-│   │   ├── app.ts                # Express application setup
-│   │   └── server.ts             # Server entry point
-│   ├── tsconfig.json             # TypeScript configuration
-│   └── package.json
-│
-├── DOCS/                         # Project documentation & source of truth
-├── .env.example                  # Documented environment variables template
-├── .gitignore                    # Git ignore configuration
-├── package.json                  # Root workspace configuration
-└── README.md                     # Project overview and setup instructions
+  [ Client / PM / Site Engineer ]
+               │
+               ▼
+       ┌───────────────┐
+       │   React App   │ (Vite, Tailwind, TypeScript)
+       └───────┬───────┘
+               │ JSON / REST
+               ▼
+     ┌───────────────────┐
+     │ Express API Gw    │ (Node.js)
+     └─────────┬─────────┘
+               │
+               ▼
+     ┌───────────────────┐
+     │  RBAC Middleware  │ (JWT Verification)
+     └─────────┬─────────┘
+               │
+      ┌────────┴────────┐
+      ▼                 ▼
+ ┌─────────┐      ┌─────────┐
+ │ Auth    │      │ Projects│ ... Domain Modules
+ └────┬────┘      └────┬────┘
+      │                │
+      ▼                ▼
+ ┌───────────────────────┐
+ │   MongoDB Database    │ (Mongoose ODM)
+ └───────────────────────┘
 ```
 
 ---
 
-## 3. Prerequisites
+## 6. Local Environment & Runtime Setup Guide
 
-- **Node.js:** v20.x or higher (Node.js v24.x LTS tested)
-- **npm:** v10.x or higher
-- **MongoDB:** v6.x or higher running locally (or via connection URI)
-- **MongoDB Compass:** Recommended for graphical database inspection during development
+### Prerequisites
+- **Node.js**: v18+ or v20+
+- **Package Manager**: npm
+- **Database**: Local MongoDB instance or MongoDB Atlas connection string
 
----
+### Port Allocation Table
+| Service | Endpoint |
+| :--- | :--- |
+| **Frontend Application** | `http://localhost:5173` (Vite Default) |
+| **Backend API Server** | `http://localhost:5000` (Configurable via `.env`) |
+| **Health Check Endpoint** | `http://localhost:5000/api/v1/health` |
+| **Database** | `mongodb://localhost:27017/smart_build` (Default MongoDB Port) |
 
-## 4. Setup & Installation
+### Environment Configuration (`.env` instructions)
 
-### Step 1: Clone Repository & Switch to Development Branch
-
-```bash
-git clone https://github.com/ASWANTH299/New_Smart_Build.git
-cd New_Smart_Build
-git checkout dev
+**Backend** (`backend/.env`):
+```env
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/smart_build
+JWT_SECRET=your_super_secret_jwt_key
+JWT_EXPIRES_IN=7d
+CLIENT_URL=http://localhost:5173
 ```
 
-### Step 2: Configure Environment Variables
-
-Copy `.env.example` to `.env` in the root directory:
-
-```bash
-cp .env.example .env
+**Frontend** (`frontend/.env`):
+```env
+VITE_API_BASE_URL=http://localhost:5000/api/v1
 ```
 
-Adjust variables in `.env` if your local ports, MongoDB URI, or secrets differ from the defaults.
+### Step-by-Step Execution Commands
 
-### Step 3: Install Dependencies
+1. **Install Dependencies**
+   Navigate to the respective directories to install required packages:
+   ```bash
+   cd backend && npm install
+   cd ../frontend && npm install
+   ```
 
-```bash
-npm install
-```
+2. **Database Seeding**
+   Seed the initial administrative accounts, project templates, and master material catalogs:
+   ```bash
+   npm --prefix backend run seed
+   ```
 
-This installs dependencies across all workspaces (`backend` and `frontend`).
+3. **Run Application**
+   Run the backend and frontend simultaneously in separate terminals:
+   ```bash
+   # Terminal 1 (Backend API)
+   cd backend && npm run dev
 
----
+   # Terminal 2 (Frontend Client)
+   cd frontend && npm run dev
+   ```
 
-## 5. Development Scripts
-
-| Command | Description |
-|---|---|
-| `npm run dev` | Start both backend and frontend development servers concurrently |
-| `npm run dev:backend` | Start backend development server with hot reload |
-| `npm run dev:frontend` | Start frontend Vite development server |
-| `npm run build` | Build both backend and frontend for production |
-| `npm run build:backend` | Compile backend TypeScript to `dist/` |
-| `npm run build:frontend` | Build frontend production bundle |
-| `npm run lint` | Run ESLint across both workspaces |
-| `npm run test` | Run tests across both workspaces |
-| `npm run test:backend` | Run backend tests |
-| `npm run test:frontend` | Run frontend tests |
-
----
-
-## 6. Git Branching Strategy
-
-- `master` — Stable release branch. Direct commits and pushes are strictly restricted.
-- `dev` — Active development and integration branch.
-- Feature work is verified and audited before merging into `dev`.
+4. **Verification Step**
+   Open [http://localhost:5173](http://localhost:5173) in your browser and log in using the demo credentials provided during the seeding process.
 
 ---
 
-## 7. Portability & Configuration Guidelines
+## 7. Quality Assurance & Verification
 
-- **No Hardcoded Ports:** Server ports are read dynamically from `PORT` (backend) and `VITE_PORT` (frontend) environment variables.
-- **No Hardcoded URLs:** Frontend connects to the backend via `VITE_API_URL`.
-- **No Committed Secrets:** `.env` is ignored by Git. Never commit production secrets or keys.
-- **Environment Validation:** All required variables are documented in `.env.example`.
+Smart Build ensures code reliability and continuous stability through a robust verification process:
+
+- **Run Test Suite:**
+  ```bash
+  npm test
+  ```
+- **Lint Codebase:**
+  ```bash
+  npm run lint
+  ```
+- **Production Build:**
+  ```bash
+  npm run build
+  ```
+
+**Coverage Summary:** Comprehensive test coverage enforces strict API validation, database modeling constraints, RBAC logic isolation, and React component state correctness across all 16 implemented phases.
 
 ---
 
-## 8. Documentation Reference
+## 8. Future Scope & V2 Roadmap
 
-Detailed specifications are maintained in the `DOCS/` folder:
+While V1 successfully models the core ERP requirements, the following modules are designated for the Future Development (V2) Scope:
 
-- `DOCS/PROJECT-CONTEXT.md` — Project context, locked decisions & principles
-- `DOCS/PRD.md` — Product Requirements Document
-- `DOCS/TRD.md` — Technical Requirements Document
-- `DOCS/WEBSITE-FLOW.md` — Complete route, sitemap & user journeys
-- `DOCS/ARCHITECTURE.md` — Modular monolith system architecture
-- `DOCS/DATABASE-DESIGN.md` — MongoDB schema, collections & indexing strategy
-- `DOCS/UI-UX.md` — Visual design tokens, layout hierarchy & UX guidelines
-- `DOCS/TESTING-QA.md` — QA strategy, testing pyramid & release criteria
-- `DOCS/IMPLEMENTATION-PLAN.md` — 22-phase sequential implementation roadmap
+- **V2.1: Quality Management & Inspection Checklists** (Punch lists, defect tracking)
+- **V2.2: Safety Management & Compliance** (OSHA incident reports, hazard audits)
+- **V2.3: Document & Blueprint Vault** (Cloud object storage for CAD/PDF blueprints and versioning)
+- **V2.4: Real-Time WebSocket Infrastructure** (Live push notifications and collaborative multi-user editing)

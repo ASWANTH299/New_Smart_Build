@@ -18,7 +18,7 @@ export const budgetService = {
    */
   async getBudgetSummary(projectId: string): Promise<{ success: boolean; data: BudgetSummaryResponse }> {
     const res = await api.get(`/projects/${projectId}/budget/summary`);
-    return res.data;
+    return res as any;
   },
 
   /**
@@ -29,7 +29,7 @@ export const budgetService = {
     payload: UpdateBudgetPlanInput
   ): Promise<{ success: boolean; data: Budget; message?: string }> {
     const res = await api.put(`/projects/${projectId}/budget`, payload);
-    return res.data;
+    return res as any;
   },
 
   /**
@@ -57,7 +57,7 @@ export const budgetService = {
     };
   }> {
     const res = await api.get(`/projects/${projectId}/expenses`, { params });
-    return res.data;
+    return res as any;
   },
 
   /**
@@ -68,7 +68,7 @@ export const budgetService = {
     expenseId: string
   ): Promise<{ success: boolean; data: Expense }> {
     const res = await api.get(`/projects/${projectId}/expenses/${expenseId}`);
-    return res.data;
+    return res as any;
   },
 
   /**
@@ -79,7 +79,7 @@ export const budgetService = {
     payload: LogExpenseInput
   ): Promise<{ success: boolean; data: Expense; message?: string }> {
     const res = await api.post(`/projects/${projectId}/expenses`, payload);
-    return res.data;
+    return res as any;
   },
 
   /**
@@ -91,7 +91,7 @@ export const budgetService = {
     payload: Partial<LogExpenseInput>
   ): Promise<{ success: boolean; data: Expense; message?: string }> {
     const res = await api.put(`/projects/${projectId}/expenses/${expenseId}`, payload);
-    return res.data;
+    return res as any;
   },
 
   /**
@@ -102,7 +102,7 @@ export const budgetService = {
     expenseId: string
   ): Promise<{ success: boolean; message?: string }> {
     const res = await api.delete(`/projects/${projectId}/expenses/${expenseId}`);
-    return res.data;
+    return res as any;
   },
 
   /**
@@ -113,7 +113,7 @@ export const budgetService = {
     params?: { status?: string }
   ): Promise<{ success: boolean; data: BudgetChangeRequest[] }> {
     const res = await api.get(`/projects/${projectId}/budget-change-requests`, { params });
-    return res.data;
+    return res as any;
   },
 
   /**
@@ -124,7 +124,7 @@ export const budgetService = {
     payload: CreateBudgetChangeRequestInput
   ): Promise<{ success: boolean; data: BudgetChangeRequest; message?: string }> {
     const res = await api.post(`/projects/${projectId}/budget-change-requests`, payload);
-    return res.data;
+    return res as any;
   },
 
   /**
@@ -139,7 +139,7 @@ export const budgetService = {
       `/projects/${projectId}/budget-change-requests/${requestId}/review`,
       payload
     );
-    return res.data;
+    return res as any;
   },
 };
 

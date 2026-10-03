@@ -142,11 +142,11 @@ export class ReportService {
       totalMilestones > 0 ? Math.round((achievedMilestones / totalMilestones) * 100) : 100;
 
     // 3. Budget & Financial Metrics
-    const totalPlanned = budget?.totalAmount || 0;
+    const totalPlanned = (budget as any)?.totalAllocated || (budget as any)?.totalAmount || 0;
     const totalActualFromExpenses = expenses
       .filter((e) => e.status !== "REJECTED")
       .reduce((sum, e) => sum + (e.amount || 0), 0);
-    const totalActual = budget?.actualAmount || totalActualFromExpenses;
+    const totalActual = (budget as any)?.actualAmount || totalActualFromExpenses;
     const remainingBalance = totalPlanned - totalActual;
     const costVariance = totalPlanned - totalActual;
     const variancePercentage =
@@ -184,7 +184,7 @@ export class ReportService {
     // 4. Materials Metrics
     const totalItems = bomItems.length;
     const lowStockCount = bomItems.filter(
-      (item) => (item.quantityRequired || 0) > (item.quantityProcured || 0)
+      (item) => ((item as any).quantityRequired || (item as any).quantity || 0) > ((item as any).quantityProcured || 0)
     ).length;
 
     // 5. Workforce Metrics

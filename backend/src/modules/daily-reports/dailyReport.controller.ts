@@ -4,8 +4,8 @@ import { dailyReportService } from "./dailyReport.service.js";
 export class DailyReportController {
   async createReport(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId } = req.params;
-      const userId = (req.user?._id || req.user?.id)?.toString() || "";
+      const projectId = String(req.params.projectId);
+      const userId = (req.user as any)?._id?.toString() || (req.user as any)?.id?.toString() || "";
       const report = await dailyReportService.createReport(
         projectId,
         req.body,
@@ -23,7 +23,7 @@ export class DailyReportController {
 
   async getReportsByProject(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const { startDate, endDate, status, page, limit } = req.query;
 
       const result = await dailyReportService.getReportsByProject(projectId, {
@@ -50,7 +50,8 @@ export class DailyReportController {
 
   async getReportById(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId, reportId } = req.params;
+      const projectId = String(req.params.projectId);
+      const reportId = String(req.params.reportId);
       const report = await dailyReportService.getReportById(projectId, reportId);
       res.status(200).json({
         success: true,
@@ -63,9 +64,10 @@ export class DailyReportController {
 
   async reviewReport(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId, reportId } = req.params;
+      const projectId = String(req.params.projectId);
+      const reportId = String(req.params.reportId);
       const { status, reviewNotes } = req.body;
-      const reviewerId = (req.user?._id || req.user?.id)?.toString() || "";
+      const reviewerId = (req.user as any)?._id?.toString() || (req.user as any)?.id?.toString() || "";
       const report = await dailyReportService.reviewReport(
         projectId,
         reportId,

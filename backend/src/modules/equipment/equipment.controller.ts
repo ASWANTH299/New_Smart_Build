@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { equipmentService } from "./equipment.service.js";
-import { AuthenticatedRequest } from "../../middleware/authenticate.js";
-
 export class EquipmentController {
-  async createEquipment(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async createEquipment(req: Request, res: Response, next: NextFunction) {
     try {
       const equipment = await equipmentService.createEquipment(req.body);
       res.status(201).json({
@@ -44,7 +42,7 @@ export class EquipmentController {
 
   async getEquipmentById(req: Request, res: Response, next: NextFunction) {
     try {
-      const { equipmentId } = req.params;
+      const equipmentId = String(req.params.equipmentId);
       const result = await equipmentService.getEquipmentById(equipmentId);
       res.status(200).json({
         success: true,
@@ -55,9 +53,9 @@ export class EquipmentController {
     }
   }
 
-  async updateEquipment(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async updateEquipment(req: Request, res: Response, next: NextFunction) {
     try {
-      const { equipmentId } = req.params;
+      const equipmentId = String(req.params.equipmentId);
       const equipment = await equipmentService.updateEquipment(equipmentId, req.body);
       res.status(200).json({
         success: true,
@@ -69,9 +67,9 @@ export class EquipmentController {
     }
   }
 
-  async deleteEquipment(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async deleteEquipment(req: Request, res: Response, next: NextFunction) {
     try {
-      const { equipmentId } = req.params;
+      const equipmentId = String(req.params.equipmentId);
       await equipmentService.deleteEquipment(equipmentId);
       res.status(200).json({
         success: true,
@@ -82,13 +80,13 @@ export class EquipmentController {
     }
   }
 
-  async assignEquipment(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async assignEquipment(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const assignment = await equipmentService.assignEquipment(
         projectId,
         req.body,
-        req.user!.id
+        (req.user as any)?._id?.toString() || (req.user as any)?.id?.toString() || ""
       );
 
       res.status(201).json({
@@ -103,7 +101,7 @@ export class EquipmentController {
 
   async getProjectEquipment(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const { status, category } = req.query;
       const assignments = await equipmentService.getProjectEquipment(projectId, {
         status: status as any,
@@ -119,9 +117,10 @@ export class EquipmentController {
     }
   }
 
-  async updateAssignment(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async updateAssignment(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId, assignmentId } = req.params;
+      const projectId = String(req.params.projectId);
+      const assignmentId = String(req.params.assignmentId);
       const assignment = await equipmentService.updateAssignment(
         projectId,
         assignmentId,
@@ -138,13 +137,13 @@ export class EquipmentController {
     }
   }
 
-  async reportBreakdown(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async reportBreakdown(req: Request, res: Response, next: NextFunction) {
     try {
-      const { equipmentId } = req.params;
+      const equipmentId = String(req.params.equipmentId);
       const result = await equipmentService.reportBreakdown(
         equipmentId,
         req.body,
-        req.user!.id
+        (req.user as any)?._id?.toString() || (req.user as any)?.id?.toString() || ""
       );
 
       res.status(200).json({
@@ -157,13 +156,13 @@ export class EquipmentController {
     }
   }
 
-  async scheduleMaintenance(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async scheduleMaintenance(req: Request, res: Response, next: NextFunction) {
     try {
-      const { equipmentId } = req.params;
+      const equipmentId = String(req.params.equipmentId);
       const maintenance = await equipmentService.scheduleMaintenance(
         equipmentId,
         req.body,
-        req.user!.id
+        (req.user as any)?._id?.toString() || (req.user as any)?.id?.toString() || ""
       );
 
       res.status(201).json({
@@ -176,9 +175,10 @@ export class EquipmentController {
     }
   }
 
-  async completeMaintenance(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async completeMaintenance(req: Request, res: Response, next: NextFunction) {
     try {
-      const { equipmentId, maintenanceId } = req.params;
+      const equipmentId = String(req.params.equipmentId);
+      const maintenanceId = String(req.params.maintenanceId);
       const maintenance = await equipmentService.completeMaintenance(
         equipmentId,
         maintenanceId,
@@ -195,13 +195,13 @@ export class EquipmentController {
     }
   }
 
-  async recordInspection(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async recordInspection(req: Request, res: Response, next: NextFunction) {
     try {
-      const { equipmentId } = req.params;
+      const equipmentId = String(req.params.equipmentId);
       const inspection = await equipmentService.recordInspection(
         equipmentId,
         req.body,
-        req.user!.id
+        (req.user as any)?._id?.toString() || (req.user as any)?.id?.toString() || ""
       );
 
       res.status(201).json({

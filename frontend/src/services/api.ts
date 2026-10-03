@@ -17,8 +17,11 @@ export class ApiError extends Error {
     this.status = status;
     this.code = code;
     this.details = details;
-    Object.setPrototypeOf(this, new.target.prototype);
   }
+}
+
+export interface ApiRequestInit extends RequestInit {
+  params?: Record<string, any>;
 }
 
 export const getApiBaseUrl = (): string => {
@@ -33,11 +36,24 @@ export const getApiBaseUrl = (): string => {
 export const apiClient = {
   async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: ApiRequestInit = {}
   ): Promise<ApiResponse<T>> {
     const baseUrl = getApiBaseUrl();
     const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-    const url = `${baseUrl}${cleanEndpoint}`;
+    let url = `${baseUrl}${cleanEndpoint}`;
+
+    if (options.params) {
+      const searchParams = new URLSearchParams();
+      Object.entries(options.params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          searchParams.append(key, String(value));
+        }
+      });
+      const qs = searchParams.toString();
+      if (qs) {
+        url += (url.includes("?") ? "&" : "?") + qs;
+      }
+    }
 
     const headers = new Headers(options.headers || {});
     if (!headers.has("Content-Type") && !(options.body instanceof FormData)) {
@@ -92,11 +108,11 @@ export const apiClient = {
     }
   },
 
-  get<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
+  get<T>(endpoint: string, options?: ApiRequestInit): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: "GET" });
   },
 
-  post<T>(endpoint: string, body?: unknown, options?: RequestInit): Promise<ApiResponse<T>> {
+  post<T>(endpoint: string, body?: unknown, options?: ApiRequestInit): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       ...options,
       method: "POST",
@@ -104,7 +120,7 @@ export const apiClient = {
     });
   },
 
-  put<T>(endpoint: string, body?: unknown, options?: RequestInit): Promise<ApiResponse<T>> {
+  put<T>(endpoint: string, body?: unknown, options?: ApiRequestInit): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       ...options,
       method: "PUT",
@@ -112,7 +128,7 @@ export const apiClient = {
     });
   },
 
-  patch<T>(endpoint: string, body?: unknown, options?: RequestInit): Promise<ApiResponse<T>> {
+  patch<T>(endpoint: string, body?: unknown, options?: ApiRequestInit): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       ...options,
       method: "PATCH",
@@ -120,7 +136,7 @@ export const apiClient = {
     });
   },
 
-  delete<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
+  delete<T>(endpoint: string, options?: ApiRequestInit): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: "DELETE" });
   },
 };

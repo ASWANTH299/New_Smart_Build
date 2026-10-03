@@ -16,10 +16,8 @@ import {
   Clock,
   Eye,
   Check,
-  AlertCircle,
   Truck,
   Package,
-  Layers,
   CheckSquare,
   AlertTriangle,
   BarChart3,
@@ -28,7 +26,6 @@ import { dailyReportService } from "../../services/dailyReportService.js";
 import {
   DailyReport,
   WeatherCondition,
-  DailyReportStatus,
   CreateDailyReportInput,
 } from "../../types/dailyReport.js";
 import { useAuth } from "../../hooks/useAuth.js";
@@ -412,9 +409,8 @@ export const DailyReportsPage: React.FC = () => {
       ) : reports.length === 0 ? (
         <EmptyState
           title="No daily site reports filed"
-          message="Site engineers submit daily logs detailing weather, work progress, headcount, and site equipment."
-          actionText={canCreate ? "Create First DPR" : undefined}
-          onAction={canCreate ? () => setIsCreateDrawerOpen(true) : undefined}
+          description="Site engineers submit daily logs detailing weather, work progress, headcount, and site equipment."
+          action={canCreate ? <Button onClick={() => setIsCreateDrawerOpen(true)}>Create First DPR</Button> : undefined}
         />
       ) : (
         <div className="space-y-4">
@@ -511,7 +507,7 @@ export const DailyReportsPage: React.FC = () => {
           </div>
 
           <Pagination
-            currentPage={page}
+            page={page}
             totalPages={totalPages}
             onPageChange={(p) => setPage(p)}
           />
@@ -713,7 +709,7 @@ export const DailyReportsPage: React.FC = () => {
             >
               Cancel
             </Button>
-            <Button type="submit" variant="primary" loading={submitting}>
+            <Button type="submit" variant="primary" isLoading={submitting}>
               Submit Report
             </Button>
           </div>
@@ -865,7 +861,7 @@ export const DailyReportsPage: React.FC = () => {
                   variant="primary"
                   className="w-full"
                   leftIcon={<Check className="w-4 h-4" />}
-                  loading={approvingId === selectedReport._id}
+                  isLoading={approvingId === selectedReport._id}
                   onClick={() => handleApproveReport(selectedReport._id)}
                 >
                   Approve Daily Report

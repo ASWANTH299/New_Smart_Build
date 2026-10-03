@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const createEquipmentSchema = z.object({
+export const createEquipmentSchema = {
   body: z.object({
     code: z.string().min(1, "Equipment code is required").max(50),
     name: z.string().min(1, "Equipment name is required").max(100),
@@ -55,9 +55,9 @@ export const createEquipmentSchema = z.object({
       .optional(),
     notes: z.string().optional(),
   }),
-});
+};
 
-export const updateEquipmentSchema = z.object({
+export const updateEquipmentSchema = {
   params: z.object({
     equipmentId: z.string().min(1, "Equipment ID is required"),
   }),
@@ -115,9 +115,9 @@ export const updateEquipmentSchema = z.object({
       .optional(),
     notes: z.string().optional(),
   }),
-});
+};
 
-export const assignEquipmentSchema = z.object({
+export const assignEquipmentSchema = {
   params: z.object({
     projectId: z.string().min(1, "Project ID is required"),
   }),
@@ -131,9 +131,9 @@ export const assignEquipmentSchema = z.object({
     meterReadingStart: z.number().min(0).optional(),
     notes: z.string().optional(),
   }),
-});
+};
 
-export const updateAssignmentSchema = z.object({
+export const updateAssignmentSchema = {
   params: z.object({
     projectId: z.string().min(1, "Project ID is required"),
     assignmentId: z.string().min(1, "Assignment ID is required"),
@@ -145,9 +145,9 @@ export const updateAssignmentSchema = z.object({
     status: z.enum(["ACTIVE", "COMPLETED", "CANCELLED"]).optional(),
     notes: z.string().optional(),
   }),
-});
+};
 
-export const reportBreakdownSchema = z.object({
+export const reportBreakdownSchema = {
   params: z.object({
     equipmentId: z.string().min(1, "Equipment ID is required"),
   }),
@@ -157,9 +157,9 @@ export const reportBreakdownSchema = z.object({
     cost: z.number().min(0).optional(),
     notes: z.string().optional(),
   }),
-});
+};
 
-export const scheduleMaintenanceSchema = z.object({
+export const scheduleMaintenanceSchema = {
   params: z.object({
     equipmentId: z.string().min(1, "Equipment ID is required"),
   }),
@@ -172,9 +172,9 @@ export const scheduleMaintenanceSchema = z.object({
     vendorId: z.string().optional().nullable(),
     notes: z.string().optional(),
   }),
-});
+};
 
-export const completeMaintenanceSchema = z.object({
+export const completeMaintenanceSchema = {
   params: z.object({
     equipmentId: z.string().min(1, "Equipment ID is required"),
     maintenanceId: z.string().min(1, "Maintenance ID is required"),
@@ -196,9 +196,9 @@ export const completeMaintenanceSchema = z.object({
     status: z.enum(["COMPLETED", "CANCELLED"]).default("COMPLETED"),
     notes: z.string().optional(),
   }),
-});
+};
 
-export const recordInspectionSchema = z.object({
+export const recordInspectionSchema = {
   params: z.object({
     equipmentId: z.string().min(1, "Equipment ID is required"),
   }),
@@ -219,4 +219,4 @@ export const recordInspectionSchema = z.object({
     nextInspectionDate: z.string().optional().nullable(),
     notes: z.string().optional(),
   }),
-});
+};

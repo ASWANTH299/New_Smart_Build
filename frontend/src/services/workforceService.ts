@@ -70,7 +70,7 @@ export const workforceService = {
     limit?: number;
   }): Promise<{ success: boolean; data: Worker[]; meta?: { total: number; page: number; totalPages: number } }> {
     const res = await api.get("/workforce", { params });
-    return res.data;
+    return res as any;
   },
 
   async getWorkerById(workerId: string): Promise<{
@@ -82,12 +82,12 @@ export const workforceService = {
     };
   }> {
     const res = await api.get(`/workforce/${workerId}`);
-    return res.data;
+    return res as any;
   },
 
   async createWorker(payload: CreateWorkerPayload): Promise<{ success: boolean; data: Worker; message?: string }> {
     const res = await api.post("/workforce", payload);
-    return res.data;
+    return res as any;
   },
 
   async updateWorker(
@@ -95,12 +95,12 @@ export const workforceService = {
     payload: Partial<CreateWorkerPayload>
   ): Promise<{ success: boolean; data: Worker; message?: string }> {
     const res = await api.put(`/workforce/${workerId}`, payload);
-    return res.data;
+    return res as any;
   },
 
   async deleteWorker(workerId: string): Promise<{ success: boolean; message?: string }> {
     const res = await api.delete(`/workforce/${workerId}`);
-    return res.data;
+    return res as any;
   },
 
   // Project-Scoped Workforce Assignments
@@ -109,7 +109,7 @@ export const workforceService = {
     params?: { status?: string; trade?: string; phaseId?: string; taskId?: string }
   ): Promise<{ success: boolean; data: WorkforceAssignment[] }> {
     const res = await api.get(`/projects/${projectId}/workforce`, { params });
-    return res.data;
+    return res as any;
   },
 
   async assignWorker(
@@ -117,7 +117,7 @@ export const workforceService = {
     payload: AssignWorkerPayload
   ): Promise<{ success: boolean; data: WorkforceAssignment; message?: string }> {
     const res = await api.post(`/projects/${projectId}/workforce`, payload);
-    return res.data;
+    return res as any;
   },
 
   async updateAssignment(
@@ -126,12 +126,12 @@ export const workforceService = {
     payload: { phaseId?: string | null; taskId?: string | null; endDate?: string | null; status?: string; notes?: string }
   ): Promise<{ success: boolean; data: WorkforceAssignment; message?: string }> {
     const res = await api.put(`/projects/${projectId}/workforce/${assignmentId}`, payload);
-    return res.data;
+    return res as any;
   },
 
   async deleteAssignment(projectId: string, assignmentId: string): Promise<{ success: boolean; message?: string }> {
     const res = await api.delete(`/projects/${projectId}/workforce/${assignmentId}`);
-    return res.data;
+    return res as any;
   },
 
   // Project-Scoped Daily Attendance
@@ -140,7 +140,7 @@ export const workforceService = {
     params?: { date?: string; startDate?: string; endDate?: string; workerId?: string; status?: string }
   ): Promise<{ success: boolean; data: Attendance[] }> {
     const res = await api.get(`/projects/${projectId}/attendance`, { params });
-    return res.data;
+    return res as any;
   },
 
   async getProjectAttendanceSummary(
@@ -148,7 +148,7 @@ export const workforceService = {
     params?: { startDate?: string; endDate?: string }
   ): Promise<{ success: boolean; data: AttendanceSummary }> {
     const res = await api.get(`/projects/${projectId}/attendance/summary`, { params });
-    return res.data;
+    return res as any;
   },
 
   async recordAttendance(
@@ -156,7 +156,7 @@ export const workforceService = {
     payload: RecordAttendancePayload
   ): Promise<{ success: boolean; data: Attendance; message?: string }> {
     const res = await api.post(`/projects/${projectId}/attendance`, payload);
-    return res.data;
+    return res as any;
   },
 
   async bulkRecordAttendance(
@@ -164,7 +164,7 @@ export const workforceService = {
     payload: BulkAttendancePayload
   ): Promise<{ success: boolean; data: { inserted: number; updated: number; records: Attendance[] }; message?: string }> {
     const res = await api.post(`/projects/${projectId}/attendance/bulk`, payload);
-    return res.data;
+    return res as any;
   },
 
   async updateAttendance(
@@ -173,7 +173,7 @@ export const workforceService = {
     payload: Partial<RecordAttendancePayload>
   ): Promise<{ success: boolean; data: Attendance; message?: string }> {
     const res = await api.put(`/projects/${projectId}/attendance/${attendanceId}`, payload);
-    return res.data;
+    return res as any;
   },
 };
 

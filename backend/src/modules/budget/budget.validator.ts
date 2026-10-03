@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const updateBudgetSchema = z.object({
+export const updateBudgetSchema = {
   params: z.object({
     projectId: z.string().min(1, "Project ID is required"),
   }),
@@ -16,9 +16,9 @@ export const updateBudgetSchema = z.object({
       .min(1, "At least one category budget is required"),
     notes: z.string().optional(),
   }),
-});
+};
 
-export const recordExpenseSchema = z.object({
+export const recordExpenseSchema = {
   params: z.object({
     projectId: z.string().min(1, "Project ID is required"),
   }),
@@ -35,9 +35,9 @@ export const recordExpenseSchema = z.object({
     receiptUrl: z.string().optional(),
     notes: z.string().optional(),
   }),
-});
+};
 
-export const updateExpenseSchema = z.object({
+export const updateExpenseSchema = {
   params: z.object({
     projectId: z.string().min(1, "Project ID is required"),
     expenseId: z.string().min(1, "Expense ID is required"),
@@ -55,9 +55,9 @@ export const updateExpenseSchema = z.object({
     receiptUrl: z.string().optional(),
     notes: z.string().optional(),
   }),
-});
+};
 
-export const createBudgetChangeRequestSchema = z.object({
+export const createBudgetChangeRequestSchema = {
   params: z.object({
     projectId: z.string().min(1, "Project ID is required"),
   }),
@@ -72,9 +72,9 @@ export const createBudgetChangeRequestSchema = z.object({
       )
       .min(1, "At least one category change must be specified"),
   }),
-});
+};
 
-export const reviewBudgetChangeRequestSchema = z.object({
+export const reviewBudgetChangeRequestSchema = {
   params: z.object({
     projectId: z.string().min(1, "Project ID is required"),
     requestId: z.string().min(1, "Request ID is required"),
@@ -83,4 +83,4 @@ export const reviewBudgetChangeRequestSchema = z.object({
     decision: z.enum(["APPROVED", "REJECTED"]),
     reviewNotes: z.string().optional(),
   }),
-});
+};

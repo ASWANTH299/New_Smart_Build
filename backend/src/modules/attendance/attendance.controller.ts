@@ -5,11 +5,11 @@ import { AuthenticatedRequest } from "../../middleware/authenticate.js";
 export class AttendanceController {
   async recordAttendance(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const attendance = await attendanceService.recordAttendance(
         projectId,
         req.body,
-        req.user!.id
+        (req.user as any)?._id?.toString() || (req.user as any)?.id?.toString() || ""
       );
 
       res.status(201).json({
@@ -24,11 +24,11 @@ export class AttendanceController {
 
   async bulkRecordAttendance(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const result = await attendanceService.bulkRecordAttendance(
         projectId,
         req.body,
-        req.user!.id
+        (req.user as any)?._id?.toString() || (req.user as any)?.id?.toString() || ""
       );
 
       res.status(200).json({
@@ -43,7 +43,8 @@ export class AttendanceController {
 
   async updateAttendance(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const { projectId, attendanceId } = req.params;
+      const projectId = String(req.params.projectId);
+      const attendanceId = String(req.params.attendanceId);
       const attendance = await attendanceService.updateAttendance(
         projectId,
         attendanceId,
@@ -62,7 +63,7 @@ export class AttendanceController {
 
   async getProjectAttendance(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const { date, startDate, endDate, workerId, status } = req.query;
 
       const records = await attendanceService.getProjectAttendance(projectId, {
@@ -84,7 +85,7 @@ export class AttendanceController {
 
   async getProjectAttendanceSummary(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const { startDate, endDate } = req.query;
 
       const summary = await attendanceService.getProjectAttendanceSummary(projectId, {

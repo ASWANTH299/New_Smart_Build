@@ -5,21 +5,15 @@ import {
   Plus,
   ArrowLeft,
   Search,
-  Filter,
   CheckCircle2,
   Clock,
   User as UserIcon,
   Calendar,
   Eye,
-  Check,
-  X,
   FileText,
   Users,
   CheckSquare,
   ShieldAlert,
-  Flame,
-  Wrench,
-  Package,
   BarChart3,
 } from "lucide-react";
 import { issueService } from "../../services/issueService.js";
@@ -31,7 +25,6 @@ import {
   IssueStatus,
   CreateIssueInput,
 } from "../../types/issue.js";
-import { useAuth } from "../../hooks/useAuth.js";
 import { useToast } from "../../hooks/useToast.js";
 import { Card } from "../../components/ui/Card.js";
 import { Button } from "../../components/ui/Button.js";
@@ -68,7 +61,6 @@ const priorityStyles: Record<IssuePriority, { bg: string; text: string; dot: str
 
 export const IssuesPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
-  const { user } = useAuth();
   const { showSuccess, showError } = useToast();
 
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -254,7 +246,6 @@ export const IssuesPage: React.FC = () => {
 
   // KPIs
   const openCount = issues.filter((i) => i.status === "OPEN").length;
-  const inProgressCount = issues.filter((i) => i.status === "IN_PROGRESS").length;
   const criticalCount = issues.filter(
     (i) => (i.priority === "CRITICAL" || i.priority === "HIGH") && i.status !== "CLOSED" && i.status !== "RESOLVED"
   ).length;
@@ -471,9 +462,8 @@ export const IssuesPage: React.FC = () => {
       ) : issues.length === 0 ? (
         <EmptyState
           title="No site issues reported"
-          message="No active hazards or snags match your current criteria. Log site issues promptly to keep team informed."
-          actionText="Report Site Issue"
-          onAction={() => setIsCreateModalOpen(true)}
+          description="No active hazards or snags match your current criteria. Log site issues promptly to keep team informed."
+          action={<Button onClick={() => setIsCreateModalOpen(true)}>Report Site Issue</Button>}
         />
       ) : (
         <div className="space-y-4">
@@ -557,7 +547,6 @@ export const IssuesPage: React.FC = () => {
                       {/* Quick Status Select */}
                       <div className="w-36">
                         <Select
-                          size="sm"
                           value={issue.status}
                           disabled={updatingId === issue._id}
                           onChange={(e) =>
@@ -591,7 +580,7 @@ export const IssuesPage: React.FC = () => {
           </div>
 
           <Pagination
-            currentPage={page}
+            page={page}
             totalPages={totalPages}
             onPageChange={(p) => setPage(p)}
           />
@@ -712,7 +701,7 @@ export const IssuesPage: React.FC = () => {
             >
               Cancel
             </Button>
-            <Button type="submit" variant="primary" loading={submitting}>
+            <Button type="submit" variant="primary" isLoading={submitting}>
               Report Issue
             </Button>
           </div>
@@ -758,7 +747,7 @@ export const IssuesPage: React.FC = () => {
             >
               Cancel
             </Button>
-            <Button type="submit" variant="primary" loading={resolving}>
+            <Button type="submit" variant="primary" isLoading={resolving}>
               Mark as Resolved
             </Button>
           </div>

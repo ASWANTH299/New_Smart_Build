@@ -4,7 +4,7 @@ import { reportService } from "./report.service.js";
 export class ReportController {
   async getProjectAnalytics(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const analytics = await reportService.getProjectAnalytics(projectId);
       res.status(200).json({
         success: true,
@@ -12,12 +12,13 @@ export class ReportController {
       });
     } catch (error) {
       next(error);
+      return;
     }
   }
 
   async exportProjectReport(req: Request, res: Response, next: NextFunction) {
     try {
-      const { projectId } = req.params;
+      const projectId = String(req.params.projectId);
       const format = (req.query.format as string)?.toLowerCase() === "csv" ? "csv" : "json";
 
       const result = await reportService.generateProjectSummaryReport(projectId, format);
@@ -31,12 +32,13 @@ export class ReportController {
         return res.status(200).send(result.csv);
       }
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         data: result.data,
       });
     } catch (error) {
       next(error);
+      return;
     }
   }
 }

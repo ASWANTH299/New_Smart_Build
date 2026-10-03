@@ -299,7 +299,7 @@ export class AttendanceService {
       throw new AppError("Invalid project ID", 400);
     }
 
-    const query: mongoose.FilterQuery<IAttendance> = {
+    const query: any = {
       projectId: new mongoose.Types.ObjectId(projectId),
     };
 
@@ -335,7 +335,7 @@ export class AttendanceService {
       throw new AppError("Invalid project ID", 400);
     }
 
-    const query: mongoose.FilterQuery<IAttendance> = {
+    const query: any = {
       projectId: new mongoose.Types.ObjectId(projectId),
     };
 

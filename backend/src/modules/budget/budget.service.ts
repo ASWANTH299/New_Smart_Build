@@ -365,7 +365,7 @@ export class BudgetService {
       throw new AppError("Invalid project ID", 400);
     }
 
-    const query: mongoose.FilterQuery<IExpense> = {
+    const query: any = {
       projectId: new mongoose.Types.ObjectId(projectId),
     };
 
@@ -665,7 +665,7 @@ export class BudgetService {
       throw new AppError("Invalid project ID", 400);
     }
 
-    const query: mongoose.FilterQuery<IBudgetChangeRequest> = {
+    const query: any = {
       projectId: new mongoose.Types.ObjectId(projectId),
     };
 

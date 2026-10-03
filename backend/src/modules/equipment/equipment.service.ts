@@ -214,7 +214,7 @@ export class EquipmentService {
     page?: number;
     limit?: number;
   }): Promise<{ equipment: IEquipment[]; total: number; page: number; totalPages: number }> {
-    const query: mongoose.FilterQuery<IEquipment> = {};
+    const query: any = {};
 
     if (filters.search) {
       query.$or = [
@@ -501,7 +501,7 @@ export class EquipmentService {
       throw new AppError("Invalid project ID", 400);
     }
 
-    const query: mongoose.FilterQuery<IEquipmentAssignment> = {
+    const query: any = {
       projectId: new mongoose.Types.ObjectId(projectId),
     };
 

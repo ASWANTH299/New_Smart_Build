@@ -43,8 +43,8 @@ export const ClientDashboardPage: React.FC = () => {
       const response = await clientService.getClientProjects();
       if (response.success && response.data) {
         setProjects(response.data);
-        if (response.data.length > 0) {
-          setSelectedProjectId((prev) => prev || response.data[0].id);
+        if (response.data && response.data.length > 0) {
+          setSelectedProjectId((prev) => prev || response.data![0].id);
         }
       } else {
         setError(response.message || "Failed to load projects");
@@ -109,9 +109,8 @@ export const ClientDashboardPage: React.FC = () => {
       <div className="py-20">
         <EmptyState
           title="No Assigned Projects Found"
-          message="Your account is not currently assigned to any active projects. Please contact your Project Manager or Smart Build Administrator for access."
-          actionText="Refresh Workspace"
-          onAction={fetchProjects}
+          description="Your account is not currently assigned to any active projects. Please contact your Project Manager or Smart Build Administrator for access."
+          action={<Button onClick={fetchProjects}>Refresh Workspace</Button>}
         />
       </div>
     );

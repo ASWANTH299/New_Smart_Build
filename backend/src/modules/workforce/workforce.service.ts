@@ -80,7 +80,7 @@ export class WorkforceService {
     page?: number;
     limit?: number;
   }): Promise<{ workers: IWorker[]; total: number; page: number; totalPages: number }> {
-    const query: mongoose.FilterQuery<IWorker> = {};
+    const query: any = {};
 
     if (filters.search) {
       query.$or = [
@@ -285,7 +285,7 @@ export class WorkforceService {
       throw new AppError("Invalid project ID", 400);
     }
 
-    const query: mongoose.FilterQuery<IWorkforceAssignment> = {
+    const query: any = {
       projectId: new mongoose.Types.ObjectId(projectId),
     };
 

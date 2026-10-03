@@ -7,18 +7,13 @@ import {
   ArrowLeft,
   Calendar,
   DollarSign,
-  TrendingUp,
   AlertTriangle,
   Users,
   CheckCircle2,
-  Clock,
   ShieldAlert,
   Flame,
   FileText,
-  Layers,
-  CheckSquare,
   Package,
-  Truck,
   RefreshCw,
 } from "lucide-react";
 import { reportService } from "../../services/reportService.js";
@@ -141,7 +136,7 @@ export const ProjectReportsPage: React.FC = () => {
             variant="outline"
             size="sm"
             leftIcon={<Download className="w-3.5 h-3.5" />}
-            loading={exporting === "csv"}
+            isLoading={exporting === "csv"}
             onClick={() => handleExport("csv")}
           >
             Export CSV
@@ -150,7 +145,7 @@ export const ProjectReportsPage: React.FC = () => {
             variant="outline"
             size="sm"
             leftIcon={<FileText className="w-3.5 h-3.5" />}
-            loading={exporting === "json"}
+            isLoading={exporting === "json"}
             onClick={() => handleExport("json")}
           >
             Export JSON
@@ -242,7 +237,7 @@ export const ProjectReportsPage: React.FC = () => {
                   {progress.overallProgress}%
                 </span>
               </div>
-              <ProgressIndicator value={progress.overallProgress} size="md" />
+              <ProgressIndicator progress={progress.overallProgress} size="md" />
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">

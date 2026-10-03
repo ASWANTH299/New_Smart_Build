@@ -109,7 +109,7 @@ export const equipmentService = {
     limit?: number;
   }): Promise<{ success: boolean; data: Equipment[]; meta?: { total: number; page: number; totalPages: number } }> {
     const res = await api.get("/equipment", { params });
-    return res.data;
+    return res as any;
   },
 
   async getEquipmentById(equipmentId: string): Promise<{
@@ -123,14 +123,14 @@ export const equipmentService = {
     };
   }> {
     const res = await api.get(`/equipment/${equipmentId}`);
-    return res.data;
+    return res as any;
   },
 
   async createEquipment(
     payload: CreateEquipmentPayload
   ): Promise<{ success: boolean; data: Equipment; message?: string }> {
     const res = await api.post("/equipment", payload);
-    return res.data;
+    return res as any;
   },
 
   async updateEquipment(
@@ -138,12 +138,12 @@ export const equipmentService = {
     payload: Partial<CreateEquipmentPayload>
   ): Promise<{ success: boolean; data: Equipment; message?: string }> {
     const res = await api.put(`/equipment/${equipmentId}`, payload);
-    return res.data;
+    return res as any;
   },
 
   async deleteEquipment(equipmentId: string): Promise<{ success: boolean; message?: string }> {
     const res = await api.delete(`/equipment/${equipmentId}`);
-    return res.data;
+    return res as any;
   },
 
   async reportBreakdown(
@@ -151,7 +151,7 @@ export const equipmentService = {
     payload: ReportBreakdownPayload
   ): Promise<{ success: boolean; data: { equipment: Equipment; maintenance: EquipmentMaintenance }; message?: string }> {
     const res = await api.post(`/equipment/${equipmentId}/breakdown`, payload);
-    return res.data;
+    return res as any;
   },
 
   async scheduleMaintenance(
@@ -159,7 +159,7 @@ export const equipmentService = {
     payload: ScheduleMaintenancePayload
   ): Promise<{ success: boolean; data: EquipmentMaintenance; message?: string }> {
     const res = await api.post(`/equipment/${equipmentId}/maintenance`, payload);
-    return res.data;
+    return res as any;
   },
 
   async completeMaintenance(
@@ -168,7 +168,7 @@ export const equipmentService = {
     payload: CompleteMaintenancePayload
   ): Promise<{ success: boolean; data: EquipmentMaintenance; message?: string }> {
     const res = await api.put(`/equipment/${equipmentId}/maintenance/${maintenanceId}`, payload);
-    return res.data;
+    return res as any;
   },
 
   async recordInspection(
@@ -176,7 +176,7 @@ export const equipmentService = {
     payload: RecordInspectionPayload
   ): Promise<{ success: boolean; data: EquipmentInspection; message?: string }> {
     const res = await api.post(`/equipment/${equipmentId}/inspections`, payload);
-    return res.data;
+    return res as any;
   },
 
   // Project-Scoped Equipment Assignments
@@ -185,7 +185,7 @@ export const equipmentService = {
     params?: { status?: string; category?: string }
   ): Promise<{ success: boolean; data: EquipmentAssignment[] }> {
     const res = await api.get(`/projects/${projectId}/equipment`, { params });
-    return res.data;
+    return res as any;
   },
 
   async assignEquipment(
@@ -193,7 +193,7 @@ export const equipmentService = {
     payload: AssignEquipmentPayload
   ): Promise<{ success: boolean; data: EquipmentAssignment; message?: string }> {
     const res = await api.post(`/projects/${projectId}/equipment/assignments`, payload);
-    return res.data;
+    return res as any;
   },
 
   async updateAssignment(
@@ -208,7 +208,7 @@ export const equipmentService = {
     }
   ): Promise<{ success: boolean; data: EquipmentAssignment; message?: string }> {
     const res = await api.put(`/projects/${projectId}/equipment/assignments/${assignmentId}`, payload);
-    return res.data;
+    return res as any;
   },
 };
 
