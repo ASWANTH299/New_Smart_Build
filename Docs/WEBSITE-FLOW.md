@@ -2744,3 +2744,12 @@ This document should be refined alongside UI/UX and architecture work.
 Changes that affect product functionality should be reviewed against `PRD.md`.
 
 Changes that affect implementation should be reflected in `TRD.md` or `ARCHITECTURE.md` as appropriate.
+
+---
+
+## Future Development (V2 Scope)
+- **V2.1: Quality Management & Inspection Checklists** (Punch lists, defect tracking)
+- **V2.2: Safety Management & Compliance** (OSHA incident reports, hazard audits)
+- **V2.3: Document & Blueprint Vault** (Cloud object storage for CAD/PDF blueprints and versioning)
+- **V2.4: Real-Time WebSocket Infrastructure** (Live push notifications and collaborative multi-user editing)
+

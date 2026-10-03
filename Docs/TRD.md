@@ -1220,3 +1220,12 @@ The next technical/design documents should refine this baseline rather than cont
 5. `DATABASE-DESIGN.md`
 6. `TESTING-QA.md`
 7. `DEPLOYMENT-OPERATIONS.md`
+
+---
+
+## Future Development (V2 Scope)
+- **V2.1: Quality Management & Inspection Checklists** (Punch lists, defect tracking)
+- **V2.2: Safety Management & Compliance** (OSHA incident reports, hazard audits)
+- **V2.3: Document & Blueprint Vault** (Cloud object storage for CAD/PDF blueprints and versioning)
+- **V2.4: Real-Time WebSocket Infrastructure** (Live push notifications and collaborative multi-user editing)
+

@@ -11,6 +11,25 @@
 
 ## 1. Product Overview
 
+### 16-Phase V1 Roadmap (100% COMPLETED)
+
+- **Phase 1  — Repository, Dev Environment & Project Baseline** (100% COMPLETED)
+- **Phase 2  — Backend Infrastructure, Express Framework & Database Foundation** (100% COMPLETED)
+- **Phase 3  — Frontend Foundation & Industrial Application Shell** (100% COMPLETED)
+- **Phase 4  — Authentication & Identity (JWT, Passwords, Session Security)** (100% COMPLETED)
+- **Phase 5  — Authorization, Role-Based Access Control (RBAC) & Project Access** (100% COMPLETED)
+- **Phase 6  — Users Directory, Organization & Project Master Setup** (100% COMPLETED)
+- **Phase 7  — Project Planning, WBS Tasks & Quantity-Based Progress** (100% COMPLETED)
+- **Phase 8  — Materials Master, BOM & Location-Based Inventory** (100% COMPLETED)
+- **Phase 9  — Procurement Pipeline & Vendor Management** (100% COMPLETED)
+- **Phase 10 — Workforce Management & Shift Attendance Tracking** (100% COMPLETED)
+- **Phase 11 — Equipment & Heavy Machinery Asset Management** (100% COMPLETED)
+- **Phase 12 — Budget Allocation, Expense Logging & Financial Variance** (100% COMPLETED)
+- **Phase 13 — Daily Site Operations (DPR) & Site Issues/Snags Management** (100% COMPLETED)
+- **Phase 14 — Cross-Domain Reports, Executive Analytics & Data Export (CSV/JSON)** (100% COMPLETED)
+- **Phase 15 — Client Portal & Stakeholder Transparency** (100% COMPLETED)
+- **Phase 16 — System Integration, Security Hardening & V1 Review Readiness** (100% COMPLETED)
+
 The product is a secure web-based construction project and resource management platform for a single organization managing multiple construction projects.
 
 The platform centralizes project operations that are commonly distributed across spreadsheets, paper records, separate tools, and manual communication.
@@ -1645,3 +1664,12 @@ External AI services are not required for V1. Rule-based business intelligence i
 **Status:** Locked V1 Baseline  
 **Authority:** Single Source of Truth  
 **Next Related Documents:** WEBSITE-FLOW.md, UI-UX.md, TRD.md, ARCHITECTURE.md
+
+---
+
+## Future Development (V2 Scope)
+- **V2.1: Quality Management & Inspection Checklists** (Punch lists, defect tracking)
+- **V2.2: Safety Management & Compliance** (OSHA incident reports, hazard audits)
+- **V2.3: Document & Blueprint Vault** (Cloud object storage for CAD/PDF blueprints and versioning)
+- **V2.4: Real-Time WebSocket Infrastructure** (Live push notifications and collaborative multi-user editing)
+

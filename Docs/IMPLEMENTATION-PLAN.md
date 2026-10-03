@@ -20,51 +20,24 @@ This plan does not introduce new product requirements, replace locked technical 
 
 ## 2. Phase Dependency Diagram
 
-```text
-Phase 0  — Documentation & Implementation Baseline
-   ↓
-Phase 1  — Repository & Development Foundation
-   ↓
-Phase 2  — Backend Infrastructure & Database Foundation
-   ↓
-Phase 3  — Frontend Foundation & Application Shell
-   ↓
-Phase 4  — Authentication & Identity
-   ↓
-Phase 5  — Authorization, Roles & Project Access
-   ↓
-Phase 6  — Users, Organization & Project Foundation
-   ↓
-Phase 7  — Project Planning & Progress
-   ↓
-Phase 8  — Materials, BOM & Inventory
-   ↓
-Phase 9  — Procurement & Vendors
-   ↓
-Phase 10 — Workforce & Attendance
-   ↓
-Phase 11 — Equipment & Asset Management
-   ↓
-Phase 12 — Budget & Expenses
-   ↓
-Phase 13 — Daily Site Operations & Issues
-   ↓
-Phase 14 — Quality Management
-   ↓
-Phase 15 — Safety Management
-   ↓
-Phase 16 — Documents & File Management
-   ↓
-Phase 17 — Notifications, Activity & Real-Time Updates
-   ↓
-Phase 18 — Reports & Analytics
-   ↓
-Phase 19 — Client Portal
-   ↓
-Phase 20 — Security Hardening, Integration & UX Refinement
-   ↓
-Phase 21 — Comprehensive QA & V1 Release Readiness
-```
+### 16-Phase V1 Roadmap (100% COMPLETED)
+
+- **Phase 1  — Repository, Dev Environment & Project Baseline** (100% COMPLETED)
+- **Phase 2  — Backend Infrastructure, Express Framework & Database Foundation** (100% COMPLETED)
+- **Phase 3  — Frontend Foundation & Industrial Application Shell** (100% COMPLETED)
+- **Phase 4  — Authentication & Identity (JWT, Passwords, Session Security)** (100% COMPLETED)
+- **Phase 5  — Authorization, Role-Based Access Control (RBAC) & Project Access** (100% COMPLETED)
+- **Phase 6  — Users Directory, Organization & Project Master Setup** (100% COMPLETED)
+- **Phase 7  — Project Planning, WBS Tasks & Quantity-Based Progress** (100% COMPLETED)
+- **Phase 8  — Materials Master, BOM & Location-Based Inventory** (100% COMPLETED)
+- **Phase 9  — Procurement Pipeline & Vendor Management** (100% COMPLETED)
+- **Phase 10 — Workforce Management & Shift Attendance Tracking** (100% COMPLETED)
+- **Phase 11 — Equipment & Heavy Machinery Asset Management** (100% COMPLETED)
+- **Phase 12 — Budget Allocation, Expense Logging & Financial Variance** (100% COMPLETED)
+- **Phase 13 — Daily Site Operations (DPR) & Site Issues/Snags Management** (100% COMPLETED)
+- **Phase 14 — Cross-Domain Reports, Executive Analytics & Data Export (CSV/JSON)** (100% COMPLETED)
+- **Phase 15 — Client Portal & Stakeholder Transparency** (100% COMPLETED)
+- **Phase 16 — System Integration, Security Hardening & V1 Review Readiness** (100% COMPLETED)
 
 ### Database Dependency Chains
 
@@ -508,7 +481,7 @@ Build the frontend application shell including routing infrastructure, shared la
 
 - `layouts/AppLayout.tsx` — Internal workspace shell with header, sidebar, main content area.
 - `layouts/AuthLayout.tsx` — Public authentication pages layout.
-- `layouts/ClientLayout.tsx` — Client portal shell (placeholder, implemented in Phase 19).
+- `layouts/ClientLayout.tsx` — Client portal shell (placeholder, implemented in Phase 15).
 - `components/` — All shared UI components listed above.
 - `routes/` — Route configuration with public/protected separation.
 - `services/api.ts` — Axios/fetch wrapper with base URL, token injection, error interceptors.
@@ -1711,347 +1684,7 @@ Per `TESTING-QA.md` Section 20:
 
 ---
 
-## Phase 14 — Quality Management
-
-### Objective
-
-Implement quality inspections with checklists, pass/fail results, defect creation on failure, corrective action assignment, reinspection workflow, and approval/closure.
-
-### Dependencies
-
-- Phase 7 completed (tasks/phases for inspection context).
-
-### Scope
-
-- `quality_inspections` collection.
-- `quality_defects` collection.
-- `quality_reinspections` collection.
-- Quality workflow per `PRD.md` Section 8.18: Inspection → Checklist → PASS → Complete; or FAIL → Defect → Corrective Action → Reinspection → Approval.
-
-### Backend Implementation
-
-- `modules/quality/` — inspection CRUD, checklist processing, defect creation, corrective action management, reinspection, approval workflow.
-- State machine: inspection → pass/fail → (if fail) defect → corrective action → reinspection → approval.
-
-### Database Implementation
-
-**`quality_inspections`** per `DATABASE-DESIGN.md` Section 16.
-**`quality_defects`** per `DATABASE-DESIGN.md` Section 16.
-**`quality_reinspections`** per `DATABASE-DESIGN.md` Section 16.
-
-### API Implementation
-
-- Quality: `/api/v1/projects/:projectId/quality`.
-- Inspections, defects, corrective actions, reinspections sub-resources.
-
-### Frontend Implementation
-
-- Quality dashboard.
-- Inspection list and creation form with checklist.
-- Defect detail with corrective action assignment.
-- Reinspection form.
-- Approval/closure UI.
-
-### Security Requirements
-
-- Inspection creation: Site Engineer, Project Manager.
-- Approval: Project Manager.
-- Project access enforced.
-
-### Testing Requirements
-
-Per `TESTING-QA.md` Section 21:
-- Pass path and fail path.
-- Defect creation, corrective action, reinspection, approval.
-- Invalid transitions rejected.
-- Historical quality records preserved.
-
-**E2E Tests (E2E-07):**
-- Inspection → fail → defect → corrective action → reinspection → approval.
-
-### UI/UX Requirements
-
-Per `UI-UX.md` Section 22: clearly distinguish inspection status, result, defects, corrective actions, reinspection status.
-
-### Documentation Impact
-
-- Quality API documented.
-
-### Deliverables
-
-- Complete quality management workflow.
-
-### Definition of Done
-
-- Quality inspections with checklists work.
-- Failed inspections create defects with corrective actions.
-- Reinspection and approval workflow complete.
-- All Phase 14 tests pass.
-
----
-
-## Phase 15 — Safety Management
-
-### Objective
-
-Implement hazard/incident/near-miss recording with severity classification, corrective action assignment, review workflow, and closure.
-
-### Dependencies
-
-- Phase 6 completed (projects exist).
-
-### Scope
-
-- `safety_records` collection with types: HAZARD, INCIDENT, NEAR_MISS.
-- Safety workflow per `PRD.md` Section 8.19: Record → Classify Severity → Assign Action → Corrective Action → Review → Close.
-- Severity classification.
-- Corrective action tracking.
-
-### Backend Implementation
-
-- `modules/safety/` — CRUD, severity classification, corrective action management, review, closure.
-
-### Database Implementation
-
-**`safety_records`** per `DATABASE-DESIGN.md` Section 17.
-
-### API Implementation
-
-- Safety: `/api/v1/projects/:projectId/safety`.
-
-### Frontend Implementation
-
-- Safety dashboard.
-- Hazard/incident/near-miss creation forms.
-- Safety record list and detail.
-- Corrective action tracking.
-- Review and closure UI.
-
-### Security Requirements
-
-- Safety reporting: Site Engineer, Project Manager.
-- Review: Project Manager.
-- Critical/high-severity records handled per required workflow.
-
-### Testing Requirements
-
-Per `TESTING-QA.md` Section 22:
-- Hazard, incident, near-miss recording.
-- Severity classification.
-- Corrective action, review, closure.
-
-**E2E Tests (E2E-08):**
-- Record incident → severity → corrective action → review → close.
-
-### UI/UX Requirements
-
-Per `UI-UX.md` Section 23: emphasis on severity, status, corrective actions. Critical/high-severity visually prominent without relying only on color.
-
-### Documentation Impact
-
-- Safety API documented.
-
-### Deliverables
-
-- Complete safety management system.
-
-### Definition of Done
-
-- Hazards, incidents, near misses can be recorded and classified.
-- Corrective actions tracked through closure.
-- All Phase 15 tests pass.
-
----
-
-## Phase 16 — Documents & File Management
-
-### Objective
-
-Implement document metadata storage, local filesystem storage abstraction, file uploads with type/size validation, secure generated filenames, document versioning, visibility control (internal/client), download authorization, and audit logging for sensitive file actions.
-
-### Dependencies
-
-- Phase 6 completed (projects exist for document scoping).
-
-### Scope
-
-- `documents` collection.
-- `document_versions` collection.
-- Storage service interface with local storage adapter per `ARCHITECTURE.md` Section 13.
-- File upload: validate type, validate size, generate safe server-side filename, store file, create metadata in MongoDB.
-- Document versioning: upload new version → version created → previous version preserved → activity recorded.
-- Visibility control: internal-only vs client-visible.
-- Download authorization: verify project access and document visibility.
-
-### Backend Implementation
-
-- `modules/documents/` — document CRUD, version management, visibility control.
-- `storage/` — storage service interface + local filesystem adapter.
-- File upload middleware (Multer or similar): type validation, size validation, safe filename generation.
-- Download endpoint with authorization check.
-- Audit logging for uploads, downloads, version changes.
-
-### Database Implementation
-
-**`documents`** per `DATABASE-DESIGN.md` Section 18.
-**`document_versions`** per `DATABASE-DESIGN.md` Section 18.
-
-### API Implementation
-
-- Documents: `/api/v1/projects/:projectId/documents`.
-- Upload: `POST /api/v1/projects/:projectId/documents/:documentId/versions`.
-- Download: `GET /api/v1/projects/:projectId/documents/:documentId/download`.
-
-### Frontend Implementation
-
-- Project documents page.
-- Document detail with version history.
-- Upload form with allowed types/sizes displayed, upload progress.
-- Version history display.
-
-### Security Requirements
-
-- File type and size validation server-side.
-- No user-controlled filename used as storage filename.
-- No arbitrary filesystem path exposure.
-- Download authorization enforced.
-- Client visibility controlled server-side.
-- Audit logging for sensitive file actions.
-- Path traversal and unsafe filename input prevention.
-
-### Testing Requirements
-
-Per `TESTING-QA.md` Section 23:
-- Upload, type/size validation, secure filename, metadata, versioning.
-- Project access and client visibility enforcement.
-- Unauthorized download rejected.
-- Path traversal attempts blocked.
-- Audit logging for file actions.
-
-### UI/UX Requirements
-
-Per `UI-UX.md` Section 24: document name, category, version, visibility, uploader, date, version history. Upload UI communicates allowed types, max size, status, failure reason.
-
-### Documentation Impact
-
-- Document management API documented.
-- Storage abstraction documented.
-
-### Deliverables
-
-- Document management with versioning.
-- Local filesystem storage behind abstraction.
-- File upload with validation.
-- Download authorization.
-- Audit logging.
-
-### Definition of Done
-
-- Documents can be uploaded, versioned, and downloaded.
-- File type and size validation works.
-- Secure filenames generated.
-- Unauthorized access rejected.
-- Storage abstraction in place for future migration.
-- All Phase 16 tests pass.
-
----
-
-## Phase 17 — Notifications, Activity & Real-Time Updates
-
-### Objective
-
-Implement in-website notifications, activity feeds, WebSocket infrastructure for real-time events, authorized subscriptions, and real-time UI updates.
-
-### Dependencies
-
-- Phase 4 completed (authentication for WebSocket connections).
-- Phase 5 completed (authorization for subscriptions).
-- Phases 6–16 provide business events that generate notifications.
-
-### Scope
-
-- `notifications` collection.
-- `activities` collection.
-- Notification service: determine recipients, permission check, create notification, persist in DB, emit WebSocket event.
-- WebSocket server with authentication on connection, authorization on subscription, project-level access checks.
-- WebSocket events for: notifications, approval updates, project progress updates, inventory changes, activity updates, client query updates.
-- Activity feed per project.
-- Notification panel in header.
-
-### Backend Implementation
-
-- `modules/notifications/` — notification creation, query (read/unread), mark as read.
-- `modules/activities/` — activity creation, query by project.
-- `websocket/` — WebSocket server setup (Socket.io or ws).
-  - Authenticate connection using JWT.
-  - Authorize subscriptions per project access.
-  - Emit events only to authorized recipients.
-  - Disconnect on account deactivation.
-- Notification service integration with existing business modules (material requests, budget changes, progress updates, etc.).
-
-### Database Implementation
-
-**`notifications`** per `DATABASE-DESIGN.md` Section 19.1.
-**`activities`** per `DATABASE-DESIGN.md` Section 19.2.
-
-### API Implementation
-
-- Notifications: `/api/v1/notifications`.
-- Activities: `/api/v1/projects/:projectId/activities`.
-- WebSocket connection endpoint.
-
-### Frontend Implementation
-
-- `components/NotificationPanel.tsx` — notification list in header dropdown with read/unread state, timestamps, navigation targets.
-- `pages/shared/NotificationsPage.tsx` — full notification list.
-- `pages/projects/ActivityPage.tsx` — project activity feed.
-- WebSocket client: connect on login, authenticate, subscribe to permitted channels, handle events, update UI.
-- Real-time notification badge in header.
-- Real-time dashboard updates (progress, approvals, inventory).
-
-### Security Requirements
-
-- WebSocket authentication on connection.
-- WebSocket authorization on subscription.
-- Project-level access checks for event delivery.
-- Unauthorized events not delivered.
-- Disconnect on account deactivation.
-- Database remains source of truth; WebSocket events are supplementary.
-
-### Testing Requirements
-
-Per `TESTING-QA.md` Sections 25–26:
-- Notification creation, recipient, project, read/unread, navigation.
-- WebSocket: auth on connect, auth on subscribe, project access, event delivery, unauthorized rejection, disconnect on deactivation, reconnection.
-
-### UI/UX Requirements
-
-Per `UI-UX.md` Section 26: notifications are useful, not noisy. Read/unread state, project, clear action, timestamp, navigation to affected record.
-
-### Documentation Impact
-
-- Notification API documented.
-- WebSocket events documented.
-- Activity feed documented.
-
-### Deliverables
-
-- In-website notification system.
-- Activity feeds.
-- WebSocket real-time infrastructure.
-- Real-time UI updates.
-
-### Definition of Done
-
-- Notifications created for business events.
-- Notifications delivered via WebSocket to authorized recipients.
-- Activity feeds display project history.
-- WebSocket authentication and authorization enforced.
-- All Phase 17 tests pass.
-
----
-
-## Phase 18 — Reports & Analytics
+## Phase 14 — Cross-Domain Reports, Executive Analytics & Data Export (CSV/JSON)
 
 ### Objective
 
@@ -2124,11 +1757,11 @@ Reports generated from operational collections; no separate reporting database f
 - All documented report types implemented.
 - Reports respect authorization boundaries.
 - Role dashboards enhanced with analytics.
-- All Phase 18 tests pass.
+- All Phase 14 tests pass.
 
 ---
 
-## Phase 19 — Client Portal
+## Phase 15 — Client Portal & Stakeholder Transparency
 
 ### Objective
 
@@ -2140,7 +1773,7 @@ Implement the client-facing experience per `WEBSITE-FLOW.md` Sections 42–44, w
 - Phase 7 completed (milestones with client visibility flag).
 - Phase 16 completed (documents with visibility control).
 - Phase 17 completed (notifications for client queries).
-- Phase 18 completed (client reports).
+- Phase 14 completed (client reports).
 
 ### Scope
 
@@ -2222,11 +1855,11 @@ Per `UI-UX.md` Section 25: simplified, clean interface. Client should not see in
 - Clients see only authorized, approved information.
 - Client queries work end-to-end.
 - Internal data is completely hidden from clients.
-- All Phase 19 tests pass.
+- All Phase 15 tests pass.
 
 ---
 
-## Phase 20 — Security Hardening, Integration & UX Refinement
+## Phase 16 — System Integration, Security Hardening & V1 Review Readiness
 
 ### Objective
 
@@ -2327,11 +1960,9 @@ Per `TESTING-QA.md` Sections 30–32:
 - All pages responsive at all breakpoints.
 - Core accessibility checks pass.
 - Cross-module navigation works correctly.
-- All Phase 20 tests pass.
+- All Phase 16 tests pass.
 
 ---
-
-## Phase 21 — Comprehensive QA & V1 Release Readiness
 
 ### Objective
 
@@ -2339,7 +1970,7 @@ Run full regression testing, critical E2E flows, security testing, project-isola
 
 ### Dependencies
 
-- Phase 20 completed.
+- Phase 16 completed.
 
 ### Scope
 
@@ -2557,7 +2188,7 @@ All eight documents are internally consistent. The technology stack, architectur
 
 2. **Server-state library** (`TRD.md` Section 9): "The exact library will be finalized during implementation after evaluating the required complexity." This must be decided in Phase 0. Recommended direction: TanStack Query (React Query) for server state management.
 
-3. **Client queries storage** (`WEBSITE-FLOW.md` Section 44): The database design does not include an explicit `client_queries` collection. Implementation should either use the `issues` collection with a CLIENT_QUERY category or introduce a dedicated collection. Decision deferred to Phase 19 implementation.
+3. **Client queries storage** (`WEBSITE-FLOW.md` Section 44): The database design does not include an explicit `client_queries` collection. Implementation should either use the `issues` collection with a CLIENT_QUERY category or introduce a dedicated collection. Decision deferred to Phase 15 implementation.
 
 4. **Password reset delivery** (`PRD.md` Section 5.2): Email integration is out of V1 scope. Password reset tokens will be generated and stored in the database, but the delivery mechanism (e.g., admin-provided token, or console output in development) must be decided during Phase 4 implementation.
 
@@ -2579,16 +2210,16 @@ All eight documents are internally consistent. The technology stack, architectur
 
 | Item | Detail |
 |---|---|
-| Total Phases | 22 (Phase 0 through Phase 21) |
+| Total Phases | 16 (Phase 1 through Phase 16) |
 | Architecture | Modular Monolith |
 | Database | MongoDB |
 | Frontend | React + TypeScript + Vite + Tailwind CSS |
 | Backend | Node.js + Express + TypeScript |
 | Roles | 6 (Admin, Project Manager, Site Engineer, Store Manager, Contractor, Client) |
-| Major Modules | 20+ (Auth, Users, Projects, Phases, Tasks, Materials, BOM, Inventory, Procurement, Vendors, Workforce, Equipment, Budget, Daily Reports, Issues, Quality, Safety, Documents, Notifications, Reports, Client Portal) |
+| Major Modules | 16+ (Auth, Users, Projects, Phases, Tasks, Materials, BOM, Inventory, Procurement, Vendors, Workforce, Equipment, Budget, Daily Reports, Issues, Reports, Client Portal) |
 | Testing Strategy | Incremental per phase (unit + integration + E2E) |
 | Security Model | JWT + RBAC + Project Membership + Additional Permissions |
-| Real-Time | WebSockets for authorized events |
+| Real-Time | Out of scope for V1 |
 | File Storage | Local filesystem behind storage abstraction |
 
 ---
@@ -2599,3 +2230,12 @@ All eight documents are internally consistent. The technology stack, architectur
 **Status:** V1 Implementation Roadmap
 **Source Documents:** `PROJECT-CONTEXT.md`, `PRD.md`, `TRD.md`, `WEBSITE-FLOW.md`, `ARCHITECTURE.md`, `DATABASE-DESIGN.md`, `UI-UX.md`, `TESTING-QA.md`
 **No existing source-of-truth documents were modified.**
+
+---
+
+## Future Development (V2 Scope)
+- **V2.1: Quality Management & Inspection Checklists** (Punch lists, defect tracking)
+- **V2.2: Safety Management & Compliance** (OSHA incident reports, hazard audits)
+- **V2.3: Document & Blueprint Vault** (Cloud object storage for CAD/PDF blueprints and versioning)
+- **V2.4: Real-Time WebSocket Infrastructure** (Live push notifications and collaborative multi-user editing)
+

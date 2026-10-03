@@ -216,29 +216,7 @@ export const AppRoutes: React.FC = () => {
           }
         />
 
-        {/* Module Placeholders */}
-        <Route
-          path="/operations"
-          element={
-            <div className="p-6">
-              <h2 className="text-xl font-bold">Site Operations</h2>
-              <p className="text-sm text-zinc-500 mt-2">
-                Operations overview — Navigate directly to Projects or Workforce & Attendance sheets.
-              </p>
-            </div>
-          }
-        />
-        <Route
-          path="/quality-safety"
-          element={
-            <div className="p-6">
-              <h2 className="text-xl font-bold">Quality & Safety</h2>
-              <p className="text-sm text-zinc-500 mt-2">
-                Quality Inspections and Safety Incident reporting modules (Phases 14 & 15).
-              </p>
-            </div>
-          }
-        />
+        <Route path="/operations" element={<Navigate to="/projects" replace />} />
       </Route>
 
       {/* Fallback Error Routes */}
