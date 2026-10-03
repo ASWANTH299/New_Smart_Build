@@ -5,7 +5,6 @@ import {
   FolderKanban,
   HardHat,
   Package,
-  ShieldCheck,
   Building2,
   Truck,
   Settings,
@@ -79,12 +78,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       icon: <Building2 className="w-4 h-4 shrink-0" />,
       roles: ["ADMIN", "PROJECT_MANAGER", "STORE_MANAGER"],
     },
-    {
-      name: "Quality & Safety",
-      href: "/quality-safety",
-      icon: <ShieldCheck className="w-4 h-4 shrink-0" />,
-      roles: ["ADMIN", "PROJECT_MANAGER", "SITE_ENGINEER"],
-    },
+
     ...(isClient
       ? [
           {

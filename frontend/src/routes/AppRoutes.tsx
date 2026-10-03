@@ -222,6 +222,8 @@ export const AppRoutes: React.FC = () => {
       {/* Fallback Error Routes */}
       <Route path="/403" element={<PermissionDeniedPage />} />
       <Route path="/404" element={<NotFoundPage />} />
+      <Route path="/quality-safety" element={<Navigate to="/projects" replace />} />
+      <Route path="/projects/:projectId/quality-safety" element={<Navigate to="issues" replace />} />
       <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>
   );
