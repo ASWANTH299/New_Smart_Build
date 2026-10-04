@@ -3,7 +3,6 @@ import { useParams, Link } from "react-router-dom";
 import {
   FileText,
   Plus,
-  ArrowLeft,
   Calendar,
   Sun,
   CloudRain,
@@ -236,41 +235,30 @@ export const DailyReportsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Header & Breadcrumb */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Link
-              to={`/projects/${projectId}`}
-              className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 flex items-center gap-1 transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" /> Back to Project Overview
-            </Link>
-          </div>
-          <h1 className="text-2xl font-bold font-display text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-            <FileText className="w-6 h-6 text-brand-600 dark:text-brand-400" />
-            Daily Site Operations (DPR)
-          </h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Submit and review daily construction site progress, workforce presence, and material usage logs.
-          </p>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <h1 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
+          Daily Site Operations (DPR)
+        </h1>
 
-        {canCreate && (
-          <Button
-            variant="primary"
-            leftIcon={<Plus className="w-4 h-4" />}
-            onClick={() => setIsCreateDrawerOpen(true)}
-          >
-            New Daily Report (DPR)
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {canCreate && (
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<Plus className="w-4 h-4" />}
+              onClick={() => setIsCreateDrawerOpen(true)}
+            >
+              + New Report
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Sub-Navigation Links */}
       <div className="flex items-center gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-2 text-sm overflow-x-auto">
         <Link
           to={`/projects/${projectId}/daily-reports`}
-          className="font-bold text-brand-600 dark:text-brand-400 border-b-2 border-brand-600 dark:border-brand-400 pb-2 -mb-2.5 flex items-center gap-1.5 shrink-0"
+          className="font-semibold border-b-2 border-amber-500 text-zinc-900 dark:text-white pb-2 -mb-2.5 flex items-center gap-1.5 shrink-0"
         >
           <FileText className="w-4 h-4" /> Daily Site Reports
         </Link>
@@ -307,7 +295,7 @@ export const DailyReportsPage: React.FC = () => {
       </div>
 
       {/* Metric KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
         <Metric
           label="Total Reports Filed"
           value={totalReports}
@@ -335,71 +323,57 @@ export const DailyReportsPage: React.FC = () => {
       </div>
 
       {/* Filters Bar */}
-      <Card noPadding className="p-4 bg-zinc-50/50 dark:bg-zinc-850/50">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
-          <div>
-            <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
-              Review Status
-            </label>
-            <Select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setPage(1);
-              }}
-              options={[
-                { value: "", label: "All Statuses" },
-                { value: "SUBMITTED", label: "Submitted (Pending)" },
-                { value: "REVIEWED", label: "Reviewed" },
-                { value: "APPROVED", label: "Approved" },
-              ]}
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
-              From Date
-            </label>
-            <Input
-              type="date"
-              value={startDate}
-              onChange={(e) => {
-                setStartDate(e.target.value);
-                setPage(1);
-              }}
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
-              To Date
-            </label>
-            <Input
-              type="date"
-              value={endDate}
-              onChange={(e) => {
-                setEndDate(e.target.value);
-                setPage(1);
-              }}
-            />
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => {
-                setStatusFilter("");
-                setStartDate("");
-                setEndDate("");
-                setPage(1);
-              }}
-            >
-              Reset Filters
-            </Button>
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800/80 rounded-lg mb-4">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <Select
+            className="h-8 text-xs min-w-[140px]"
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
+            options={[
+              { value: "", label: "All Statuses" },
+              { value: "SUBMITTED", label: "Submitted (Pending)" },
+              { value: "REVIEWED", label: "Reviewed" },
+              { value: "APPROVED", label: "Approved" },
+            ]}
+          />
+          <Input
+            className="h-8 text-xs"
+            type="date"
+            value={startDate}
+            onChange={(e) => {
+              setStartDate(e.target.value);
+              setPage(1);
+            }}
+          />
+          <span className="text-zinc-500 text-xs">to</span>
+          <Input
+            className="h-8 text-xs"
+            type="date"
+            value={endDate}
+            onChange={(e) => {
+              setEndDate(e.target.value);
+              setPage(1);
+            }}
+          />
         </div>
-      </Card>
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8"
+          onClick={() => {
+            setStatusFilter("");
+            setStartDate("");
+            setEndDate("");
+            setPage(1);
+          }}
+        >
+          Reset Filters
+        </Button>
+      </div>
 
       {/* Reports List */}
       {loading ? (

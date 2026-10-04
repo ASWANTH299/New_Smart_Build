@@ -4,8 +4,6 @@ import {
   BarChart3,
   Download,
   Printer,
-  ArrowLeft,
-  Calendar,
   DollarSign,
   AlertTriangle,
   Users,
@@ -90,40 +88,19 @@ export const ProjectReportsPage: React.FC = () => {
   return (
     <div className="space-y-6 print:space-y-4 print:p-0">
       {/* Executive Summary Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-zinc-200 dark:border-zinc-800 print:border-b-2">
-        <div>
-          <div className="flex items-center gap-2 mb-2 print:hidden">
-            <Link
-              to={`/projects/${projectId}`}
-              className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 flex items-center gap-1 transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" /> Back to Project Overview
-            </Link>
-          </div>
-          <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="text-2xl font-bold font-display text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-              <BarChart3 className="w-6 h-6 text-brand-600 dark:text-brand-400 print:hidden" />
-              {project.name}
-            </h1>
-            <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
-              {project.code}
-            </span>
-            <StatusBadge status={project.status.toLowerCase()} label={project.status} />
-            <StatusBadge status={project.health.toLowerCase()} label={project.health} />
-          </div>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 flex items-center gap-3">
-            <span>Location: <strong>{project.location}</strong></span>
-            <span>•</span>
-            <span className="flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-zinc-400" />
-              {new Date(project.plannedStartDate).toLocaleDateString()} &mdash;{" "}
-              {new Date(project.plannedEndDate).toLocaleDateString()}
-            </span>
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-3">
+          <h1 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
+            {project.name} Reports
+          </h1>
+          <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+            {project.code}
+          </span>
+          <StatusBadge status={project.status} size="sm" />
+          <StatusBadge status={project.health} size="sm" />
         </div>
 
-        {/* Export & Actions Toolbar */}
-        <div className="flex items-center gap-2 print:hidden shrink-0">
+        <div className="flex items-center gap-2 print:hidden">
           <Button
             variant="outline"
             size="sm"
@@ -140,15 +117,6 @@ export const ProjectReportsPage: React.FC = () => {
             onClick={() => handleExport("csv")}
           >
             Export CSV
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<FileText className="w-3.5 h-3.5" />}
-            isLoading={exporting === "json"}
-            onClick={() => handleExport("json")}
-          >
-            Export JSON
           </Button>
           <Button
             variant="primary"
@@ -189,14 +157,14 @@ export const ProjectReportsPage: React.FC = () => {
         </Link>
         <Link
           to={`/projects/${projectId}/reports`}
-          className="font-bold text-brand-600 dark:text-brand-400 border-b-2 border-brand-600 dark:border-brand-400 pb-2 -mb-2.5 flex items-center gap-1.5 shrink-0"
+          className="font-semibold border-b-2 border-amber-500 text-zinc-900 dark:text-white pb-2 -mb-2.5 flex items-center gap-1.5 shrink-0"
         >
           <BarChart3 className="w-4 h-4" /> Reports & Analytics
         </Link>
       </div>
 
       {/* 4 Analytical KPI Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
         <Metric
           label="Milestone Health"
           value={`${milestones.milestoneHealth}%`}

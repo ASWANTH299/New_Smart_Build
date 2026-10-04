@@ -3,7 +3,6 @@ import { useParams, Link } from "react-router-dom";
 import {
   AlertTriangle,
   Plus,
-  ArrowLeft,
   Search,
   CheckCircle2,
   Clock,
@@ -256,32 +255,21 @@ export const IssuesPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Header & Breadcrumb */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Link
-              to={`/projects/${projectId}`}
-              className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 flex items-center gap-1 transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" /> Back to Project Overview
-            </Link>
-          </div>
-          <h1 className="text-2xl font-bold font-display text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-            <AlertTriangle className="w-6 h-6 text-amber-500" />
-            Site Issues & Snag Tracking
-          </h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Log, prioritize, assign, and resolve construction hazards, defects, material bottlenecks, and schedule snags.
-          </p>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <h1 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
+          Site Issues & Snag Tracking
+        </h1>
 
-        <Button
-          variant="primary"
-          leftIcon={<Plus className="w-4 h-4" />}
-          onClick={() => setIsCreateModalOpen(true)}
-        >
-          Report Site Issue
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="primary"
+            size="sm"
+            leftIcon={<Plus className="w-4 h-4" />}
+            onClick={() => setIsCreateModalOpen(true)}
+          >
+            Report Issue
+          </Button>
+        </div>
       </div>
 
       {/* Sub-Navigation Links */}
@@ -294,7 +282,7 @@ export const IssuesPage: React.FC = () => {
         </Link>
         <Link
           to={`/projects/${projectId}/issues`}
-          className="font-bold text-amber-600 dark:text-amber-400 border-b-2 border-amber-600 dark:border-amber-400 pb-2 -mb-2.5 flex items-center gap-1.5 shrink-0"
+          className="font-semibold border-b-2 border-amber-500 text-zinc-900 dark:text-white pb-2 -mb-2.5 flex items-center gap-1.5 shrink-0"
         >
           <AlertTriangle className="w-4 h-4" /> Site Issues & Snags
         </Link>
@@ -325,7 +313,7 @@ export const IssuesPage: React.FC = () => {
       </div>
 
       {/* Metric KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
         <Metric
           label="Total Issues"
           value={totalIssues}
@@ -353,106 +341,84 @@ export const IssuesPage: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <Card noPadding className="p-4 bg-zinc-50/50 dark:bg-zinc-850/50">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 items-end">
-          <div className="md:col-span-1">
-            <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
-              Search
-            </label>
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-2.5 text-zinc-400" />
-              <Input
-                placeholder="Search issue # or title..."
-                className="pl-9"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setPage(1);
-                }}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
-              Status
-            </label>
-            <Select
-              value={statusFilter}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800/80 rounded-lg mb-4">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-zinc-400" />
+            <Input
+              placeholder="Search..."
+              className="h-8 text-xs pl-8 w-32"
+              value={searchQuery}
               onChange={(e) => {
-                setStatusFilter(e.target.value);
+                setSearchQuery(e.target.value);
                 setPage(1);
               }}
-              options={[
-                { value: "", label: "All Statuses" },
-                { value: "OPEN", label: "Open" },
-                { value: "IN_PROGRESS", label: "In Progress" },
-                { value: "RESOLVED", label: "Resolved" },
-                { value: "CLOSED", label: "Closed" },
-              ]}
             />
           </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
-              Priority
-            </label>
-            <Select
-              value={priorityFilter}
-              onChange={(e) => {
-                setPriorityFilter(e.target.value);
-                setPage(1);
-              }}
-              options={[
-                { value: "", label: "All Priorities" },
-                { value: "CRITICAL", label: "Critical" },
-                { value: "HIGH", label: "High" },
-                { value: "MEDIUM", label: "Medium" },
-                { value: "LOW", label: "Low" },
-              ]}
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
-              Category
-            </label>
-            <Select
-              value={categoryFilter}
-              onChange={(e) => {
-                setCategoryFilter(e.target.value);
-                setPage(1);
-              }}
-              options={[
-                { value: "", label: "All Categories" },
-                { value: "SAFETY", label: "Safety Hazard" },
-                { value: "QUALITY", label: "Quality Defect" },
-                { value: "MATERIAL", label: "Material Issue" },
-                { value: "EQUIPMENT", label: "Equipment Breakdown" },
-                { value: "SCHEDULE", label: "Schedule Delay" },
-                { value: "WEATHER", label: "Weather Impact" },
-                { value: "OTHER", label: "Other" },
-              ]}
-            />
-          </div>
-
-          <div>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => {
-                setStatusFilter("");
-                setPriorityFilter("");
-                setCategoryFilter("");
-                setSearchQuery("");
-                setPage(1);
-              }}
-            >
-              Reset Filters
-            </Button>
-          </div>
+          <Select
+            className="h-8 text-xs min-w-[120px]"
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
+            options={[
+              { value: "", label: "All Statuses" },
+              { value: "OPEN", label: "Open" },
+              { value: "IN_PROGRESS", label: "In Progress" },
+              { value: "RESOLVED", label: "Resolved" },
+              { value: "CLOSED", label: "Closed" },
+            ]}
+          />
+          <Select
+            className="h-8 text-xs min-w-[120px]"
+            value={priorityFilter}
+            onChange={(e) => {
+              setPriorityFilter(e.target.value);
+              setPage(1);
+            }}
+            options={[
+              { value: "", label: "All Priorities" },
+              { value: "CRITICAL", label: "Critical" },
+              { value: "HIGH", label: "High" },
+              { value: "MEDIUM", label: "Medium" },
+              { value: "LOW", label: "Low" },
+            ]}
+          />
+          <Select
+            className="h-8 text-xs min-w-[130px]"
+            value={categoryFilter}
+            onChange={(e) => {
+              setCategoryFilter(e.target.value);
+              setPage(1);
+            }}
+            options={[
+              { value: "", label: "All Categories" },
+              { value: "SAFETY", label: "Safety" },
+              { value: "QUALITY", label: "Quality" },
+              { value: "MATERIAL", label: "Material" },
+              { value: "EQUIPMENT", label: "Equipment" },
+              { value: "SCHEDULE", label: "Schedule" },
+              { value: "WEATHER", label: "Weather" },
+              { value: "OTHER", label: "Other" },
+            ]}
+          />
         </div>
-      </Card>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8"
+          onClick={() => {
+            setStatusFilter("");
+            setPriorityFilter("");
+            setCategoryFilter("");
+            setSearchQuery("");
+            setPage(1);
+          }}
+        >
+          Reset Filters
+        </Button>
+      </div>
 
       {/* Issues Table & Card View */}
       {loading ? (

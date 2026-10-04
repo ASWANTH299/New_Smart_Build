@@ -8,7 +8,6 @@ import {
   Plus,
   FileText,
   PieChart,
-  ArrowLeft,
   Layers,
   CheckCircle2,
   ArrowUpRight,
@@ -195,31 +194,17 @@ export const ProjectBudgetPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-zinc-500 mb-1 font-sans">
-            <Link
-              to={`/projects/${projectId}`}
-              className="hover:underline text-brand-600 dark:text-brand-400 font-medium inline-flex items-center gap-1"
-            >
-              <ArrowLeft className="w-3 h-3" /> Project Workspace
-            </Link>
-            <span>/</span>
-            <span>Budget & Financials</span>
-          </div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight font-display">
-            Budget & Financial Management
-          </h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            Real-time planned allocations, cumulative expense rollups, variance analysis, and governance controls.
-          </p>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <h1 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
+          Budget & Financial Management
+        </h1>
 
         <div className="flex items-center gap-2">
           {canManage && (
             <Button
               id="edit-budget-baseline-btn"
               variant="outline"
+              size="sm"
               leftIcon={<Layers className="w-4 h-4" />}
               onClick={() => setIsEditBudgetOpen(true)}
             >
@@ -231,6 +216,7 @@ export const ProjectBudgetPage: React.FC = () => {
             <Button
               id="log-expense-btn"
               variant="primary"
+              size="sm"
               leftIcon={<Plus className="w-4 h-4" />}
               onClick={() => setIsLogExpenseOpen(true)}
             >
@@ -244,7 +230,7 @@ export const ProjectBudgetPage: React.FC = () => {
       <div className="flex items-center gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-2 text-sm">
         <Link
           to={`/projects/${projectId}/budget`}
-          className="font-bold text-brand-600 dark:text-brand-400 border-b-2 border-brand-600 dark:border-brand-400 pb-2 -mb-2.5 flex items-center gap-1.5"
+          className="font-semibold border-b-2 border-amber-500 text-zinc-900 dark:text-white pb-2 -mb-2.5 flex items-center gap-1.5"
         >
           <PieChart className="w-4 h-4" /> Financial Summary
         </Link>
@@ -276,7 +262,7 @@ export const ProjectBudgetPage: React.FC = () => {
       ) : (
         <>
           {/* Top KPI Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
             {/* Total Budget Planned */}
             <div className="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 shadow-card">
               <div className="flex items-center justify-between text-xs text-zinc-500 uppercase tracking-wider font-display font-bold">

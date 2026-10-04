@@ -5,12 +5,9 @@ import {
   MapPin,
   RotateCcw,
   CheckCircle2,
-  Layers,
-  CheckSquare,
   Flag,
   AlertTriangle,
   HeartPulse,
-  Package,
   UserPlus,
   UserX,
   Sparkles,
@@ -18,13 +15,7 @@ import {
   Shield,
   Activity,
   Calendar,
-  Truck,
-  DollarSign,
-  Clock,
-  FileText,
-  BarChart3,
 } from "lucide-react";
-import { PageHeader } from "../../components/ui/PageHeader.js";
 import { Card } from "../../components/ui/Card.js";
 import { Metric } from "../../components/ui/Metric.js";
 import { StatusBadge } from "../../components/ui/StatusBadge.js";
@@ -244,126 +235,79 @@ export const ProjectOverviewPage: React.FC = () => {
         </Link>
       </div>
 
-      {/* Hero Command Center Header */}
-      <PageHeader
-        title={`${project.name} (${project.code})`}
-        description={project.location}
-        badge={
-          <div className="flex items-center gap-1.5">
-            <StatusBadge status={project.health} size="md" />
-            <StatusBadge status={project.status} size="md" />
-          </div>
-        }
-        actions={
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <Button
-              variant={isCurrentActive ? "secondary" : "outline"}
-              onClick={handleSetCurrentContext}
-              leftIcon={
-                isCurrentActive ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                ) : undefined
-              }
-            >
-              {isCurrentActive ? "Active Workspace" : "Set as Active Project"}
-            </Button>
-            {canManage && (
-              <>
-                <Link to={`/projects/${project._id}/edit`}>
-                  <Button variant="outline">Edit Settings</Button>
-                </Link>
-                <Button
-                  variant="primary"
-                  leftIcon={<RotateCcw className="w-4 h-4" />}
-                  onClick={() => setIsStatusModalOpen(true)}
-                >
-                  Change Lifecycle
-                </Button>
-              </>
-            )}
-          </div>
-        }
-      />
+      {/* Top Row Standardized */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <h1 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
+            {project.name} ({project.code})
+          </h1>
+          <StatusBadge status={project.health} size="sm" />
+          <StatusBadge status={project.status} size="sm" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={isCurrentActive ? "secondary" : "outline"}
+            size="sm"
+            onClick={handleSetCurrentContext}
+            leftIcon={
+              isCurrentActive ? (
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              ) : undefined
+            }
+          >
+            {isCurrentActive ? "Active Workspace" : "Set Active"}
+          </Button>
+          {canManage && (
+            <>
+              <Link to={`/projects/${project._id}/edit`}>
+                <Button variant="outline" size="sm">Settings</Button>
+              </Link>
+              <Button
+                variant="primary"
+                size="sm"
+                leftIcon={<RotateCcw className="w-4 h-4" />}
+                onClick={() => setIsStatusModalOpen(true)}
+              >
+                Change Lifecycle
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
 
-      {/* Quick Access Module Pill Bar */}
-      <div className="flex items-center gap-2 p-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 shadow-card overflow-x-auto">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-display px-2 shrink-0">
-          Modules:
+      {/* Clean Tab Navigation */}
+      <div className="flex items-center gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-2 text-sm overflow-x-auto">
+        <span className="border-b-2 border-amber-500 text-zinc-900 dark:text-white font-semibold pb-2 -mb-2.5 shrink-0">
+          Overview
         </span>
-        <Link to={`/projects/${projectId}/phases`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<Layers className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Phases ({phases.length})
-          </Button>
+        <Link to={`/projects/${projectId}/phases`} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white pb-2 shrink-0">
+          Phases
         </Link>
-        <Link to={`/projects/${projectId}/tasks`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<CheckSquare className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Tasks & Progress
-          </Button>
+        <Link to={`/projects/${projectId}/tasks`} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white pb-2 shrink-0">
+          Tasks
         </Link>
-        <Link to={`/projects/${projectId}/milestones`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<Flag className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Milestones ({milestones.length})
-          </Button>
+        <Link to={`/projects/${projectId}/milestones`} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white pb-2 shrink-0">
+          Milestones
         </Link>
-        <Link to={`/projects/${projectId}/bom`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<Package className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            BOM Spec
-          </Button>
+        <Link to={`/projects/${projectId}/workforce`} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white pb-2 shrink-0">
+          Workforce
         </Link>
-        <Link to={`/projects/${projectId}/material-requests`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<RotateCcw className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Requisitions
-          </Button>
+        <Link to={`/projects/${projectId}/budget`} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white pb-2 shrink-0">
+          Budget
         </Link>
-        <Link to={`/projects/${projectId}/purchase-orders`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<Package className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Purchase Orders
-          </Button>
+        <Link to={`/projects/${projectId}/daily-reports`} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white pb-2 shrink-0">
+          DPR
         </Link>
-        <Link to={`/projects/${projectId}/workforce`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<Users className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Workforce
-          </Button>
+        <Link to={`/projects/${projectId}/issues`} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white pb-2 shrink-0">
+          Issues
         </Link>
-        <Link to={`/projects/${projectId}/attendance`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<Clock className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Attendance
-          </Button>
-        </Link>
-        <Link to={`/projects/${projectId}/equipment`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<Truck className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Equipment
-          </Button>
-        </Link>
-        <Link to={`/projects/${projectId}/budget`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<DollarSign className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Budget & Financials
-          </Button>
-        </Link>
-        <Link to={`/projects/${projectId}/receiving`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<CheckCircle2 className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Receiving GRN
-          </Button>
-        </Link>
-        <Link to={`/projects/${projectId}/daily-reports`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<FileText className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Daily Reports (DPR)
-          </Button>
-        </Link>
-        <Link to={`/projects/${projectId}/issues`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<AlertTriangle className="w-3.5 h-3.5 text-amber-500" />}>
-            Site Issues
-          </Button>
-        </Link>
-        <Link to={`/projects/${projectId}/reports`} className="shrink-0">
-          <Button variant="outline" size="sm" leftIcon={<BarChart3 className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />}>
-            Reports & Analytics
-          </Button>
+        <Link to={`/projects/${projectId}/reports`} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white pb-2 shrink-0">
+          Reports
         </Link>
       </div>
 
       {/* Overview Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
         <Metric
           label="Lifecycle Status"
           value={project.status}

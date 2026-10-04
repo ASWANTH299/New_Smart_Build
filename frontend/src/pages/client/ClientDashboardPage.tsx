@@ -25,6 +25,8 @@ import { Button } from "../../components/ui/Button.js";
 import { LoadingState } from "../../components/ui/LoadingState.js";
 import { EmptyState } from "../../components/ui/EmptyState.js";
 import { ErrorState } from "../../components/ui/ErrorState.js";
+import { Card } from "../../components/ui/Card.js";
+import { StatusBadge } from "../../components/ui/StatusBadge.js";
 
 export const ClientDashboardPage: React.FC = () => {
   const [projects, setProjects] = useState<ClientProjectMetadata[]>([]);
@@ -195,10 +197,9 @@ export const ClientDashboardPage: React.FC = () => {
       ) : details && project ? (
         <>
           {/* SECTION 1: Project Summary Banner with Live % Completion and Handover Date */}
-          <section id="overview" className="relative overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 sm:p-8 shadow-xl">
-            <div className="absolute top-0 right-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-brand-500/10 blur-3xl pointer-events-none" />
-
-            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <section id="overview">
+            <Card className="relative overflow-hidden">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
               {/* Left Column: Project Overview */}
               <div className="lg:col-span-7 space-y-4">
                 <div className="flex flex-wrap items-center gap-2">
@@ -305,7 +306,8 @@ export const ClientDashboardPage: React.FC = () => {
                   </div>
                 )}
               </div>
-            </div>
+              </div>
+            </Card>
           </section>
 
           {/* SECTION 2: Milestones Progress Cards with Visual Timeline/Checkmarks */}
@@ -323,41 +325,22 @@ export const ClientDashboardPage: React.FC = () => {
             </div>
 
             {milestones.length === 0 ? (
-              <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 text-center text-xs text-slate-400">
-                No client-visible milestones published yet for this project.
-              </div>
+              <EmptyState title="No milestones" description="No client-visible milestones published yet." />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {milestones.map((m, index) => {
                   const isAchieved = m.status === "ACHIEVED";
-                  const isPending = m.status === "PENDING";
                   return (
-                    <div
-                      key={m.id || index}
-                      className={`relative flex flex-col justify-between rounded-xl border p-5 transition-all duration-200 ${
-                        isAchieved
-                          ? "border-emerald-500/30 bg-emerald-950/10 hover:border-emerald-500/50"
-                          : isPending
-                          ? "border-slate-800 bg-slate-900/70 hover:border-slate-700"
-                          : "border-rose-900/30 bg-rose-950/10 hover:border-rose-800/40"
-                      }`}
-                    >
+                    <Card key={m.id || index} className="relative flex flex-col justify-between">
                       <div className="space-y-3">
-                        {/* Status Icon & Milestone Sequence */}
                         <div className="flex items-center justify-between">
-                          <span className="inline-flex items-center gap-1.5 text-xs font-mono font-medium text-slate-400">
+                          <span className="text-xs font-mono font-bold text-zinc-500 uppercase tracking-wider">
                             Stage {index + 1}
                           </span>
                           {isAchieved ? (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-xs font-semibold text-emerald-400">
-                              <CheckCircle2 className="w-3.5 h-3.5" />
-                              Achieved
-                            </span>
+                            <StatusBadge status="COMPLETED" size="sm" />
                           ) : (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 text-xs font-semibold text-amber-400">
-                              <Clock className="w-3.5 h-3.5" />
-                              In Progress
-                            </span>
+                            <StatusBadge status="PENDING" size="sm" />
                           )}
                         </div>
 
@@ -374,24 +357,18 @@ export const ClientDashboardPage: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Footer: Dates & Completion % */}
-                      <div className="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                        <span className="text-slate-400 flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                      <div className="mt-5 pt-3 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-xs">
+                        <span className="text-zinc-500 flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5" />
                           {m.actualDate
                             ? `Completed: ${new Date(m.actualDate).toLocaleDateString()}`
                             : `Target: ${new Date(m.targetDate).toLocaleDateString()}`}
                         </span>
-
-                        <span
-                          className={`font-semibold font-mono ${
-                            isAchieved ? "text-emerald-400" : "text-slate-300"
-                          }`}
-                        >
+                        <span className="font-semibold font-mono text-zinc-900 dark:text-zinc-100">
                           {m.completionPercentage}%
                         </span>
                       </div>
-                    </div>
+                    </Card>
                   );
                 })}
               </div>
@@ -420,7 +397,7 @@ export const ClientDashboardPage: React.FC = () => {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Photo Gallery Grid */}
                 <div className="lg:col-span-7 space-y-4">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                     {dailyProgress
                       .flatMap((dp) =>
                         (dp.photos || []).map((photoUrl, photoIdx) => ({
@@ -431,12 +408,12 @@ export const ClientDashboardPage: React.FC = () => {
                           id: `${dp.id}-${photoIdx}`,
                         }))
                       )
-                      .slice(0, 9)
+                      .slice(0, 12)
                       .map((item) => (
                         <div
                           key={item.id}
                           onClick={() => setPreviewPhoto(item.url)}
-                          className="group relative aspect-4/3 rounded-xl overflow-hidden border border-slate-800 bg-slate-900 cursor-pointer hover:border-brand-500/50 transition-all shadow-md"
+                          className="group relative aspect-4/3 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 cursor-pointer hover:border-brand-500 transition-all shadow-xs"
                         >
                           <img
                             src={item.url}
@@ -530,7 +507,7 @@ export const ClientDashboardPage: React.FC = () => {
               </span>
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 sm:p-8 space-y-6">
+            <Card className="space-y-6">
               {/* Financial Metrics Row */}
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 pb-6 border-b border-slate-800">
                 <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
@@ -664,7 +641,7 @@ export const ClientDashboardPage: React.FC = () => {
                   </table>
                 </div>
               </div>
-            </div>
+            </Card>
           </section>
         </>
       ) : null}
