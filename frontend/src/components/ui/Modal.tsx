@@ -50,38 +50,38 @@ export const Modal: React.FC<ModalProps> = ({
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 z-50 bg-zinc-950/50 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       />
 
       {/* Dialog Frame */}
-      <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+      <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0 z-50 relative">
         <div
           className={cn(
-            "relative transform overflow-hidden rounded-xl bg-white dark:bg-slate-900 text-left shadow-elevated transition-all duration-150 sm:my-8 w-full border border-slate-200 dark:border-slate-800",
+            "relative transform overflow-hidden bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl w-full text-left transition-all sm:my-8",
             sizeStyles[size],
             className
           )}
         >
           {title && (
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-6 py-4">
+            <div className="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
               <div>
-                <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
-                {description && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>}
+                <h3 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{title}</h3>
+                {description && <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">{description}</p>}
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
                 aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
           )}
-          <div className="px-6 py-5 text-slate-800 dark:text-slate-200">{children}</div>
+          <div className="p-5 text-xs text-zinc-600 dark:text-zinc-300 space-y-4">{children}</div>
           {footer && (
-            <div className="flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 px-6 py-3.5">
+            <div className="px-5 py-3 bg-zinc-50/60 dark:bg-zinc-950/40 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-2">
               {footer}
             </div>
           )}

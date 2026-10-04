@@ -55,20 +55,20 @@ export function DataTable<T>({
   return (
     <div
       className={cn(
-        "w-full overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-card transition-colors",
+        "w-full border border-zinc-200/90 dark:border-zinc-800/80 rounded-lg overflow-hidden bg-white dark:bg-zinc-900 shadow-xs",
         className
       )}
     >
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs sm:text-sm">
-          <thead className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-850/80 text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-display">
+          <thead className="bg-zinc-50/80 dark:bg-zinc-950/60 border-b border-zinc-200/80 dark:border-zinc-800/80">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
                   scope="col"
                   className={cn(
-                    "px-4 py-3.5",
+                    "text-[11px] font-mono font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 py-2.5 px-3.5 text-left",
                     col.align === "center" && "text-center",
                     col.align === "right" && "text-right",
                     col.className
@@ -79,7 +79,7 @@ export function DataTable<T>({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/80 bg-white dark:bg-zinc-900">
+          <tbody className="bg-white dark:bg-zinc-900">
             {data.map((row) => {
               const key = keyExtractor(row);
               return (
@@ -87,10 +87,8 @@ export function DataTable<T>({
                   key={key}
                   onClick={() => onRowClick && onRowClick(row)}
                   className={cn(
-                    "transition-colors duration-150 group",
-                    onRowClick
-                      ? "cursor-pointer hover:bg-zinc-50/90 dark:hover:bg-zinc-800/60 active:bg-zinc-100 dark:active:bg-zinc-800"
-                      : "hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30"
+                    "border-b border-zinc-100 dark:border-zinc-800/60 last:border-b-0 hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40 transition-colors",
+                    onRowClick && "cursor-pointer"
                   )}
                 >
                   {columns.map((col) => {
@@ -99,7 +97,7 @@ export function DataTable<T>({
                       <td
                         key={`${key}-${col.key}`}
                         className={cn(
-                          "px-4 py-3.5 text-zinc-800 dark:text-zinc-200 font-sans",
+                          "text-xs font-normal text-zinc-800 dark:text-zinc-200 py-3 px-3.5 align-middle",
                           col.align === "center" && "text-center",
                           col.align === "right" && "text-right",
                           col.className

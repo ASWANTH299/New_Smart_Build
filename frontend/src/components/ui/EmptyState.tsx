@@ -13,23 +13,21 @@ export interface EmptyStateProps {
 export const EmptyState: React.FC<EmptyStateProps> = ({
   title,
   description,
-  icon = <FolderOpen className="w-10 h-10 text-slate-400 dark:text-slate-500" />,
+  icon = <FolderOpen className="w-5 h-5" />,
   action,
   className,
 }) => {
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center p-8 sm:p-12 text-center bg-white dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-800 rounded-xl space-y-4 shadow-sm transition-colors duration-150",
+        "flex flex-col items-center justify-center p-8 text-center bg-white dark:bg-zinc-900 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-800",
         className
       )}
     >
-      <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-full border border-slate-100 dark:border-slate-700">{icon}</div>
-      <div className="space-y-1 max-w-sm">
-        <h4 className="text-base font-semibold text-slate-900 dark:text-slate-100">{title}</h4>
-        {description && <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{description}</p>}
-      </div>
-      {action && <div className="pt-2">{action}</div>}
+      <div className="h-10 w-10 rounded-lg flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 mb-3">{icon}</div>
+      <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-800 dark:text-zinc-200 font-mono">{title}</h4>
+      {description && <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mt-1 leading-relaxed">{description}</p>}
+      {action && <div className="mt-4">{action}</div>}
     </div>
   );
 };
