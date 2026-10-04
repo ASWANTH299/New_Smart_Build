@@ -5,6 +5,8 @@ import { AuthLayout } from "../layouts/AuthLayout.js";
 import { ClientLayout } from "../layouts/ClientLayout.js";
 import { ProtectedRoute } from "./ProtectedRoute.js";
 import { PublicRoute } from "./PublicRoute.js";
+import { useAuth } from "../hooks/useAuth.js";
+import { getDefaultRouteForRole } from "../utils/roleRouting.js";
 
 import {
   LoginPage,
@@ -58,6 +60,8 @@ import {
 } from "../pages/index.js";
 
 export const AppRoutes: React.FC = () => {
+  const { user } = useAuth();
+
   return (
     <Routes>
       {/* 1. Public Authentication & Onboarding Routes */}
@@ -96,7 +100,7 @@ export const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       >
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<Navigate to={getDefaultRouteForRole(user?.primaryRole)} replace />} />
         <Route path="/dashboard" element={<DashboardPage />} />
 
         {/* Global Tasks Direct Route */}

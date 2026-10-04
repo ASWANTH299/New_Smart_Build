@@ -3,6 +3,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.js";
 import { UserRole } from "../types/index.js";
 import { PermissionDenied } from "../components/ui/PermissionDenied.js";
+import { getDefaultRouteForRole } from "../utils/roleRouting.js";
 
 export interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -23,14 +24,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(user.primaryRole)) {
-    return (
-      <div className="py-8">
-        <PermissionDenied
-          title="Access Restricted"
-          message={`Your role (${user.primaryRole}) does not have permission to view this section.`}
-        />
-      </div>
-    );
+    return <Navigate to={getDefaultRouteForRole(user.primaryRole)} replace />;
   }
 
   if (requiredPermission && user.primaryRole !== "ADMIN" && !user.additionalPermissions?.includes(requiredPermission)) {

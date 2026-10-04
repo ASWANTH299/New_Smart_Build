@@ -6,6 +6,7 @@ import { Button } from "../../components/ui/Button.js";
 import { useAuth } from "../../hooks/useAuth.js";
 import { useToast } from "../../hooks/useToast.js";
 import authService from "../../services/authService.js";
+import { getDefaultRouteForRole } from "../../utils/roleRouting.js";
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -29,8 +30,7 @@ export const LoginPage: React.FC = () => {
       const response = await authService.login(email, password);
       if (response.success && response.data) {
         login(response.data.token, response.data.user);
-        const defaultTarget =
-          response.data.user.primaryRole === "CLIENT" ? "/client-portal" : "/dashboard";
+        const defaultTarget = getDefaultRouteForRole(response.data.user.primaryRole);
         const from =
           (location.state as { from?: { pathname: string } })?.from?.pathname || defaultTarget;
         navigate(from, { replace: true });
