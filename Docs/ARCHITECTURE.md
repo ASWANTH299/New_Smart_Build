@@ -599,6 +599,12 @@ React
  + Tailwind CSS
 ```
 
+### 14.1 UI Design System & Core Primitives
+
+- **UI Design System**: Industrial Engineering tokens (`#f8fafc`/`#090d16` canvas, `#f59e0b` Safety Amber primary, `-webkit-font-smoothing` antialiased typography, `shadow-xs` hairline depth).
+- **Core Primitives**: `Card`, `Metric` (HUD telemetry), `StatusBadge` (live pulse dots), `DataTable` (monospace headers, row striping), and `Modal`.
+- **Client Portal Alignment**: Elimination of independent styling in favor of shared component tokens.
+
 Recommended layers:
 
 ``` text
@@ -671,6 +677,8 @@ Public routes:
 /reset-password
 /activate-account
 ```
+
+The 6-role routing engine (`roleRouting.ts`) handles default route mappings for `ADMIN`, `PROJECT_MANAGER`, `SITE_ENGINEER`, `CLIENT`, `CONTRACTOR`, and `AUDITOR`. Dynamic URL tampering defense via `ProtectedRoute.tsx` provides an automatic bounce to the assigned role workspace instead of a dead-end 403.
 
 Internal routes follow the documented project structure, including:
 
@@ -756,13 +764,14 @@ Frontend pages must consistently handle:
 
 Security controls include:
 
+-   Backend security hardening: `helmet` integration, rate limiting policies (Auth: 10 req/15m; Global: 300 req/15m), and 10kb body payload protection.
 -   Password hashing
 -   JWT authentication
 -   Session expiration
 -   Account lock behavior
 -   Failed-login tracking
 -   Backend RBAC
--   Project-level authorization
+-   Project-level authorization with strict `requireProjectAccess` IDOR prevention across all sub-resource routes.
 -   Input validation
 -   Safe error responses
 -   File validation

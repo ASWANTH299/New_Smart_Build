@@ -304,8 +304,15 @@ frontend/
     ├── routes/
     ├── types/
     ├── utils/
-    └── styles/
+    ├── styles/
+    └── utils/
 ```
+
+### 8.1 UI Design System & Core Primitives
+
+- **UI Design System**: Industrial Engineering tokens (`#f8fafc`/`#090d16` canvas, `#f59e0b` Safety Amber primary, `-webkit-font-smoothing` antialiased typography, `shadow-xs` hairline depth).
+- **Core Primitives**: `Card`, `Metric` (HUD telemetry), `StatusBadge` (live pulse dots), `DataTable` (monospace headers, row striping), and `Modal`.
+- **Client Portal Alignment**: Elimination of independent styling in favor of shared component tokens.
 
 Feature-specific code should remain close to its domain where practical.
 
@@ -381,6 +388,11 @@ Authentication implementation must ensure that passwords are never stored in pla
 JWT secrets and other credentials must be supplied through environment configuration.
 
 They must never be committed to Git.
+
+### 10.1 Role Routing & Anti-Tampering
+
+The 6-role routing engine (`roleRouting.ts`) handles automatic routing to the correct workspace for `ADMIN`, `PROJECT_MANAGER`, `SITE_ENGINEER`, `CLIENT`, `CONTRACTOR`, and `AUDITOR` users post-login. 
+Dynamic URL tampering defense is provided via `ProtectedRoute.tsx` (automatic bounce to assigned role workspace instead of a dead-end 403 when users attempt to navigate to unauthorized paths).
 
 ---
 
@@ -727,6 +739,8 @@ The implementation must include:
 - Login history and failed-login lockout tracking
 - Environment-based secrets with no hardcoded credentials
 - No sensitive information in logs or API responses
+- Backend security hardening: `helmet` integration, rate limiting policies (Auth: 10 req/15m; Global: 300 req/15m), and 10kb body payload protection
+- Strict `requireProjectAccess` IDOR prevention across all sub-resource routes
 
 Sensitive values that must not appear in logs or unauthenticated responses include:
 

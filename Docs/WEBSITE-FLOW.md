@@ -232,9 +232,9 @@ Check Lock / Security Rules
    ↓
 Create Authenticated Session
    ↓
-Determine Role + Permissions
+Inspect user.role
    ↓
-Redirect to Appropriate Dashboard
+Route via getDefaultRouteForRole
 ```
 
 ### Failure cases
@@ -546,6 +546,15 @@ Provide:
 
 ```text
 You don't have permission to access this page.
+```
+
+When an authenticated user attempts to access an unauthorized route or manipulates the URL (tampering defense):
+```text
+User navigates to unauthorized path
+  ↓
+ProtectedRoute intercepts
+  ↓
+Redirects to default role dashboard
 ```
 
 Do not expose sensitive information about the protected resource.

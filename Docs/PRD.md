@@ -215,6 +215,9 @@ The platform has six primary roles.
 
 Organization-level administration.
 
+**Landing Page:** `/admin` (System Overview & Access Requests)
+**Boundary:** Organization-wide settings, user directory, global audit logs. Does not perform day-to-day project operations.
+
 Responsibilities include:
 
 - User management
@@ -232,6 +235,9 @@ Admin can grant specific additional permissions to users but cannot create new r
 ### 6.2 Project Manager
 
 Responsible for project planning and management.
+
+**Landing Page:** `/pm/dashboard` (Multi-project health & pending approvals)
+**Boundary:** Full access to assigned projects. Can approve material requests and budget changes. Cannot alter global user directory.
 
 Responsibilities include:
 
@@ -255,6 +261,9 @@ Responsibilities include:
 
 Responsible for day-to-day site operations.
 
+**Landing Page:** `/engineer/dashboard` (Active tasks, open issues, daily logs)
+**Boundary:** Strictly scoped to assigned projects. Can submit material requests and log progress. Cannot approve budgets or material issuance.
+
 Responsibilities include:
 
 - Daily site activities
@@ -273,6 +282,9 @@ Responsibilities include:
 
 Responsible for material and inventory operations.
 
+**Landing Page:** `/store/dashboard` (Low stock alerts, pending material requests)
+**Boundary:** Inventory and BOM operations. Cannot modify project phases, tasks, or workforce attendance.
+
 Responsibilities include:
 
 - Material catalog
@@ -290,6 +302,9 @@ Responsibilities include:
 
 Responsible for assigned construction work.
 
+**Landing Page:** `/contractor/dashboard` (Assigned active tasks)
+**Boundary:** Can view and update only explicitly assigned tasks/milestones on assigned projects. No access to financial/budget data.
+
 Responsibilities include:
 
 - Assigned projects
@@ -305,6 +320,9 @@ Responsibilities include:
 ### 6.6 Client
 
 The Client has a separate, simplified external-facing portal.
+
+**Landing Page:** `/client/portal` (Approved progress & milestones overview)
+**Boundary:** Read-only access to explicitly approved external-facing documents, milestones, and reports. Cannot modify operational data.
 
 Clients can:
 
@@ -1402,8 +1420,9 @@ Testing should cover:
 - Injection attempts
 - Input validation
 
-### UI
+### UI / UX
 
+- High-density Industrial SaaS interface targeting field and project office productivity (replacing generic dashboard forms).
 - Forms
 - Navigation
 - Role-specific screens
