@@ -19,6 +19,7 @@ const configSchema = z.object({
   CLIENT_URL: z.string().url("CLIENT_URL must be a valid URL"),
   STORAGE_PATH: z.string().min(1, "STORAGE_PATH cannot be empty"),
   LOG_LEVEL: z.enum(["error", "warn", "info", "http", "debug"]),
+  CORS_ORIGIN: z.string().optional(),
 });
 
 export type Config = z.infer<typeof configSchema>;
@@ -50,6 +51,7 @@ export const config: Config = ((): Config => {
         CLIENT_URL: "http://localhost:5173",
         STORAGE_PATH: "./storage_test",
         LOG_LEVEL: "info",
+        CORS_ORIGIN: "http://localhost:5173",
       };
     }
     throw error;

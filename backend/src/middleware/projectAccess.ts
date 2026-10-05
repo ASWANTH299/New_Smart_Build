@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ProjectMembershipModel, IProjectMembership } from "../modules/auth/projectMembership.model.js";
-import { ForbiddenError, UnauthorizedError, BadRequestError } from "../utils/AppError.js";
+import { UnauthorizedError, BadRequestError } from "../utils/AppError.js";
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -13,7 +13,7 @@ declare global {
 }
 
 export const requireProjectAccess = (paramName = "projectId") => {
-  return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const user = req.user;
       if (!user) {
@@ -44,9 +44,11 @@ export const requireProjectAccess = (paramName = "projectId") => {
       }).exec();
 
       if (!membership) {
-        throw new ForbiddenError(
-          "Access denied. You do not have active membership or authorization for this project."
-        );
+        res.status(403).json({
+          success: false,
+          message: "Access denied: You are not assigned to this project.",
+        });
+        return;
       }
 
       req.projectMembership = membership;

@@ -48,24 +48,24 @@ router.post(
 );
 
 // Nested resource routes with project isolation
-router.use("/:projectId/phases", phaseRoutes);
-router.use("/:projectId/tasks", taskRoutes);
-router.use("/:projectId/milestones", milestoneRoutes);
-router.use("/:projectId/progress", progressRoutes);
-router.use("/:projectId/bom", bomRoutes);
-router.use("/:projectId/material-requests", materialRequestRoutes);
-router.use("/:projectId/procurement-requests", procurementRequestRouter);
-router.use("/:projectId/purchase-orders", purchaseOrderRouter);
-router.use("/:projectId/receiving", receivingRouter);
-router.use("/:projectId/workforce", projectWorkforceRouter);
-router.use("/:projectId/attendance", attendanceRouter);
-router.use("/:projectId/equipment", projectEquipmentRouter);
-router.use("/:projectId/budget", budgetRouter);
-router.use("/:projectId/expenses", expenseRouter);
-router.use("/:projectId/budget-change-requests", budgetChangeRequestRouter);
-router.use("/:projectId/daily-reports", dailyReportRouter);
-router.use("/:projectId/issues", issueRouter);
-router.use("/:projectId/reports", reportRouter);
+router.use("/:projectId/phases", requireProjectAccess("projectId"), phaseRoutes);
+router.use("/:projectId/tasks", requireProjectAccess("projectId"), taskRoutes);
+router.use("/:projectId/milestones", requireProjectAccess("projectId"), milestoneRoutes);
+router.use("/:projectId/progress", requireProjectAccess("projectId"), progressRoutes);
+router.use("/:projectId/bom", requireProjectAccess("projectId"), bomRoutes);
+router.use("/:projectId/material-requests", requireProjectAccess("projectId"), materialRequestRoutes);
+router.use("/:projectId/procurement-requests", requireProjectAccess("projectId"), procurementRequestRouter);
+router.use("/:projectId/purchase-orders", requireProjectAccess("projectId"), purchaseOrderRouter);
+router.use("/:projectId/receiving", requireProjectAccess("projectId"), receivingRouter);
+router.use("/:projectId/workforce", requireProjectAccess("projectId"), projectWorkforceRouter);
+router.use("/:projectId/attendance", requireProjectAccess("projectId"), attendanceRouter);
+router.use("/:projectId/equipment", requireProjectAccess("projectId"), projectEquipmentRouter);
+router.use("/:projectId/budget", requireProjectAccess("projectId"), budgetRouter);
+router.use("/:projectId/expenses", requireProjectAccess("projectId"), expenseRouter);
+router.use("/:projectId/budget-change-requests", requireProjectAccess("projectId"), budgetChangeRequestRouter);
+router.use("/:projectId/daily-reports", requireProjectAccess("projectId"), dailyReportRouter);
+router.use("/:projectId/issues", requireProjectAccess("projectId"), issueRouter);
+router.use("/:projectId/reports", requireProjectAccess("projectId"), reportRouter);
 
 // Project-scoped direct routes (with membership check)
 router.get("/:projectId", requireProjectAccess("projectId"), (req, res, next) =>

@@ -163,7 +163,9 @@ export class ClientService {
         .exec();
 
       const isClientOwner =
-        project.clientUserId && project.clientUserId.toString() === clientId.toString();
+        (project.clientUserId && project.clientUserId.toString() === clientId.toString()) ||
+        ((project as any).clientId && (project as any).clientId.toString() === clientId.toString()) ||
+        ((project as any).clientOwnerId && (project as any).clientOwnerId.toString() === clientId.toString());
 
       if (!membership && !isClientOwner) {
         throw new ForbiddenError("You do not have permission to view this project");
